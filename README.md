@@ -1,22 +1,79 @@
 # Olist Brazilian E-Commerce Analytics
 
-An end-to-end data engineering project that transforms raw e-commerce data into actionable business insights using modern data stack tools.
+An advanced SQL analytics project demonstrating production-grade data modeling patterns including RFM segmentation, cohort analysis, customer lifetime value, and funnel optimization — built with dbt, Snowflake, and Power BI.
 
 ## Overview
 
-This project builds a complete analytics pipeline for the [Olist Brazilian E-Commerce dataset](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce) from Kaggle. The dataset contains information about 100k orders made at multiple marketplaces in Brazil from 2016 to 2018.
+This project builds a complete analytics pipeline for the [Olist Brazilian E-Commerce dataset](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce) from Kaggle, containing 100k orders from Brazilian marketplaces (2016-2018).
+
+Beyond basic reporting, this project showcases **advanced SQL patterns** used by data teams at top companies to drive real business decisions — customer segmentation, revenue attribution, churn prediction, and operational optimization.
 
 ## Key Analytics Questions
 
-This pipeline enables answering business questions like:
+### Customer Segmentation (RFM Analysis)
+- How can we segment customers into actionable groups (Champions, At-Risk, Lost) based on purchase behavior?
+- Which customer segments should marketing prioritize for retention vs. re-activation campaigns?
+- What is the revenue contribution of each RFM segment?
 
-- What is the revenue trend over time?
-- Which product categories perform best?
-- What is the geographic distribution of sales?
-- How do different payment methods perform?
-- What is the average delivery time vs. estimate?
-- Which sellers have the highest performance?
-- What drives customer satisfaction (review scores)?
+### Customer Lifetime Value (CLV)
+- What is the predicted lifetime value of customers acquired this quarter?
+- How does CLV vary across customer segments and acquisition channels?
+- Which customer cohorts have the highest ROI potential?
+
+### Pareto Analysis (80/20 Rule)
+- Which 20% of products generate 80% of revenue?
+- Which customers drive the majority of sales volume?
+- What percentage of sellers account for most marketplace GMV?
+
+### Funnel & Conversion Analysis
+- What is the conversion rate from order placement to delivery confirmation?
+- Where are the biggest drop-offs in the customer journey?
+- How does review submission rate correlate with delivery performance?
+
+### Cohort Analysis
+- How does purchasing behavior differ between monthly acquisition cohorts?
+- What is the retention curve for customers acquired in each quarter?
+- Do newer cohorts show improving or declining engagement trends?
+
+### Churn Prediction Indicators
+- Which customers haven't purchased in 90+ days but were previously active?
+- What behavioral signals indicate a customer is at risk of churning?
+- What is our customer reactivation rate after dormancy?
+
+### Market Basket Analysis
+- Which products are frequently purchased together?
+- What cross-sell opportunities exist based on co-purchase patterns?
+- How can we optimize product bundling recommendations?
+
+### Time Intelligence & Trends
+- What is the month-over-month and year-over-year revenue growth?
+- How do 7-day and 30-day moving averages reveal sales trends?
+- What seasonal patterns exist in purchasing behavior?
+
+### Seller Performance Scoring
+- How can we rank sellers using a composite score (delivery time, reviews, volume)?
+- Which sellers consistently underperform on delivery estimates?
+- What is the correlation between seller ratings and repeat purchases?
+
+### Geographic Performance
+- Which regions have the highest average order value?
+- How does delivery performance vary by customer location?
+- Where are the untapped market opportunities?
+
+## Advanced SQL Patterns
+
+| Pattern | Business Value | Key SQL Features |
+|---------|----------------|------------------|
+| RFM Analysis | Customer segmentation | `NTILE()`, `CASE WHEN` scoring |
+| Pareto Analysis | Focus on high-impact items | `SUM() OVER`, cumulative percentages |
+| Customer Lifetime Value | Revenue forecasting | Cohort averages, predictive aggregations |
+| Funnel Analysis | Conversion optimization | `COUNT(CASE WHEN...)`, stage ratios |
+| Cohort Analysis | Retention tracking | `DATE_TRUNC`, cohort pivots |
+| Market Basket | Cross-sell opportunities | Self-joins, co-occurrence matrices |
+| Churn Indicators | Proactive retention | `DATEDIFF`, `LAG()`, behavioral flags |
+| Time Intelligence | Trend analysis | `LAG()`, moving averages, YoY/MoM |
+| Seller Scoring | Vendor management | `PERCENT_RANK()`, weighted composites |
+| Geo Performance | Regional strategy | Location-based aggregations |
 
 ## Architecture
 
