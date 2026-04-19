@@ -106,6 +106,7 @@ The Olist dataset includes:
 ```
 ecommerce-retail-analytics-dbt-snowflake/
 ├── README.md                   # Project overview (this file)
+├── INSTALLATION.md             # Setup and installation guide
 ├── INSTRUCTIONS.md             # Detailed execution guide
 │
 └── olist-retail-analytics/
@@ -129,108 +130,27 @@ ecommerce-retail-analytics-dbt-snowflake/
         └── seeds/
 ```
 
-## Setup
-
-### Prerequisites
-
-- Python 3.12 (dbt doesn't support Python 3.13+ yet)
-- [uv](https://docs.astral.sh/uv/) - Fast Python package manager
-- Snowflake account with key-pair authentication
-- Kaggle account (for data download)
-
-### 1. Clone the Repository
+## Quick Start
 
 ```bash
+# Clone the repository
 git clone https://github.com/musatouray/ecommerce-retail-analytics-dbt-snowflake.git
 cd ecommerce-retail-analytics-dbt-snowflake/olist-retail-analytics
-```
 
-### 2. Install Python 3.12 and Dependencies
-
-```bash
-# Install Python 3.12 via uv
-uv python install 3.12
-
-# Create virtual environment with Python 3.12
+# Install dependencies (requires uv and Python 3.12)
 uv venv --python 3.12
-
-# Install dependencies
 uv sync
-```
 
-### 3. Configure Environment Variables
-
-```bash
-# Copy the example file
+# Configure environment
 cp .env.example .env
-
 # Edit .env with your credentials
-```
 
-### 4. Set Up Snowflake Key-Pair Authentication
-
-Generate an RSA key pair:
-
-```bash
-# Create directory for keys
-mkdir ~/.snowflake
-cd ~/.snowflake
-
-# Generate private key (without passphrase)
-openssl genrsa -out rsa_key_temp.pem 2048
-openssl pkcs8 -topk8 -inform PEM -in rsa_key_temp.pem -out rsa_key.p8 -nocrypt
-rm rsa_key_temp.pem
-
-# Or with passphrase (more secure)
-openssl genrsa -out rsa_key_temp.pem 2048
-openssl pkcs8 -topk8 -inform PEM -in rsa_key_temp.pem -out rsa_key.p8 -v2 aes256
-rm rsa_key_temp.pem
-
-# Generate public key
-openssl rsa -in rsa_key.p8 -pubout -out rsa_key.pub
-```
-
-Assign the public key to your Snowflake user:
-
-```sql
--- In Snowflake, run:
-ALTER USER YOUR_USERNAME SET RSA_PUBLIC_KEY='your_public_key_content_here';
-```
-
-### 5. Configure dbt Profile
-
-Create `~/.dbt/profiles.yml`:
-
-```yaml
-olist_retail_analytics:
-  target: dev
-  outputs:
-    dev:
-      type: snowflake
-      threads: 16
-      account: "{{ env_var('SNOWFLAKE_ACCOUNT') }}"
-      user: "{{ env_var('SNOWFLAKE_USER') }}"
-      database: "{{ env_var('SNOWFLAKE_DATABASE') }}"
-      warehouse: "{{ env_var('SNOWFLAKE_WAREHOUSE') }}"
-      schema: "{{ env_var('SNOWFLAKE_SCHEMA') }}"
-      role: "{{ env_var('SNOWFLAKE_ROLE') }}"
-      private_key_path: ~/.snowflake/rsa_key.p8
-      private_key_passphrase: "{{ env_var('SNOWFLAKE_PRIVATE_KEY_PASSPHRASE') }}"  # if using passphrase
-```
-
-### 6. Verify Connection
-
-```bash
-# Activate virtual environment
-# Windows PowerShell:
-.venv\Scripts\Activate.ps1
-# Linux/Mac:
-source .venv/bin/activate
-
-# Load environment variables and test
+# Test connection
 cd dbt
 dbt debug
 ```
+
+For detailed setup instructions including Snowflake key-pair authentication, see **[INSTALLATION.md](INSTALLATION.md)**.
 
 ## Key Analytics Questions
 
