@@ -1,0 +1,13 @@
+name: 'olist_retail_analytics'
+version: '1.0.0'
+
+profile: 'olist_retail_analytics'
+
+model-paths: ["models"]
+seed-paths: ["seeds"]
+test-paths: ["tests"]
+macro-paths: ["macros"]
+
+clean-targets:
+  - "target"
+  - "dbt_packages"
