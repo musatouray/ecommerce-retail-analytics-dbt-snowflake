@@ -1,4 +1,4 @@
-# Olist Brazilian E-Commerce Analytics
+# E-Commerce Analytics
 
 An advanced SQL analytics project demonstrating production-grade data modeling patterns including RFM segmentation, cohort analysis, customer lifetime value, and funnel optimization — built with dbt, Snowflake, and Power BI.
 
