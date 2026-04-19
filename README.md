@@ -6,6 +6,18 @@ An end-to-end data engineering project that transforms raw e-commerce data into 
 
 This project builds a complete analytics pipeline for the [Olist Brazilian E-Commerce dataset](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce) from Kaggle. The dataset contains information about 100k orders made at multiple marketplaces in Brazil from 2016 to 2018.
 
+## Key Analytics Questions
+
+This pipeline enables answering business questions like:
+
+- What is the revenue trend over time?
+- Which product categories perform best?
+- What is the geographic distribution of sales?
+- How do different payment methods perform?
+- What is the average delivery time vs. estimate?
+- Which sellers have the highest performance?
+- What drives customer satisfaction (review scores)?
+
 ## Architecture
 
 ```
@@ -151,18 +163,6 @@ dbt debug
 ```
 
 For detailed setup instructions including Snowflake key-pair authentication, see **[INSTALLATION.md](INSTALLATION.md)**.
-
-## Key Analytics Questions
-
-This pipeline enables answering questions like:
-
-- What is the revenue trend over time?
-- Which product categories perform best?
-- What is the geographic distribution of sales?
-- How do different payment methods perform?
-- What is the average delivery time vs. estimate?
-- Which sellers have the highest performance?
-- What drives customer satisfaction (review scores)?
 
 ## License
 
