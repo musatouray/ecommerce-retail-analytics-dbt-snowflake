@@ -204,21 +204,6 @@ ecommerce-retail-analytics-dbt-snowflake/
 ```bash
 # Clone the repository
 git clone https://github.com/musatouray/ecommerce-retail-analytics-dbt-snowflake.git
-cd ecommerce-retail-analytics-dbt-snowflake/olist-retail-analytics
-
-# Install dependencies (requires uv and Python 3.12)
-uv venv --python 3.12
-uv sync
-
-# Configure environment
-cp .env.example .env
-# Edit .env with your credentials
-
-# Test connection
-cd dbt
-dbt debug
-```
-
 For detailed setup instructions including Snowflake key-pair authentication, see **[INSTALLATION.md](INSTALLATION.md)**.
 
 ## License
