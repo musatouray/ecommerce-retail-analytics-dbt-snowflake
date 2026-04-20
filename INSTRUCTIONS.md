@@ -1,6 +1,6 @@
 # Setup and Execution Instructions
 
-Step-by-step guide to build the Olist E-Commerce Analytics pipeline.
+Step-by-step guide to build the E-Commerce Analytics pipeline.
 
 ## Prerequisites
 
