@@ -43,8 +43,4 @@ CREATE USER IF NOT EXISTS DBT_SERVICE_USER
 
 GRANT ROLE LEAD_DATA_ENGINEER_ROLE TO USER DBT_SERVICE_USER;
 
--- =================================================
--- ASSIGN ROLE TO YOUR USER (optional)
--- =================================================
--- Uncomment and replace with your username if needed:
--- GRANT ROLE LEAD_DATA_ENGINEER_ROLE TO USER YOUR_USERNAME;
+

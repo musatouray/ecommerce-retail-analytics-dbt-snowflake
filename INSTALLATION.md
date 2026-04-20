@@ -11,7 +11,7 @@
 
 ```bash
 git clone https://github.com/musatouray/ecommerce-retail-analytics-dbt-snowflake.git
-cd ecommerce-retail-analytics-dbt-snowflake/olist-retail-analytics
+cd ecommerce-retail-analytics-dbt-snowflake/ecommerce-retail-analytics
 ```
 
 ## 2. Install Python 3.12 and Dependencies
@@ -100,7 +100,7 @@ openssl rsa -in rsa_key.p8 -pubout -out rsa_key.pub
 Create `~/.dbt/profiles.yml`:
 
 ```yaml
-olist_retail_analytics:
+ecommerce_retail_analytics:
   target: dev
   outputs:
     dev:

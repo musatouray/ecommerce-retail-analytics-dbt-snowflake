@@ -29,13 +29,13 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 ### 1.2 Create Project Structure
 
 ```bash
-mkdir olist-retail-analytics
-cd olist-retail-analytics
+mkdir ecommerce-retail-analytics
+cd ecommerce-retail-analytics
 
 # Create directory structure
 mkdir -p scripts
 mkdir -p data/raw
-mkdir -p dbt_project/models/staging/olist
+mkdir -p dbt_project/models/staging/ecommerce
 mkdir -p dbt_project/models/intermediate
 mkdir -p dbt_project/models/marts/core
 mkdir -p dbt_project/models/marts/finance
@@ -51,7 +51,7 @@ Create `pyproject.toml`:
 
 ```toml
 [project]
-name = "olist-retail-analytics"
+name = "ecommerce-retail-analytics"
 version = "0.1.0"
 requires-python = ">=3.10"
 dependencies = [
@@ -79,8 +79,8 @@ SNOWFLAKE_ACCOUNT=your_account.region
 SNOWFLAKE_USER=your_username
 SNOWFLAKE_PASSWORD=your_password
 SNOWFLAKE_ROLE=ACCOUNTADMIN
-SNOWFLAKE_WAREHOUSE=OLIST_WH
-SNOWFLAKE_DATABASE=OLIST_ANALYTICS
+SNOWFLAKE_WAREHOUSE=ECOMMERCE_WH
+SNOWFLAKE_DATABASE=ECOMMERCE_ANALYTICS
 SNOWFLAKE_SCHEMA=RAW
 
 # Kaggle (optional if using kaggle.json)
@@ -163,14 +163,14 @@ Run this SQL in Snowflake worksheet:
 
 ```sql
 -- Create warehouse
-CREATE WAREHOUSE IF NOT EXISTS OLIST_WH
+CREATE WAREHOUSE IF NOT EXISTS ECOMMERCE_WH
     WAREHOUSE_SIZE = 'X-SMALL'
     AUTO_SUSPEND = 60
     AUTO_RESUME = TRUE;
 
 -- Create database and schemas
-CREATE DATABASE IF NOT EXISTS OLIST_ANALYTICS;
-USE DATABASE OLIST_ANALYTICS;
+CREATE DATABASE IF NOT EXISTS ECOMMERCE_ANALYTICS;
+USE DATABASE ECOMMERCE_ANALYTICS;
 
 CREATE SCHEMA IF NOT EXISTS RAW;
 CREATE SCHEMA IF NOT EXISTS STAGING;
@@ -212,7 +212,7 @@ uv run python scripts/load_to_snowflake.py
 ### 3.4 Verify Data in Snowflake
 
 ```sql
-USE OLIST_ANALYTICS.RAW;
+USE ECOMMERCE_ANALYTICS.RAW;
 SELECT 'orders' as table_name, COUNT(*) as row_count FROM orders
 UNION ALL SELECT 'customers', COUNT(*) FROM customers
 UNION ALL SELECT 'products', COUNT(*) FROM products;
@@ -227,11 +227,11 @@ UNION ALL SELECT 'products', COUNT(*) FROM products;
 Create `dbt_project/dbt_project.yml`:
 
 ```yaml
-name: 'olist_analytics'
+name: 'ecommerce_analytics'
 version: '1.0.0'
 config-version: 2
 
-profile: 'olist_analytics'
+profile: 'ecommerce_analytics'
 
 model-paths: ["models"]
 test-paths: ["tests"]
@@ -239,7 +239,7 @@ macro-paths: ["macros"]
 seed-paths: ["seeds"]
 
 models:
-  olist_analytics:
+  ecommerce_analytics:
     staging:
       +schema: staging
       +materialized: view
@@ -256,7 +256,7 @@ models:
 Create `~/.dbt/profiles.yml` (or `dbt_project/profiles.yml`):
 
 ```yaml
-olist_analytics:
+ecommerce_analytics:
   target: dev
   outputs:
     dev:
@@ -266,7 +266,7 @@ olist_analytics:
       password: "{{ env_var('SNOWFLAKE_PASSWORD') }}"
       role: "{{ env_var('SNOWFLAKE_ROLE') }}"
       warehouse: "{{ env_var('SNOWFLAKE_WAREHOUSE') }}"
-      database: OLIST_ANALYTICS
+      database: ECOMMERCE_ANALYTICS
       schema: STAGING
       threads: 4
 ```
@@ -295,10 +295,10 @@ uv run dbt deps
 
 ### 5.1 Create Sources
 
-Create `dbt_project/models/staging/olist/_sources.yml`:
+Create `dbt_project/models/staging/ecommerce/_sources.yml`:
 
 **Define sources for all 9 RAW tables with:**
-- Database: OLIST_ANALYTICS
+- Database: ECOMMERCE_ANALYTICS
 - Schema: RAW
 - Column descriptions
 
@@ -308,14 +308,14 @@ Create one staging model per source table:
 
 | Model | Purpose |
 |-------|---------|
-| `stg_olist__orders.sql` | Standardize timestamps, clean status |
-| `stg_olist__customers.sql` | Clean city/state names |
-| `stg_olist__order_items.sql` | Cast prices, add total_item_value |
-| `stg_olist__order_payments.sql` | Standardize payment types |
-| `stg_olist__order_reviews.sql` | Parse timestamps |
-| `stg_olist__products.sql` | Join with translation table |
-| `stg_olist__sellers.sql` | Clean city/state names |
-| `stg_olist__geolocation.sql` | Deduplicate by zip code |
+| `stg_ecommerce__orders.sql` | Standardize timestamps, clean status |
+| `stg_ecommerce__customers.sql` | Clean city/state names |
+| `stg_ecommerce__order_items.sql` | Cast prices, add total_item_value |
+| `stg_ecommerce__order_payments.sql` | Standardize payment types |
+| `stg_ecommerce__order_reviews.sql` | Parse timestamps |
+| `stg_ecommerce__products.sql` | Join with translation table |
+| `stg_ecommerce__sellers.sql` | Clean city/state names |
+| `stg_ecommerce__geolocation.sql` | Deduplicate by zip code |
 
 ### 5.3 Create Intermediate Models
 
@@ -379,12 +379,12 @@ uv run dbt docs serve
 1. Open Power BI Desktop
 2. Get Data → Snowflake
 3. Server: `your_account.snowflakecomputing.com`
-4. Warehouse: `OLIST_WH`
+4. Warehouse: `ECOMMERCE_WH`
 5. Sign in with Snowflake credentials
 
 ### 6.2 Import Tables
 
-From `OLIST_ANALYTICS.MARTS` schema:
+From `ECOMMERCE_ANALYTICS.MARTS` schema:
 - fct_orders
 - fct_daily_revenue
 - fct_category_performance

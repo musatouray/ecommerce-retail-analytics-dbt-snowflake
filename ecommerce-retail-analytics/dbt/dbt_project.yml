@@ -1,7 +1,7 @@
-name: 'olist_retail_analytics'
+name: 'ecommerce_retail_analytics'
 version: '1.0.0'
 
-profile: 'olist_retail_analytics'
+profile: 'ecommerce_retail_analytics'
 
 model-paths: ["models"]
 seed-paths: ["seeds"]
