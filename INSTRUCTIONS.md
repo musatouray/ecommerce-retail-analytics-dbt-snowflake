@@ -298,7 +298,7 @@ uv run dbt deps
 Create `dbt_project/models/staging/ecommerce/_sources.yml`:
 
 **Define sources for all 9 RAW tables with:**
-- Database: ECOMMERCE_ANALYTICS
+- Database: ECOMMERCE_RETAIL_DB
 - Schema: RAW
 - Column descriptions
 

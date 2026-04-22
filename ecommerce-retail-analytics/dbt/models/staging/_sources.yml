@@ -1,0 +1,214 @@
+# Source generation for raw data tables
+# Data integrity tests: Add generic tests like not null, unique, accepted values, relationships
+version: 2
+
+sources:
+  - name: raw
+    database: "{{ target.database }}"
+    schema: "{{ target.schema }}"
+    description: "Source definitions for staging models in ecommerce_retail_analytics project."
+
+    tables:
+      - name: customers
+        description: ""
+        columns:
+          - name: customer_id
+            data_type: varchar
+            description: "primary key for customers table"
+            data_tests:
+              - not_null
+              - unique
+          - name: customer_unique_id
+            data_type: varchar
+            description: ""
+          - name: customer_zip_code_prefix
+            data_type: number
+            description: ""
+          - name: customer_city
+            data_type: varchar
+            description: ""
+          - name: customer_state
+            data_type: varchar
+            description: ""
+
+      - name: geolocation
+        description: ""
+        columns:
+          - name: geolocation_zip_code_prefix
+            data_type: number
+            description: ""
+          - name: geolocation_lat
+            data_type: float
+            description: ""
+          - name: geolocation_lng
+            data_type: float
+            description: ""
+          - name: geolocation_city
+            data_type: varchar
+            description: ""
+          - name: geolocation_state
+            data_type: varchar
+            description: ""
+
+      - name: order_items
+        description: ""
+        columns:
+          - name: order_id
+            data_type: varchar
+            description: ""
+          - name: order_item_id
+            data_type: number
+            description: ""
+          - name: product_id
+            data_type: varchar
+            description: ""
+          - name: seller_id
+            data_type: varchar
+            description: ""
+          - name: shipping_limit_date
+            data_type: varchar
+            description: ""
+          - name: price
+            data_type: float
+            description: ""
+          - name: freight_value
+            data_type: float
+            description: ""
+
+      - name: order_payments
+        description: ""
+        columns:
+          - name: order_id
+            data_type: varchar
+            description: ""
+          - name: payment_sequential
+            data_type: number
+            description: ""
+          - name: payment_type
+            data_type: varchar
+            description: ""
+          - name: payment_installments
+            data_type: number
+            description: ""
+          - name: payment_value
+            data_type: float
+            description: ""
+
+      - name: order_reviews
+        description: ""
+        columns:
+          - name: review_id
+            data_type: varchar
+            description: ""
+          - name: order_id
+            data_type: varchar
+            description: ""
+          - name: review_score
+            data_type: number
+            description: ""
+          - name: review_comment_title
+            data_type: varchar
+            description: ""
+          - name: review_comment_message
+            data_type: varchar
+            description: ""
+          - name: review_creation_date
+            data_type: varchar
+            description: ""
+          - name: review_answer_timestamp
+            data_type: varchar
+            description: ""
+
+      - name: orders
+        description: "Order header information"
+        columns:
+          - name: order_id
+            data_type: varchar
+            description: "Primary key for orders table"
+            data_tests:
+              - not_null
+              - unique
+          - name: customer_id
+            data_type: varchar
+            description: ""
+          - name: order_status
+            data_type: varchar
+            description: ""
+          - name: order_purchase_timestamp
+            data_type: varchar
+            description: ""
+          - name: order_approved_at
+            data_type: varchar
+            description: ""
+          - name: order_delivered_carrier_date
+            data_type: varchar
+            description: ""
+          - name: order_delivered_customer_date
+            data_type: varchar
+            description: ""
+          - name: order_estimated_delivery_date
+            data_type: varchar
+            description: ""
+
+      - name: product_category_translation
+        description: ""
+        columns:
+          - name: product_category_name
+            data_type: varchar
+            description: ""
+          - name: product_category_name_english
+            data_type: varchar
+            description: ""
+
+      - name: products
+        description: "Product catalog"
+        columns:
+          - name: product_id
+            data_type: varchar
+            description: "Primary key for products table"
+            data_tests:
+              - not_null
+              - unique
+          - name: product_category_name
+            data_type: varchar
+            description: ""
+          - name: product_name_lenght
+            data_type: float
+            description: ""
+          - name: product_description_lenght
+            data_type: float
+            description: ""
+          - name: product_photos_qty
+            data_type: float
+            description: ""
+          - name: product_weight_g
+            data_type: float
+            description: ""
+          - name: product_length_cm
+            data_type: float
+            description: ""
+          - name: product_height_cm
+            data_type: float
+            description: ""
+          - name: product_width_cm
+            data_type: float
+            description: ""
+
+      - name: sellers
+        description: "Seller information"
+        columns:
+          - name: seller_id
+            data_type: varchar
+            description: "Primary key for sellers table"
+            data_tests:
+              - not_null
+              - unique
+          - name: seller_zip_code_prefix
+            data_type: number
+            description: ""
+          - name: seller_city
+            data_type: varchar
+            description: ""
+          - name: seller_state
+            data_type: varchar
+            description: ""

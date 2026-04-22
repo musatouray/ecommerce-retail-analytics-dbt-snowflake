@@ -1,0 +1,8 @@
+# VS Code settings (contains credentials)
+.vscode/
+
+# Claude Code
+.claude/
+
+# Logs
+logs/
