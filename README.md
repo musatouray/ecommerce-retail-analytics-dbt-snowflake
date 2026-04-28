@@ -166,9 +166,10 @@ The Olist dataset includes:
 - `fct_payment_analysis` - Grain: one row per payment type per month
 
 **Dimension Tables:**
-- `dim_customers` - Customer attributes and lifetime metrics
-- `dim_products` - Product catalog with categories
-- `dim_sellers` - Seller information and performance tiers
+- `dim_customers` - Customer attributes and location
+- `dim_dates` - Date dimension with calendar attributes
+- `dim_products` - Product catalog with English categories
+- `dim_sellers` - Seller information and location
 
 ## Project Structure
 
@@ -193,7 +194,10 @@ ecommerce-retail-analytics-dbt-snowflake/
         ├── models/
         │   ├── staging/        # Staging models + sources.yml
         │   ├── intermediate/   # Enriched models
-        │   └── marts/          # Fact and dimension tables
+        │   └── marts/
+        │       ├── core/       # Shared dimensions & facts
+        │       ├── finance/    # Revenue & payment analytics
+        │       └── marketing/  # Category & geo analytics
         ├── macros/
         ├── tests/
         └── seeds/

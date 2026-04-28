@@ -73,7 +73,8 @@ ecommerce-retail-analytics-dbt-snowflake/
         ├── packages.yml           # dbt_utils, audit_helper, codegen
         │
         ├── macros/
-        │   └── generate_schema_name.sql  # Custom schema naming
+        │   ├── generate_schema_name.sql  # Custom schema naming
+        │   └── generate_date_spine.sql   # Date spine generator for dim_dates
         │
         └── models/
             ├── staging/           # Clean and type raw data
@@ -87,7 +88,19 @@ ecommerce-retail-analytics-dbt-snowflake/
             │   ├── int_orders_enriched.sql
             │   └── int_order_items_enriched.sql
             │
-            └── marts/             # Fact and dimension tables (TODO)
+            └── marts/             # Fact and dimension tables
+                ├── core/          # Shared dimensions & facts
+                │   ├── dim_customers.sql
+                │   ├── dim_dates.sql
+                │   ├── dim_products.sql
+                │   ├── dim_sellers.sql
+                │   └── fct_orders.sql
+                ├── finance/       # Revenue & payment analytics
+                │   ├── fct_daily_revenue.sql
+                │   └── fct_payment_analysis.sql
+                └── marketing/     # Category & geo analytics
+                    ├── fct_category_performance.sql
+                    └── fct_geo_performance.sql
 ```
 
 ## Snowflake Configuration
@@ -105,7 +118,9 @@ ecommerce-retail-analytics-dbt-snowflake/
 | `RAW` | Source data from Kaggle CSV | Tables |
 | `STAGING` | Cleaned, typed, deduplicated | Views |
 | `INTERMEDIATE` | Joined and enriched | Views |
-| `MARTS` | Fact and dimension tables | Tables |
+| `MARTS_CORE` | Shared dimensions & facts | Tables |
+| `MARTS_FINANCE` | Revenue & payment analytics | Tables |
+| `MARTS_MARKETING` | Category & geo analytics | Tables |
 
 ## dbt Conventions
 
@@ -210,12 +225,45 @@ select * from renamed
 | int_orders_enriched | order_id | Orders joined with customers, aggregated items/payments/reviews. Excludes canceled/unavailable orders. |
 | int_order_items_enriched | (order_id, order_item_id) | Order items joined with orders, products, sellers. Includes English category names. |
 
+## Mart Models
+
+### Core (MARTS_CORE schema)
+
+| Model | Grain | Description |
+|-------|-------|-------------|
+| dim_customers | customer_unique_id | Customer dimension with attributes and location |
+| dim_dates | date | Date dimension generated from order date range |
+| dim_products | product_id | Product dimension with English category names |
+| dim_sellers | seller_id | Seller dimension with location |
+| fct_orders | order_id | Order fact table with metrics |
+
+### Finance (MARTS_FINANCE schema)
+
+| Model | Grain | Description |
+|-------|-------|-------------|
+| fct_daily_revenue | date | Daily revenue aggregates |
+| fct_payment_analysis | payment_type, month | Payment method performance by month |
+
+### Marketing (MARTS_MARKETING schema)
+
+| Model | Grain | Description |
+|-------|-------|-------------|
+| fct_category_performance | category, month | Category sales metrics by month |
+| fct_geo_performance | state, month | Geographic performance by month |
+
+## Custom Macros
+
+| Macro | Purpose |
+|-------|---------|
+| `generate_schema_name` | Uses schema names directly without appending to target |
+| `get_order_date_spine` | Generates date spine from min/max order dates using dbt_utils.date_spine |
+
 ## Testing Strategy
 
 - **Sources**: Basic integrity (not_null, unique on PKs)
 - **Staging**: Full coverage (not_null, unique, relationships, accepted_values, composite key tests)
 - **Intermediate**: Key validation (not_null, unique on grain, composite key tests)
-- **Marts**: Business logic validation (TODO)
+- **Marts**: Primary key validation (not_null, unique on grain)
 
 ## Known Data Issues
 

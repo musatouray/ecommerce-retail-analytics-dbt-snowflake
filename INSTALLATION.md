@@ -7,6 +7,19 @@
 - Snowflake account with key-pair authentication
 - Kaggle account (for data download)
 
+## Snowflake Schemas
+
+This project uses the following schemas:
+
+| Schema | Purpose |
+|--------|---------|
+| `RAW` | Source data from Kaggle CSV |
+| `STAGING` | Cleaned, typed staging views |
+| `INTERMEDIATE` | Joined and enriched views |
+| `MARTS_CORE` | Shared dimensions & facts |
+| `MARTS_FINANCE` | Revenue & payment analytics |
+| `MARTS_MARKETING` | Category & geo analytics |
+
 ## 1. Clone the Repository
 
 ```bash

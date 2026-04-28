@@ -22,6 +22,11 @@ models:
       +schema: intermediate
       +materialized: view
     marts:
-      +schema: marts
       +materialized: table
+      core:
+        +schema: marts_core
+      finance:
+        +schema: marts_finance
+      marketing:
+        +schema: marts_marketing
     
