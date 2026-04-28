@@ -3,6 +3,7 @@
 *.env.local
 
 # Data
+data/
 data-raw/*.csv
 data-raw/*.json
 data-raw/*.xlsx

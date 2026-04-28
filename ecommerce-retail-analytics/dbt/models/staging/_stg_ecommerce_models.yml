@@ -1,0 +1,246 @@
+# Build tests for staging models
+# Add generic tests like not null, unique, accepted values, relationships
+version: 2
+
+models:
+  # Customers
+  - name: stg_ecommerce__customers
+    description: "Staging model for customers data."
+    columns:
+      - name: customer_id
+        description: "primary key for customers table, unique for every order and not null"
+        data_tests:
+          - not_null
+          - unique
+      - name: customer_unique_id
+        description: "identifier for unique customers, can be used to analyze customer behavior and retention"
+        data_tests:
+          - not_null
+      - name: zip_code
+        description: "ZIP code for the customer, derived from the original customer_zip_code_prefix column"
+      - name: city
+        description: "City for the customer, derived from the original customer_city column"
+      - name: state
+        description: "State for the customer, derived from the original customer_state column"
+
+  # Geolocation
+  - name: stg_ecommerce__geolocation
+    description: "Staging model for geolocation data."
+    columns:
+      - name: zip_code
+        description: "primary key for geolocation table"
+        data_tests:
+          - not_null
+          - unique
+      - name: latitude
+        description: "latitude for the geolocation, can be used to analyze geographic distribution of customers"
+        data_tests:
+          - not_null
+      - name: longitude
+        description: "longitude for the geolocation, can be used to analyze geographic distribution of customers"
+        data_tests:
+          - not_null
+      - name: city
+        description: "city for the geolocation, can be used to analyze geographic distribution of customers"
+        data_tests:
+          - not_null
+      - name: state
+        description: "state for the geolocation, can be used to analyze geographic distribution of customers"
+        data_tests:
+          - not_null
+
+  # Orders
+  - name: stg_ecommerce__orders
+    description: "Staging model for orders data."
+    columns:
+      - name: order_id
+        description: "primary key for orders table, unique for every order and not null"
+        data_tests:
+          - not_null
+          - unique
+      - name: customer_id
+        description: "foreign key to customers table"
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_ecommerce__customers')
+                field: customer_id
+      - name: order_status
+        description: "{{ doc('order_status_description') }}"
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ["approved", "delivered", "unavailable", "created", "processing", "canceled", "invoiced", "shipped"]
+      - name: order_date
+        description: "order purchase date and time, can be used to analyze order trends over time and calculate delivery times by comparing with delivery dates"
+        data_tests:
+          - not_null
+      - name: order_approved_at
+        description: "order approval date and time, can be used to analyze order approval trends"
+      - name: delivered_carrier_date
+        description: "date and time when the order was handed over to the carrier"
+      - name: delivered_customer_date
+        description: "order delivery date and time, can be used to calculate delivery times and analyze delivery trends over time"
+      - name: estimated_delivery_date
+        description: "estimated delivery date for the order, can be used to calculate delivery times and analyze delivery trends over time"
+
+  # Order items
+  - name: stg_ecommerce__order_items
+    description: "Staging model for order items data."
+    columns:
+      - name: order_id
+        description: "foreign key to orders table"
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_ecommerce__orders')
+                field: order_id
+      - name: order_item_id
+        description: "identifier for the order item"
+        data_tests:
+          - not_null
+          - dbt_utils.unique_combination_of_columns:
+              arguments:
+                combination_of_columns:
+                  - order_id
+                  - order_item_id
+      - name: product_id
+        description: "foreign key to products table"
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_ecommerce__products')
+                field: product_id
+      - name: seller_id
+        description: "identifier for the seller of the product"
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_ecommerce__sellers')
+                field: seller_id
+      - name: shipping_deadline
+        description: "date and time by which the order item should be shipped"
+      - name: price
+        description: "price of the order item"
+        data_tests:
+          - not_null
+      - name: freight_value
+        description: "freight cost for the order item"
+        data_tests:
+          - not_null
+
+  # Order payments
+  - name: stg_ecommerce__order_payments
+    description: "Staging model for order payments data."
+    columns:
+      - name: order_id
+        description: "foreign key to orders table"
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_ecommerce__orders')
+                field: order_id
+      - name: payment_sequential
+        description: "identifier for the payment sequence of the order"
+        data_tests:
+          - not_null
+          - dbt_utils.unique_combination_of_columns:
+              arguments:
+                combination_of_columns:
+                  - order_id
+                  - payment_sequential
+      - name: payment_type
+        description: "{{ doc('payment_type_description') }}"
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ["credit_card", "boleto", "voucher", "debit_card", "not_defined"]
+      - name: payment_installments
+        description: "number of installments for the payment"
+        data_tests:
+          - not_null
+      - name: payment_value
+        description: "total amount paid for the order"
+        data_tests:
+          - not_null
+
+  # Order reviews
+  - name: stg_ecommerce__order_reviews
+    description: "Staging model for order reviews data."
+    columns:
+      - name: review_id
+        description: "primary key for order reviews table, unique for every review and not null"
+        data_tests:
+          - not_null
+          - unique
+      - name: order_id
+        description: "foreign key to orders table"
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_ecommerce__orders')
+                field: order_id
+      - name: score
+        description: "customer rating for the order, can be used to analyze customer satisfaction and product quality"
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [1, 2, 3, 4, 5]
+      - name: comment_title
+        description: "title of the customer's review comment"
+      - name: comment_message
+        description: "message of the customer's review comment"
+      - name: creation_date
+        description: "date and time when the review was created"
+      - name: answer_date
+        description: "date and time when the review was answered by the seller"
+
+  # Products
+  - name: stg_ecommerce__products
+    description: "Staging model for products data."
+    columns:
+      - name: product_id
+        description: "primary key for products table, unique for every product and not null"
+        data_tests:
+          - not_null
+          - unique
+      - name: product_category
+        description: "category of the product"
+      - name: name_length
+        description: "length of the product name"
+      - name: description_length
+        description: "length of the product description"
+      - name: photos_qty
+        description: "number of photos for the product"
+      - name: weight_g
+        description: "weight of the product in grams"
+      - name: length_cm
+        description: "length of the product in centimeters"
+      - name: height_cm
+        description: "height of the product in centimeters"
+      - name: width_cm
+        description: "width of the product in centimeters"
+
+  # Sellers
+  - name: stg_ecommerce__sellers
+    description: "Staging model for sellers data."
+    columns:
+      - name: seller_id
+        description: "primary key for sellers table, unique for every seller and not null"
+        data_tests:
+          - not_null
+          - unique
+      - name: zip_code
+        description: "ZIP code for the seller"
+      - name: city
+        description: "City for the seller"
+      - name: state
+        description: "State for the seller"

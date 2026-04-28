@@ -1,5 +1,5 @@
 # Source generation for raw data tables
-# Data integrity tests: Add generic tests like not null, unique, accepted values, relationships
+# Data source integrity tests: Add generic tests like not null, unique
 version: 2
 
 sources:
@@ -9,8 +9,9 @@ sources:
     description: "Source definitions for staging models in ecommerce_retail_analytics project."
 
     tables:
+      # Customers
       - name: customers
-        description: ""
+        description: "Customer information, can be used to analyze customer behavior and retention"
         columns:
           - name: customer_id
             data_type: varchar
@@ -20,105 +21,134 @@ sources:
               - unique
           - name: customer_unique_id
             data_type: varchar
-            description: ""
+            description: "identifier for unique customers, can be used to analyze customer behavior and retention"
           - name: customer_zip_code_prefix
             data_type: number
-            description: ""
+            description: "ZIP code prefix for the customer, can be used to analyze geographic distribution of customers"
           - name: customer_city
             data_type: varchar
-            description: ""
+            description: "City for the customer, can be used to analyze geographic distribution of customers"
           - name: customer_state
             data_type: varchar
-            description: ""
+            description: "State for the customer, can be used to analyze geographic distribution of customers"
 
+      # Geolocation
       - name: geolocation
-        description: ""
+        description: "Geolocation information, can be used to analyze geographic distribution of customers"
         columns:
           - name: geolocation_zip_code_prefix
             data_type: number
-            description: ""
+            description: "primary key for geolocation table"
+            data_tests:
+              - not_null
           - name: geolocation_lat
             data_type: float
-            description: ""
+            description: "latitude for the geolocation, can be used to analyze geographic distribution of customers"
+            data_tests:
+              - not_null
           - name: geolocation_lng
             data_type: float
-            description: ""
+            description: "longitude for the geolocation, can be used to analyze geographic distribution of customers"
+            data_tests:
+              - not_null
           - name: geolocation_city
             data_type: varchar
-            description: ""
+            description: "city for the geolocation, can be used to analyze geographic distribution of customers"
           - name: geolocation_state
             data_type: varchar
-            description: ""
-
+            description: "state for the geolocation, can be used to analyze geographic distribution of customers"
+      
+      # Order Items
       - name: order_items
-        description: ""
+        description: "Order items information, can be used to analyze order details and calculate total order value"
         columns:
           - name: order_id
             data_type: varchar
-            description: ""
+            description: "foreign key to orders table, can be used to link order items to order header information"
           - name: order_item_id
             data_type: number
-            description: ""
+            description: "identifier for the order item, unique within an order but not unique across the entire table due to multiple items per order"
+            data_tests:
+              - dbt_utils.unique_combination_of_columns:
+                  arguments:
+                    combination_of_columns:
+                      - order_id
+                      - order_item_id
           - name: product_id
             data_type: varchar
-            description: ""
+            description: "foreign key to products table, can be used to link order items to product information"
           - name: seller_id
             data_type: varchar
-            description: ""
+            description: "foreign key to sellers table, can be used to link order items to seller information"
           - name: shipping_limit_date
             data_type: varchar
-            description: ""
+            description: "deadline date for shipping"
           - name: price
             data_type: float
-            description: ""
+            description: "price of the order item, can be used to calculate total order value by summing across order items for each order_id"
           - name: freight_value
             data_type: float
-            description: ""
+            description: "freight cost for the order item, can be used to calculate total shipping cost by summing across order items for each order_id"
 
+      # Order Payments
       - name: order_payments
-        description: ""
+        description: "Order payments information, can be used to analyze payment details and calculate total payment amount for each order"
         columns:
           - name: order_id
             data_type: varchar
-            description: ""
+            description: "A candidate key for order_payments table, but not unique due to multiple payments per order"
           - name: payment_sequential
             data_type: number
-            description: ""
+            description: "A candidate key for order_payments table, but not unique due to multiple payments per order"
+            data_tests:
+              - dbt_utils.unique_combination_of_columns:
+                  arguments:
+                    combination_of_columns:
+                      - order_id
+                      - payment_sequential
           - name: payment_type
             data_type: varchar
-            description: ""
+            description: "{{ doc('payment_type_description') }}"
           - name: payment_installments
             data_type: number
-            description: ""
+            description: "number of installments for the payment, 1 means no installments, 2 means 2 installments, etc."
           - name: payment_value
             data_type: float
-            description: ""
+            description: "payment amount for the order, can be used to calculate total order value by summing across payments for each order_id"
 
+      # Order Reviews
       - name: order_reviews
-        description: ""
+        description: "Order reviews information, can be used to analyze customer feedback and satisfaction"
         columns:
           - name: review_id
             data_type: varchar
-            description: ""
+            description: "Identifier for reviews. Note: source data contains duplicates which are handled in staging model"
+            data_tests:
+              - not_null
           - name: order_id
             data_type: varchar
-            description: ""
+            description: "foreign key to orders table, can be used to link reviews to orders"
+            data_tests:
+              - not_null
           - name: review_score
             data_type: number
-            description: ""
+            description: "review score for the order, can be used to analyze customer satisfaction and feedback"
+            data_tests:
+              - not_null
           - name: review_comment_title
             data_type: varchar
-            description: ""
+            description: "title of the review comment, can be used to analyze customer feedback"
           - name: review_comment_message
             data_type: varchar
-            description: ""
+            description: "message of the review comment, can be used to analyze customer feedback"
           - name: review_creation_date
             data_type: varchar
-            description: ""
+            description: "date and time when the review was created, can be used to analyze review trends over time"
           - name: review_answer_timestamp
             data_type: varchar
-            description: ""
+            description: "date and time when the review was answered, can be used to analyze response times to customer feedback"
 
+      # Orders
       - name: orders
         description: "Order header information"
         columns:
@@ -130,36 +160,40 @@ sources:
               - unique
           - name: customer_id
             data_type: varchar
-            description: ""
+            description: "identifier for the customer who made the order, foreign key to customers table"
+            data_tests:
+              - not_null
           - name: order_status
             data_type: varchar
-            description: ""
+            description: "status of the order, can be used to analyze order fulfillment and cancellation trends"
           - name: order_purchase_timestamp
             data_type: varchar
-            description: ""
+            description: "order purchase date and time, can be used to analyze order trends over time and calculate delivery times by comparing with delivery dates"
           - name: order_approved_at
             data_type: varchar
-            description: ""
+            description: "order approval date and time, can be used to analyze order approval trends over time"
           - name: order_delivered_carrier_date
             data_type: varchar
-            description: ""
+            description: "date and time when the order was handed over to the carrier, can be used to calculate delivery times"
           - name: order_delivered_customer_date
             data_type: varchar
-            description: ""
+            description: "order delivery date and time, can be used to calculate delivery times and analyze delivery trends over time"
           - name: order_estimated_delivery_date
             data_type: varchar
-            description: ""
+            description: "estimated delivery date for the order, can be used to calculate delivery times and analyze delivery trends over time"
 
+      # Product Category Translation
       - name: product_category_translation
-        description: ""
+        description: "Translation table for product category names, can be used to translate product category names from Portuguese to English"
         columns:
           - name: product_category_name
             data_type: varchar
-            description: ""
+            description: "primary key for product_category_translation table"
           - name: product_category_name_english
             data_type: varchar
-            description: ""
+            description: "translated product category name in English"
 
+      # Products
       - name: products
         description: "Product catalog"
         columns:
@@ -171,29 +205,30 @@ sources:
               - unique
           - name: product_category_name
             data_type: varchar
-            description: ""
+            description: "category of the product, can be used to analyze sales trends by product category and calculate category-level metrics"
           - name: product_name_lenght
             data_type: float
-            description: ""
+            description: "length of the product name, can be used to analyze if product name length has any impact on sales performance"
           - name: product_description_lenght
             data_type: float
-            description: ""
+            description: "length of the product description, can be used to analyze if product description length has any impact on sales performance"
           - name: product_photos_qty
             data_type: float
-            description: ""
+            description: "number of photos for the product, can be used to analyze if the number of photos has any impact on sales performance"
           - name: product_weight_g
             data_type: float
-            description: ""
+            description: "weight of the product in grams, can be used to analyze if product weight has any impact on sales performance"
           - name: product_length_cm
             data_type: float
-            description: ""
+            description: "length of the product in centimeters, can be used to analyze if product dimensions have any impact on sales performance"
           - name: product_height_cm
             data_type: float
-            description: ""
+            description: "height of the product in centimeters, can be used to analyze if product dimensions have any impact on sales performance"
           - name: product_width_cm
             data_type: float
-            description: ""
-
+            description: "width of the product in centimeters, can be used to analyze if product dimensions have any impact on sales performance"
+      
+      # Sellers
       - name: sellers
         description: "Seller information"
         columns:
@@ -205,10 +240,10 @@ sources:
               - unique
           - name: seller_zip_code_prefix
             data_type: number
-            description: ""
+            description: "zip code for the seller's location"
           - name: seller_city
             data_type: varchar
-            description: ""
+            description: "city where the seller is located"
           - name: seller_state
             data_type: varchar
-            description: ""
+            description: "state where the seller is located"
