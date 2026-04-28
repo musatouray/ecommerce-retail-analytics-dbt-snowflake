@@ -88,6 +88,12 @@ models:
   # Order items
   - name: stg_ecommerce__order_items
     description: "Staging model for order items data."
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - order_id
+              - order_item_id
     columns:
       - name: order_id
         description: "foreign key to orders table"
@@ -101,11 +107,6 @@ models:
         description: "identifier for the order item"
         data_tests:
           - not_null
-          - dbt_utils.unique_combination_of_columns:
-              arguments:
-                combination_of_columns:
-                  - order_id
-                  - order_item_id
       - name: product_id
         description: "foreign key to products table"
         data_tests:
@@ -136,6 +137,12 @@ models:
   # Order payments
   - name: stg_ecommerce__order_payments
     description: "Staging model for order payments data."
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - order_id
+              - payment_sequential
     columns:
       - name: order_id
         description: "foreign key to orders table"
@@ -149,11 +156,6 @@ models:
         description: "identifier for the payment sequence of the order"
         data_tests:
           - not_null
-          - dbt_utils.unique_combination_of_columns:
-              arguments:
-                combination_of_columns:
-                  - order_id
-                  - payment_sequential
       - name: payment_type
         description: "{{ doc('payment_type_description') }}"
         data_tests:
@@ -203,9 +205,23 @@ models:
       - name: answer_date
         description: "date and time when the review was answered by the seller"
 
+  # Product Category Translation
+  - name: stg_ecommerce__product_category_translation
+    description: "Staging model for product category translation from Portuguese to English."
+    columns:
+      - name: product_category
+        description: "Primary key - product category name in Portuguese"
+        data_tests:
+          - not_null
+          - unique
+      - name: product_category_english
+        description: "Product category name translated to English"
+        data_tests:
+          - not_null
+
   # Products
   - name: stg_ecommerce__products
-    description: "Staging model for products data."
+    description: "Staging model for products data with English category translation."
     columns:
       - name: product_id
         description: "primary key for products table, unique for every product and not null"
@@ -213,7 +229,9 @@ models:
           - not_null
           - unique
       - name: product_category
-        description: "category of the product"
+        description: "Category of the product in Portuguese"
+      - name: product_category_english
+        description: "Category of the product translated to English"
       - name: name_length
         description: "length of the product name"
       - name: description_length

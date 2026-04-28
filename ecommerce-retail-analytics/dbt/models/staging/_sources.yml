@@ -68,12 +68,6 @@ sources:
           - name: order_item_id
             data_type: number
             description: "identifier for the order item, unique within an order but not unique across the entire table due to multiple items per order"
-            data_tests:
-              - dbt_utils.unique_combination_of_columns:
-                  arguments:
-                    combination_of_columns:
-                      - order_id
-                      - order_item_id
           - name: product_id
             data_type: varchar
             description: "foreign key to products table, can be used to link order items to product information"
@@ -100,12 +94,6 @@ sources:
           - name: payment_sequential
             data_type: number
             description: "A candidate key for order_payments table, but not unique due to multiple payments per order"
-            data_tests:
-              - dbt_utils.unique_combination_of_columns:
-                  arguments:
-                    combination_of_columns:
-                      - order_id
-                      - payment_sequential
           - name: payment_type
             data_type: varchar
             description: "{{ doc('payment_type_description') }}"

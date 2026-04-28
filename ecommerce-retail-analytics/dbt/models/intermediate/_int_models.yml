@@ -1,0 +1,125 @@
+version: 2
+
+models:
+  # Orders enriched with customer, items, payments, and reviews
+  - name: int_orders_enriched
+    description: >
+      Order-level intermediate model that joins orders with customer information
+      and aggregates order items, payments, and reviews. Excludes canceled and
+      unavailable orders. Use this model for order-level analytics like RFM
+      segmentation, cohort analysis, and customer lifetime value calculations.
+    columns:
+      - name: order_id
+        description: "Primary key - unique identifier for each order"
+        data_tests:
+          - not_null
+          - unique
+      - name: order_status
+        description: "Current status of the order (approved, delivered, created, processing, invoiced, shipped)"
+        data_tests:
+          - not_null
+      - name: order_date
+        description: "Timestamp when the order was placed"
+        data_tests:
+          - not_null
+      - name: order_approved_at
+        description: "Timestamp when the order was approved"
+      - name: delivered_carrier_date
+        description: "Timestamp when the order was handed to the carrier"
+      - name: delivered_customer_date
+        description: "Timestamp when the order was delivered to the customer"
+      - name: estimated_delivery_date
+        description: "Estimated delivery date provided to the customer"
+      - name: customer_id
+        description: "Foreign key to customers - identifier for the order's customer"
+        data_tests:
+          - not_null
+      - name: customer_unique_id
+        description: "Unique customer identifier for tracking repeat purchases"
+        data_tests:
+          - not_null
+      - name: zip_code
+        description: "Customer's ZIP code"
+      - name: city
+        description: "Customer's city"
+      - name: state
+        description: "Customer's state code"
+      - name: total_price
+        description: "Sum of all item prices in the order"
+        data_tests:
+          - not_null
+      - name: total_freight_value
+        description: "Sum of all freight costs in the order"
+        data_tests:
+          - not_null
+      - name: payment_count
+        description: "Number of payment transactions for the order"
+      - name: total_payment_value
+        description: "Sum of all payment amounts for the order"
+      - name: avg_score
+        description: "Average review score for the order (1-5 scale)"
+
+  # Order items enriched with product and seller information
+  - name: int_order_items_enriched
+    description: >
+      Order item-level intermediate model that joins order items with orders,
+      products, and sellers. Excludes canceled and unavailable orders. Use this
+      model for product-level analytics like category performance, seller metrics,
+      and product mix analysis.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - order_id
+              - order_item_id
+    columns:
+      - name: order_id
+        description: "Foreign key to orders"
+        data_tests:
+          - not_null
+      - name: order_item_id
+        description: "Sequential identifier for items within an order"
+        data_tests:
+          - not_null
+      - name: order_status
+        description: "Current status of the order"
+        data_tests:
+          - not_null
+      - name: order_date
+        description: "Timestamp when the order was placed"
+        data_tests:
+          - not_null
+      - name: order_approved_at
+        description: "Timestamp when the order was approved"
+      - name: delivered_carrier_date
+        description: "Timestamp when the order was handed to the carrier"
+      - name: delivered_customer_date
+        description: "Timestamp when the order was delivered to the customer"
+      - name: estimated_delivery_date
+        description: "Estimated delivery date provided to the customer"
+      - name: product_id
+        description: "Foreign key to products"
+        data_tests:
+          - not_null
+      - name: price
+        description: "Price of this order item"
+        data_tests:
+          - not_null
+      - name: freight_value
+        description: "Freight cost for this order item"
+        data_tests:
+          - not_null
+      - name: product_category
+        description: "Product category name in Portuguese"
+      - name: product_category_english
+        description: "Product category name translated to English"
+      - name: seller_id
+        description: "Foreign key to sellers"
+        data_tests:
+          - not_null
+      - name: zip_code
+        description: "Seller's ZIP code"
+      - name: city
+        description: "Seller's city"
+      - name: state
+        description: "Seller's state code"

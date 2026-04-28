@@ -82,7 +82,11 @@ ecommerce-retail-analytics-dbt-snowflake/
             │   ├── _docs.md
             │   └── stg_ecommerce__*.sql
             │
-            ├── intermediate/      # Join and enrich (TODO)
+            ├── intermediate/      # Join and enrich
+            │   ├── _int_models.yml
+            │   ├── int_orders_enriched.sql
+            │   └── int_order_items_enriched.sql
+            │
             └── marts/             # Fact and dimension tables (TODO)
 ```
 
@@ -115,21 +119,33 @@ The project uses a custom `generate_schema_name` macro that uses schema names di
 Tests require the `arguments:` wrapper:
 
 ```yaml
-# Correct syntax
-data_tests:
-  - relationships:
-      arguments:
-        to: ref('stg_ecommerce__orders')
-        field: order_id
-  - accepted_values:
-      arguments:
-        values: ["credit_card", "boleto", "voucher"]
-  - dbt_utils.unique_combination_of_columns:
-      arguments:
-        combination_of_columns:
-          - order_id
-          - order_item_id
+# Correct syntax for column-level tests
+columns:
+  - name: order_id
+    data_tests:
+      - not_null
+      - relationships:
+          arguments:
+            to: ref('stg_ecommerce__orders')
+            field: order_id
+  - name: payment_type
+    data_tests:
+      - accepted_values:
+          arguments:
+            values: ["credit_card", "boleto", "voucher"]
+
+# Model-level tests (NOT column-level) - place at model level
+models:
+  - name: stg_ecommerce__order_items
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - order_id
+              - order_item_id
 ```
+
+**Important**: `dbt_utils.unique_combination_of_columns` must be defined at the model level, not under a column. Placing it under a column causes a compilation error.
 
 ### Staging Model Pattern
 
@@ -183,14 +199,23 @@ select * from renamed
 | stg_ecommerce__order_items | Renamed shipping_deadline |
 | stg_ecommerce__order_payments | Payment type validation |
 | stg_ecommerce__order_reviews | ROW_NUMBER deduplication on review_id |
-| stg_ecommerce__products | Fixed column name typos (lenght→length) |
+| stg_ecommerce__product_category_translation | Portuguese to English category translation |
+| stg_ecommerce__products | Fixed typos, joins translation for English category |
 | stg_ecommerce__sellers | Zip code padding, city/state formatting |
+
+## Intermediate Models
+
+| Model | Grain | Description |
+|-------|-------|-------------|
+| int_orders_enriched | order_id | Orders joined with customers, aggregated items/payments/reviews. Excludes canceled/unavailable orders. |
+| int_order_items_enriched | (order_id, order_item_id) | Order items joined with orders, products, sellers. Includes English category names. |
 
 ## Testing Strategy
 
-- **Sources**: Basic integrity (not_null, unique on PKs, composite keys)
-- **Staging**: Full coverage (not_null, unique, relationships, accepted_values)
-- **Intermediate/Marts**: Business logic validation (TODO)
+- **Sources**: Basic integrity (not_null, unique on PKs)
+- **Staging**: Full coverage (not_null, unique, relationships, accepted_values, composite key tests)
+- **Intermediate**: Key validation (not_null, unique on grain, composite key tests)
+- **Marts**: Business logic validation (TODO)
 
 ## Known Data Issues
 

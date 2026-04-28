@@ -4,11 +4,18 @@ with source as (
 
 ),
 
+translation as (
+
+    select * from {{ ref('stg_ecommerce__product_category_translation') }}
+
+),
+
 renamed as (
 
     select
         trim(product_id) as product_id,
         trim(product_category_name) as product_category,
+        t.product_category_english,
         product_name_lenght::int as name_length,
         product_description_lenght::int as description_length,
         product_photos_qty::int as photos_qty,
@@ -17,7 +24,8 @@ renamed as (
         product_height_cm::numeric(10,2) as height_cm,
         product_width_cm::numeric(10,2) as width_cm
 
-    from source
+    from source s
+    left join translation t on trim(s.product_category_name) = t.product_category
 
 )
 
