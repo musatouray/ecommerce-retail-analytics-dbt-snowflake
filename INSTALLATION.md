@@ -16,9 +16,8 @@ This project uses the following schemas:
 | `RAW` | Source data from Kaggle CSV |
 | `STAGING` | Cleaned, typed staging views |
 | `INTERMEDIATE` | Joined and enriched views |
-| `MARTS_CORE` | Shared dimensions & facts |
-| `MARTS_FINANCE` | Revenue & payment analytics |
-| `MARTS_MARKETING` | Category & geo analytics |
+| `MARTS` | Fact and dimension tables |
+| `SEEDS` | Static reference data |
 
 ## 1. Clone the Repository
 

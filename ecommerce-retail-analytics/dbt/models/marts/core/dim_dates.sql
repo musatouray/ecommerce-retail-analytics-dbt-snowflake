@@ -8,7 +8,9 @@ with generated_dates as (
     {{ get_order_date_spine() }}
 )
 
-select 
+select
+    -- Integer surrogate key in YYYYMMDD format (e.g., 20231225)
+    to_number(to_char(date_day, 'YYYYMMDD')) as date_key,
     date_day as date,
     year(date_day) as year,
     yearofweekiso(date_day) as iso_year,

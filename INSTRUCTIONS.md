@@ -175,9 +175,7 @@ USE DATABASE ECOMMERCE_ANALYTICS;
 CREATE SCHEMA IF NOT EXISTS RAW;
 CREATE SCHEMA IF NOT EXISTS STAGING;
 CREATE SCHEMA IF NOT EXISTS INTERMEDIATE;
-CREATE SCHEMA IF NOT EXISTS MARTS_CORE;
-CREATE SCHEMA IF NOT EXISTS MARTS_FINANCE;
-CREATE SCHEMA IF NOT EXISTS MARTS_MARKETING;
+CREATE SCHEMA IF NOT EXISTS MARTS;
 ```
 
 ### 3.2 Create Data Loading Script
@@ -249,13 +247,8 @@ models:
       +schema: intermediate
       +materialized: view
     marts:
+      +schema: marts
       +materialized: table
-      core:
-        +schema: marts_core
-      finance:
-        +schema: marts_finance
-      marketing:
-        +schema: marts_marketing
 ```
 
 ### 4.2 Create profiles.yml
@@ -391,18 +384,14 @@ uv run dbt docs serve
 
 ### 6.2 Import Tables
 
-From `ECOMMERCE_ANALYTICS.MARTS_CORE` schema:
+From `ECOMMERCE_ANALYTICS.MARTS` schema:
 - dim_customers
 - dim_dates
 - dim_products
 - dim_sellers
 - fct_orders
-
-From `ECOMMERCE_ANALYTICS.MARTS_FINANCE` schema:
 - fct_daily_revenue
 - fct_payment_analysis
-
-From `ECOMMERCE_ANALYTICS.MARTS_MARKETING` schema:
 - fct_category_performance
 - fct_geo_performance
 

@@ -118,9 +118,9 @@ ecommerce-retail-analytics-dbt-snowflake/
 | `RAW` | Source data from Kaggle CSV | Tables |
 | `STAGING` | Cleaned, typed, deduplicated | Views |
 | `INTERMEDIATE` | Joined and enriched | Views |
-| `MARTS_CORE` | Shared dimensions & facts | Tables |
-| `MARTS_FINANCE` | Revenue & payment analytics | Tables |
-| `MARTS_MARKETING` | Category & geo analytics | Tables |
+| `MARTS` | Fact and dimension tables | Tables |
+
+Note: Mart models are organized into subfolders (`core/`, `finance/`, `marketing/`) for code organization, but all deploy to the single `MARTS` schema.
 
 ## dbt Conventions
 
@@ -227,7 +227,7 @@ select * from renamed
 
 ## Mart Models
 
-### Core (MARTS_CORE schema)
+### Core (`marts/core/`)
 
 | Model | Grain | Description |
 |-------|-------|-------------|
@@ -237,14 +237,14 @@ select * from renamed
 | dim_sellers | seller_id | Seller dimension with location |
 | fct_orders | order_id | Order fact table with metrics |
 
-### Finance (MARTS_FINANCE schema)
+### Finance (`marts/finance/`)
 
 | Model | Grain | Description |
 |-------|-------|-------------|
 | fct_daily_revenue | date | Daily revenue aggregates |
 | fct_payment_analysis | payment_type, month | Payment method performance by month |
 
-### Marketing (MARTS_MARKETING schema)
+### Marketing (`marts/marketing/`)
 
 | Model | Grain | Description |
 |-------|-------|-------------|

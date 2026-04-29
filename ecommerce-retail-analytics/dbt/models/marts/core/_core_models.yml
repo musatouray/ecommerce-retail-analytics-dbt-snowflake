@@ -1,0 +1,206 @@
+version: 2
+
+models:
+  - name: dim_customers
+    description: >
+      Customer dimension table containing customer attributes, location,
+      aggregated order metrics, and behavioral segmentation. Grain is one row
+      per unique customer (customer_unique_id). Includes customers who have
+      never placed an order (prospects).
+    columns:
+      - name: customer_key
+        description: Surrogate key for the customer dimension, generated from customer_unique_id
+        data_tests:
+          - unique
+          - not_null
+
+      - name: customer_unique_id
+        description: Natural key - unique customer identifier from source system
+        data_tests:
+          - unique
+          - not_null
+
+      - name: zip_code
+        description: Customer's zip code (5-digit, zero-padded). Uses most recent address if customer has multiple orders.
+
+      - name: city
+        description: Customer's city name (title case). Uses most recent address if customer has multiple orders.
+
+      - name: state
+        description: Customer's state code (2-letter uppercase). Uses most recent address if customer has multiple orders.
+
+      - name: first_order_date
+        description: Date of the customer's first order. NULL for prospects.
+
+      - name: last_order_date
+        description: Date of the customer's most recent order. NULL for prospects.
+
+      - name: total_orders
+        description: Total number of orders placed by the customer. 0 for prospects.
+        data_tests:
+          - not_null
+
+      - name: total_revenue
+        description: Total payment value across all customer orders (BRL). 0 for prospects.
+        data_tests:
+          - not_null
+
+      - name: average_order_value
+        description: Average payment value per order (total_revenue / total_orders). NULL for prospects.
+
+      - name: total_reviews
+        description: Total number of reviews submitted by the customer across all orders. NULL for prospects.
+
+      - name: average_rating
+        description: >
+          Weighted average review score across all customer reviews (1-5 scale).
+          Computed as sum of all review scores / total review count, not average of order averages.
+          NULL if customer has no reviews.
+
+      - name: days_since_last_order
+        description: Number of days between last order date and current date. NULL for prospects.
+
+      - name: customer_tenure_days
+        description: Number of days between first and last order. 0 for single-order customers, NULL for prospects.
+
+      - name: customer_segment
+        description: >
+          Customer purchase behavior segment:
+          - prospect: No orders placed
+          - new: Exactly 1 order placed
+          - returning: 2+ orders placed
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['prospect', 'new', 'returning']
+
+      - name: customer_value_segment
+        description: >
+          Customer value segment based on total revenue. Thresholds configurable via dbt vars:
+          - unknown: No orders (prospect)
+          - high_value: Revenue >= $customer_high_value_threshold (default 500)
+          - medium_value: Revenue >= $customer_medium_value_threshold (default 100)
+          - low_value: Revenue < $customer_medium_value_threshold
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['unknown', 'high_value', 'medium_value', 'low_value']
+
+      - name: customer_satisfaction_segment
+        description: >
+          Customer satisfaction segment based on average review rating. Thresholds configurable via dbt vars:
+          - unknown: No reviews submitted
+          - promoter: Average rating >= $customer_promoter_threshold (default 4.5)
+          - neutral: Average rating >= $customer_neutral_threshold (default 3.0)
+          - detractor: Average rating < $customer_neutral_threshold
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['unknown', 'promoter', 'neutral', 'detractor']
+
+      - name: is_active
+        description: >
+          TRUE if customer's last order was within $customer_active_days_threshold days (default 180).
+          FALSE otherwise, including prospects.
+        data_tests:
+          - not_null
+
+      - name: created_at
+        description: Timestamp when this record was created in the data warehouse
+        data_tests:
+          - not_null
+
+      - name: updated_at
+        description: Timestamp when this record was last updated in the data warehouse
+        data_tests:
+          - not_null
+
+  - name: dim_dates
+    description: >
+      Date dimension table generated from the order date range in the source data.
+      Contains date attributes for time-based analysis including fiscal periods,
+      ISO week numbering, and relative offsets from current date.
+    columns:
+      - name: date_key
+        description: Integer surrogate key in YYYYMMDD format (e.g., 20231225 for Dec 25, 2023)
+        data_tests:
+          - unique
+          - not_null
+
+      - name: date
+        description: Calendar date (natural key)
+        data_tests:
+          - unique
+          - not_null
+
+      - name: year
+        description: Calendar year (e.g., 2023)
+
+      - name: iso_year
+        description: ISO year for week-based calculations
+
+      - name: iso_year_week
+        description: ISO year and week in format YYYY-WNN (e.g., 2023-W52)
+
+      - name: year_quarter
+        description: Year and quarter in format YYYY-QN (e.g., 2023-Q4)
+
+      - name: year_month
+        description: Year and month in format YYYY-MM (e.g., 2023-12)
+
+      - name: quarter_number
+        description: Quarter number (1-4)
+
+      - name: quarter_name
+        description: Quarter name (Q1, Q2, Q3, Q4)
+
+      - name: month
+        description: Month number (1-12)
+
+      - name: month_name
+        description: Full month name (January, February, etc.)
+
+      - name: month_year
+        description: Month and year in format Mon-YYYY (e.g., Dec-2023)
+
+      - name: week
+        description: Week number of the year
+
+      - name: year_week
+        description: Week and year in format WW-YYYY
+
+      - name: day
+        description: Day of the month (1-31)
+
+      - name: iso_day_of_week
+        description: ISO day of week (1=Monday, 7=Sunday)
+
+      - name: day_name
+        description: Abbreviated day name (Mon, Tue, etc.)
+
+      - name: day_of_week
+        description: Snowflake day of week (0=Sunday, 6=Saturday)
+
+      - name: is_weekend
+        description: TRUE if Saturday or Sunday (Snowflake convention)
+
+      - name: is_iso_weekend
+        description: TRUE if Saturday or Sunday (ISO convention)
+
+      - name: day_offset
+        description: Days relative to current date (negative=past, 0=today, positive=future)
+
+      - name: week_offset
+        description: Weeks relative to current date
+
+      - name: month_offset
+        description: Months relative to current date
+
+      - name: quarter_offset
+        description: Quarters relative to current date
+
+      - name: year_offset
+        description: Years relative to current date

@@ -44,11 +44,13 @@ reviews as (
     from {{ ref('stg_ecommerce__order_reviews') }}
 ),
 
--- Aggregate reviews to get average score per order
+-- Aggregate reviews to get average score and count per order
 aggregated_reviews as (
 
     select
         order_id,
+        count(*) as review_count,
+        sum(score) as total_score,
         avg(score) as avg_score
     from reviews
     group by order_id
@@ -79,6 +81,8 @@ enriched as (
         oi.total_freight_value,
         p.payment_count,
         p.total_payment_value,
+        r.review_count,
+        r.total_score,
         r.avg_score
 
     from orders o
