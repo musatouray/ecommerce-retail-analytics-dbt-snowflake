@@ -6,3 +6,6 @@
 
 # Logs
 logs/
+
+# Windows artifacts
+nul
