@@ -2,7 +2,7 @@
 name = "ecommerce-retail-analytics"
 version = "0.1.0"
 description = "End-to-end retail analytics pipeline using dbt and Snowflake"
-requires-python = ">=3.10"
+requires-python = "==3.12.*"
 dependencies = [
     "dbt-snowflake>=1.7.0",
     "kaggle>=1.6.0",
