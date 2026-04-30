@@ -1,6 +1,12 @@
+  # Core dimension models for customers, sellers, products, and dates. 
+  # These tables are designed to be the foundation for all downstream marts and analyses, 
+  # providing a single source of truth for key entities and their attributes. 
+  #They include comprehensive data quality tests to ensure reliability and consistency across the analytics ecosystem.
+
 version: 2
 
 models:
+  # Customers dimension model
   - name: dim_customers
     description: >
       Customer dimension table containing customer attributes, location,
@@ -118,6 +124,135 @@ models:
         data_tests:
           - not_null
 
+  # Sellers dimension model
+  - name: dim_sellers
+    description: >
+      Seller dimension table containing seller attributes, location,
+      aggregated order metrics, delivery performance, and segmentation.
+      Grain is one row per seller (seller_id). Includes sellers who have
+      never completed an order.
+    columns:
+      - name: seller_key
+        description: Surrogate key for the seller dimension, generated from seller_id
+        data_tests:
+          - unique
+          - not_null
+
+      - name: seller_id
+        description: Natural key - unique seller identifier from source system
+        data_tests:
+          - unique
+          - not_null
+
+      - name: zip_code
+        description: Seller's zip code (5-digit, zero-padded)
+
+      - name: city
+        description: Seller's city name (title case)
+
+      - name: state
+        description: Seller's state code (2-letter uppercase)
+
+      - name: latitude
+        description: Geographic latitude of seller location (from geolocation data)
+
+      - name: longitude
+        description: Geographic longitude of seller location (from geolocation data)
+
+      - name: first_order_date
+        description: Date of the seller's first order. NULL if no orders.
+
+      - name: last_order_date
+        description: Date of the seller's most recent order. NULL if no orders.
+
+      - name: seller_tenure_days
+        description: Number of days between first and last order. NULL if no orders.
+
+      - name: days_since_last_sale
+        description: Number of days between last order date and current date. NULL if no orders.
+
+      - name: average_delivery_days
+        description: >
+          Average days from order purchase to customer delivery for delivered orders.
+          Measures total customer wait time. NULL if no delivered orders.
+
+      - name: average_shipping_transit_days
+        description: >
+          Average days from carrier pickup to customer delivery for delivered orders.
+          Measures shipping transit time. NULL if no delivered orders.
+
+      - name: average_fulfillment_days
+        description: >
+          Average days from order approval to customer delivery for delivered orders.
+          Measures fulfillment efficiency. NULL if no delivered orders.
+
+      - name: primary_product_category
+        description: >
+          The product category (English) with the most items sold by this seller.
+          Ties broken by most recent order date, then alphabetically.
+          'Unknown' if no category data available.
+        data_tests:
+          - not_null
+
+      - name: is_active
+        description: >
+          TRUE if seller's last order was within $active_days_threshold days (default 180).
+          NULL if seller has no orders.
+
+      - name: total_orders
+        description: Total number of distinct orders fulfilled by the seller. 0 if no orders.
+        data_tests:
+          - not_null
+
+      - name: total_items_sold
+        description: Total number of items sold by the seller across all orders. 0 if no orders.
+        data_tests:
+          - not_null
+
+      - name: total_revenue
+        description: Total revenue (price + freight) across all seller orders (BRL). 0 if no orders.
+        data_tests:
+          - not_null
+
+      - name: successful_orders
+        description: Number of items in orders with 'delivered' status. 0 if no delivered orders.
+        data_tests:
+          - not_null
+
+      - name: successful_revenue
+        description: Revenue from orders with 'delivered' status (BRL). 0 if no delivered orders.
+        data_tests:
+          - not_null
+
+      - name: sale_success_rate
+        description: >
+          Percentage of orders successfully delivered (delivered orders / total orders * 100).
+          0 if no orders.
+        data_tests:
+          - not_null
+
+      - name: revenue_success_rate
+        description: >
+          Percentage of revenue from delivered orders (delivered revenue / total revenue * 100).
+          0 if no orders.
+        data_tests:
+          - not_null
+
+      - name: performance_segment
+        description: >
+          Seller performance segment based on total revenue. Thresholds configurable via dbt vars:
+          - inactive: No orders
+          - platinum: Revenue >= $seller_platinum_value_threshold (default 10000)
+          - gold: Revenue >= $seller_gold_value_threshold (default 1000)
+          - silver: Revenue >= $seller_silver_value_threshold (default 100)
+          - bronze: Revenue < $seller_silver_value_threshold
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['inactive', 'platinum', 'gold', 'silver', 'bronze']
+
+  # Dates dimension model
   - name: dim_dates
     description: >
       Date dimension table generated from the order date range in the source data.
