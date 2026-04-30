@@ -8,7 +8,6 @@ with order_items as (
 orders as (
     select *
     from {{ ref('stg_ecommerce__orders') }}
-    where order_status in ('approved', 'delivered', 'created', 'processing', 'invoiced', 'shipped')
 ),
 
 products as (

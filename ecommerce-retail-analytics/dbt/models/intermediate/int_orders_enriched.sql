@@ -3,7 +3,6 @@
 with orders as (
     select *
     from {{ ref('stg_ecommerce__orders') }}
-    where order_status in ('approved', 'delivered', 'created', 'processing', 'invoiced', 'shipped')
 ),
 
 order_items as (

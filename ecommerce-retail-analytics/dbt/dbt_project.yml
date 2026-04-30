@@ -14,12 +14,18 @@ clean-targets:
   - "dbt_packages"
 
 vars:
+  active_days_threshold: 180
+  
   # Customer segmentation thresholds
   customer_high_value_threshold: 500
   customer_medium_value_threshold: 100
   customer_promoter_threshold: 4.5
   customer_neutral_threshold: 3.0
-  customer_active_days_threshold: 180
+
+  # Seller segmentation thresholds
+  seller_platinum_value_threshold: 10000
+  seller_gold_value_threshold: 1000
+  seller_silver_value_threshold: 100
 
 models:
   ecommerce_retail_analytics:

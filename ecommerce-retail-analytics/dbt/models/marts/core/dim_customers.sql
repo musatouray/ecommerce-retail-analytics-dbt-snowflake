@@ -34,6 +34,7 @@ deduped_customers as (
 
 final as (
     select
+        -- Generate surrogate key for customer dimension
         {{ dbt_utils.generate_surrogate_key(['dc.customer_unique_id']) }} as customer_key,
         dc.customer_unique_id,
         dc.zip_code,
@@ -74,7 +75,7 @@ final as (
 
         -- Active customer flag
         case
-            when datediff(day, co.last_order_date, current_date) <= {{ var('customer_active_days_threshold') }} then TRUE
+            when datediff(day, co.last_order_date, current_date) <= {{ var('active_days_threshold') }} then TRUE
             else FALSE
         end as is_active,
 
