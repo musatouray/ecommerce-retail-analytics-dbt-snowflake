@@ -339,3 +339,46 @@ models:
 
       - name: year_offset
         description: Years relative to current date
+
+  # Products dimension model
+  - name: dim_products
+    description: >
+      Product dimension table containing product attributes including
+      category, physical dimensions, and content metadata.
+      Grain is one row per product (product_id).
+    columns:
+      - name: product_key
+        description: Surrogate key for the product dimension, generated from product_id
+        data_tests:
+          - unique
+          - not_null
+
+      - name: product_id
+        description: Natural key - unique product identifier from source system
+        data_tests:
+          - unique
+          - not_null
+
+      - name: product_category
+        description: Product category name in English (translated from Portuguese)
+
+      - name: name_length
+        description: Length of product name in characters
+
+      - name: description_length
+        description: Length of product description in characters
+
+      - name: photos_qty
+        description: Number of product photos
+
+      - name: weight_g
+        description: Product weight in grams
+
+      - name: length_cm
+        description: Product length in centimeters
+
+      - name: height_cm
+        description: Product height in centimeters
+
+      - name: width_cm
+        description: Product width in centimeters
