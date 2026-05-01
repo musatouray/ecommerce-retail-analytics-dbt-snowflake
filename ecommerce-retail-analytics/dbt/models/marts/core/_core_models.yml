@@ -252,6 +252,116 @@ models:
               arguments:
                 values: ['inactive', 'platinum', 'gold', 'silver', 'bronze']
 
+      - name: created_at
+        description: Timestamp when this record was created in the data warehouse
+        data_tests:
+          - not_null
+
+      - name: updated_at
+        description: Timestamp when this record was last updated in the data warehouse
+        data_tests:
+          - not_null
+
+  # Products dimension model
+  - name: dim_products
+    description: >
+      Product dimension table containing product attributes, sales metrics,
+      review ratings, and performance segmentation.
+      Grain is one row per product (product_id). Includes products that have
+      never been sold.
+    columns:
+      - name: product_key
+        description: Surrogate key for the product dimension, generated from product_id
+        data_tests:
+          - unique
+          - not_null
+
+      - name: product_id
+        description: Natural key - unique product identifier from source system
+        data_tests:
+          - unique
+          - not_null
+
+      - name: product_category
+        description: Product category name in English (translated from Portuguese)
+
+      - name: first_order_date
+        description: Date of the product's first sale. NULL if never sold.
+
+      - name: last_order_date
+        description: Date of the product's most recent sale. NULL if never sold.
+
+      - name: total_orders
+        description: Total number of distinct orders containing this product. NULL if never sold.
+
+      - name: total_units_sold
+        description: Total number of units sold across all orders. NULL if never sold.
+
+      - name: canceled_orders
+        description: Number of order items canceled for this product. NULL if never sold.
+
+      - name: canceled_rate
+        description: >
+          Percentage of orders canceled (canceled orders / total orders * 100).
+          NULL if never sold.
+
+      - name: total_revenue
+        description: Total revenue (price + freight) from this product (BRL). NULL if never sold.
+
+      - name: total_reviews
+        description: Total number of reviews for orders containing this product. NULL if never sold.
+
+      - name: average_rating
+        description: >
+          Weighted average review score for this product (1-5 scale).
+          Computed as sum of all review scores / total review count.
+          NULL if no reviews.
+
+      - name: performance_segment
+        description: >
+          Product performance segment based on total revenue. Thresholds configurable via dbt vars:
+          - no_sales: Never sold
+          - platinum: Revenue >= $platinum_value_threshold
+          - gold: Revenue >= $gold_value_threshold
+          - silver: Revenue >= $silver_value_threshold
+          - bronze: Revenue < $silver_value_threshold
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['no_sales', 'platinum', 'gold', 'silver', 'bronze']
+
+      - name: name_length
+        description: Length of product name in characters
+
+      - name: description_length
+        description: Length of product description in characters
+
+      - name: photos_qty
+        description: Number of product photos
+
+      - name: weight_g
+        description: Product weight in grams
+
+      - name: length_cm
+        description: Product length in centimeters
+
+      - name: height_cm
+        description: Product height in centimeters
+
+      - name: width_cm
+        description: Product width in centimeters
+
+      - name: created_at
+        description: Timestamp when this record was created in the data warehouse
+        data_tests:
+          - not_null
+
+      - name: updated_at
+        description: Timestamp when this record was last updated in the data warehouse
+        data_tests:
+          - not_null
+
   # Dates dimension model
   - name: dim_dates
     description: >
@@ -339,46 +449,3 @@ models:
 
       - name: year_offset
         description: Years relative to current date
-
-  # Products dimension model
-  - name: dim_products
-    description: >
-      Product dimension table containing product attributes including
-      category, physical dimensions, and content metadata.
-      Grain is one row per product (product_id).
-    columns:
-      - name: product_key
-        description: Surrogate key for the product dimension, generated from product_id
-        data_tests:
-          - unique
-          - not_null
-
-      - name: product_id
-        description: Natural key - unique product identifier from source system
-        data_tests:
-          - unique
-          - not_null
-
-      - name: product_category
-        description: Product category name in English (translated from Portuguese)
-
-      - name: name_length
-        description: Length of product name in characters
-
-      - name: description_length
-        description: Length of product description in characters
-
-      - name: photos_qty
-        description: Number of product photos
-
-      - name: weight_g
-        description: Product weight in grams
-
-      - name: length_cm
-        description: Product length in centimeters
-
-      - name: height_cm
-        description: Product height in centimeters
-
-      - name: width_cm
-        description: Product width in centimeters

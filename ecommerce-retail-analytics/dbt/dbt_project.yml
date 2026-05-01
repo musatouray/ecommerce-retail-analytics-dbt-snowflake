@@ -22,10 +22,10 @@ vars:
   customer_promoter_threshold: 4.5
   customer_neutral_threshold: 3.0
 
-  # Seller segmentation thresholds
-  seller_platinum_value_threshold: 10000
-  seller_gold_value_threshold: 1000
-  seller_silver_value_threshold: 100
+  # Seller/Product segmentation thresholds
+  platinum_value_threshold: 10000
+  gold_value_threshold: 1000
+  silver_value_threshold: 100
 
 models:
   ecommerce_retail_analytics:

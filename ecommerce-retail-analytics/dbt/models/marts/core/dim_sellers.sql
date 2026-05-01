@@ -76,11 +76,16 @@ final as (
         -- Seller performance segment
         case
             when so.total_revenue is null then 'inactive'
-            when so.total_revenue >= {{ var('seller_platinum_value_threshold') }} then 'platinum'
-            when so.total_revenue >= {{ var('seller_gold_value_threshold') }} then 'gold'
-            when so.total_revenue >= {{ var('seller_silver_value_threshold') }} then 'silver'
+            when so.total_revenue >= {{ var('platinum_value_threshold') }} then 'platinum'
+            when so.total_revenue >= {{ var('gold_value_threshold') }} then 'gold'
+            when so.total_revenue >= {{ var('silver_value_threshold') }} then 'silver'
             else 'bronze'
-        end as performance_segment
+        end as performance_segment,
+
+        -- Metadata
+        current_timestamp() as created_at,
+        current_timestamp() as updated_at
+
     from sellers s
     left join geolocation g using (zip_code)
     left join seller_orders so using (seller_id)

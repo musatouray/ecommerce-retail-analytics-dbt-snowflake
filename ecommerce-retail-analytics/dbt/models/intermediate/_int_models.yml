@@ -5,8 +5,7 @@ models:
   - name: int_orders_enriched
     description: >
       Order-level intermediate model that joins orders with customer information
-      and aggregates order items, payments, and reviews. Excludes canceled and
-      unavailable orders. Use this model for order-level analytics like RFM
+      and aggregates order items, payments, and reviews. Use this model for order-level analytics like RFM
       segmentation, cohort analysis, and customer lifetime value calculations.
     columns:
       - name: order_id
@@ -15,7 +14,7 @@ models:
           - not_null
           - unique
       - name: order_status
-        description: "Current status of the order (approved, delivered, created, processing, invoiced, shipped)"
+        description: "Current status of the order (approved, delivered, created, processing, invoiced, shipped, canceled, unavailable)"
         data_tests:
           - not_null
       - name: order_date
@@ -63,9 +62,8 @@ models:
   - name: int_order_items_enriched
     description: >
       Order item-level intermediate model that joins order items with orders,
-      products, and sellers. Excludes canceled and unavailable orders. Use this
-      model for product-level analytics like category performance, seller metrics,
-      and product mix analysis.
+      products, and sellers. Use this model for product-level analytics like category performance, 
+      seller metrics, and product mix analysis.
     data_tests:
       - dbt_utils.unique_combination_of_columns:
           arguments:

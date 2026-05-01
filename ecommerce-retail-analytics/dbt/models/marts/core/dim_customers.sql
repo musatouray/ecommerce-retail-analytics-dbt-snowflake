@@ -78,7 +78,8 @@ final as (
             when datediff(day, co.last_order_date, current_date) <= {{ var('active_days_threshold') }} then TRUE
             else FALSE
         end as is_active,
-
+        
+        -- Metadata
         current_timestamp() as created_at,
         current_timestamp() as updated_at
 
