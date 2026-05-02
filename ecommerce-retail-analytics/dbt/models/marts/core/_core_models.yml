@@ -215,25 +215,13 @@ models:
           - not_null
 
       - name: successful_orders
-        description: Number of items in orders with 'delivered' status. 0 if no delivered orders.
-        data_tests:
-          - not_null
-
-      - name: successful_revenue
-        description: Revenue from orders with 'delivered' status (BRL). 0 if no delivered orders.
+        description: Number of distinct orders with 'delivered' status. 0 if no delivered orders.
         data_tests:
           - not_null
 
       - name: sale_success_rate
         description: >
           Percentage of orders successfully delivered (delivered orders / total orders * 100).
-          0 if no orders.
-        data_tests:
-          - not_null
-
-      - name: revenue_success_rate
-        description: >
-          Percentage of revenue from delivered orders (delivered revenue / total revenue * 100).
           0 if no orders.
         data_tests:
           - not_null

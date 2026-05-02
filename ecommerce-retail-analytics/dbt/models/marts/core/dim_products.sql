@@ -20,7 +20,7 @@ products_orders as (
         count(distinct oi.order_id) as total_orders,
         count(*) as total_units_sold,
         sum(oi.price + oi.freight_value) as total_revenue,
-        sum(case when oi.order_status = 'canceled' then 1 else 0 end) as canceled_orders,
+        count(distinct case when oi.order_status = 'canceled' then oi.order_id end) as canceled_orders,
         count(distinct case when oi.order_status = 'canceled' then oi.order_id end)::float / nullif(count(distinct oi.order_id), 0) * 100 as canceled_rate,
         sum(o.review_count) as total_reviews,
         sum(o.total_score) / nullif(sum(o.review_count), 0) as average_rating
@@ -48,7 +48,7 @@ final as (
         -- Product review attributes
         po.total_reviews,
         po.average_rating,
-        
+
         -- Product segmentation based on revenue
         case
             when po.total_revenue is null then 'no_sales'

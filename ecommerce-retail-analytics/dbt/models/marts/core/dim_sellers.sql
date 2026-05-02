@@ -17,10 +17,8 @@ seller_orders as (
         avg(case when order_status = 'delivered' then datediff(day, order_date, delivered_customer_date::date) end) as average_delivery_days,
         avg(case when order_status = 'delivered' then datediff(day, delivered_carrier_date::date, delivered_customer_date::date) end) as average_shipping_transit_days,
         avg(case when order_status = 'delivered' then datediff(day, order_approved_at::date, delivered_customer_date::date) end) as average_fulfillment_days,
-        sum(case when order_status = 'delivered' then 1 else 0 end) as successful_orders,
-        sum(case when order_status = 'delivered' then price + freight_value else 0 end) as successful_revenue,
-        count(distinct case when order_status = 'delivered' then order_id end)::float / nullif(count(distinct order_id), 0) * 100 as success_rate,
-        sum(case when order_status = 'delivered' then price + freight_value else 0 end) / nullif(sum(price + freight_value), 0) * 100 as revenue_success_rate
+        count(distinct case when order_status = 'delivered' then order_id end) as successful_orders,
+        count(distinct case when order_status = 'delivered' then order_id end)::float / nullif(count(distinct order_id), 0) * 100 as sale_success_rate
     from {{ ref('int_order_items_enriched') }}
     group by seller_id
 ),
@@ -69,9 +67,7 @@ final as (
         coalesce(so.total_items_sold, 0) as total_items_sold,
         coalesce(so.total_revenue, 0) as total_revenue,
         coalesce(so.successful_orders, 0) as successful_orders,
-        coalesce(so.successful_revenue, 0) as successful_revenue,
-        coalesce(so.success_rate, 0) as sale_success_rate,
-        coalesce(so.revenue_success_rate, 0) as revenue_success_rate,
+        coalesce(so.sale_success_rate, 0) as sale_success_rate,
 
         -- Seller performance segment
         case
