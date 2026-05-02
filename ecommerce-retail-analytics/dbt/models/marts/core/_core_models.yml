@@ -437,3 +437,172 @@ models:
 
       - name: year_offset
         description: Years relative to current date
+
+  # Orders fact table
+  - name: fct_orders
+    description: >
+      Fact table for orders at order grain (one row per order).
+      Use this for order-level analytics: revenue trends, AOV, customer behavior.
+      Includes role-playing date dimensions for multiple date contexts.
+    columns:
+      - name: order_key
+        description: Surrogate key for the order fact, generated from order_id
+        data_tests:
+          - unique
+          - not_null
+
+      - name: order_id
+        description: Natural key - unique order identifier from source system
+        data_tests:
+          - unique
+          - not_null
+
+      - name: customer_key
+        description: Foreign key to dim_customers
+
+      - name: order_date_key
+        description: Foreign key to dim_dates for order placement date
+        data_tests:
+          - not_null
+
+      - name: approval_date_key
+        description: Foreign key to dim_dates for order approval date
+
+      - name: delivery_date_key
+        description: Foreign key to dim_dates for customer delivery date
+
+      - name: estimated_delivery_date_key
+        description: Foreign key to dim_dates for estimated delivery date
+
+      - name: order_status
+        description: Current status of the order
+        data_tests:
+          - not_null
+
+      - name: delivery_days
+        description: Days from order placement to customer delivery. NULL if not delivered.
+
+      - name: fulfillment_days
+        description: Days from order approval to customer delivery. NULL if not delivered.
+
+      - name: shipping_transit_days
+        description: Days from carrier pickup to customer delivery. NULL if not delivered.
+
+      - name: is_on_time_delivery
+        description: TRUE if delivered on or before estimated date, FALSE otherwise, NULL if not delivered.
+
+      - name: total_price
+        description: Total item price for the order (BRL)
+        data_tests:
+          - not_null
+
+      - name: total_freight_value
+        description: Total freight/shipping cost for the order (BRL)
+        data_tests:
+          - not_null
+
+      - name: gross_order_value
+        description: Total order value including freight (total_price + total_freight_value)
+        data_tests:
+          - not_null
+
+      - name: payment_count
+        description: Number of payment installments for the order
+
+      - name: total_payment_value
+        description: Total payment amount collected for the order (BRL)
+
+      - name: review_count
+        description: Number of reviews submitted for this order
+
+      - name: review_score
+        description: Average review score for this order (1-5 scale)
+
+      - name: created_at
+        description: Timestamp when this record was created in the data warehouse
+        data_tests:
+          - not_null
+
+      - name: updated_at
+        description: Timestamp when this record was last updated in the data warehouse
+        data_tests:
+          - not_null
+
+  # Order items fact table
+  - name: fct_order_items
+    description: >
+      Fact table for order items at line-item grain (one row per order item).
+      Use this for product/seller analytics: category performance, seller metrics, basket analysis.
+      Includes role-playing date dimensions for date contexts.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns:
+              - order_id
+              - order_item_id
+    columns:
+      - name: order_item_key
+        description: Surrogate key for the order item fact, generated from (order_id, order_item_id)
+        data_tests:
+          - unique
+          - not_null
+
+      - name: order_id
+        description: Order identifier from source system
+        data_tests:
+          - not_null
+
+      - name: order_item_id
+        description: Sequential item number within the order
+        data_tests:
+          - not_null
+
+      - name: customer_key
+        description: Foreign key to dim_customers
+
+      - name: product_key
+        description: Foreign key to dim_products
+
+      - name: seller_key
+        description: Foreign key to dim_sellers
+
+      - name: order_date_key
+        description: Foreign key to dim_dates for order placement date
+        data_tests:
+          - not_null
+
+      - name: delivery_date_key
+        description: Foreign key to dim_dates for customer delivery date
+
+      - name: order_status
+        description: Current status of the order
+        data_tests:
+          - not_null
+
+      - name: product_category
+        description: Product category name in English (denormalized for quick access)
+
+      - name: item_price
+        description: Price of this item (BRL)
+        data_tests:
+          - not_null
+
+      - name: item_freight
+        description: Freight cost allocated to this item (BRL)
+        data_tests:
+          - not_null
+
+      - name: item_total
+        description: Total value for this item (item_price + item_freight)
+        data_tests:
+          - not_null
+
+      - name: created_at
+        description: Timestamp when this record was created in the data warehouse
+        data_tests:
+          - not_null
+
+      - name: updated_at
+        description: Timestamp when this record was last updated in the data warehouse
+        data_tests:
+          - not_null
