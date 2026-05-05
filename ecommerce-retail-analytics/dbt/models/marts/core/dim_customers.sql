@@ -36,6 +36,8 @@ final as (
     select
         -- Generate surrogate key for customer dimension
         {{ dbt_utils.generate_surrogate_key(['dc.customer_unique_id']) }} as customer_key,
+        -- FK to dim_cohorts (must match cohort_key generation in dim_cohorts)
+        {{ dbt_utils.generate_surrogate_key(['date_trunc(month, co.first_order_date)']) }} as cohort_key,
         dc.customer_unique_id,
         dc.zip_code,
         dc.city,

@@ -27,6 +27,9 @@ models:
           - unique
           - not_null
 
+      - name: cohort_key
+        description: Foreign key to dim_cohorts (acquisition cohort)
+
       - name: zip_code
         description: Customer's zip code (5-digit, zero-padded). Uses most recent address if customer has multiple orders.
 
@@ -340,6 +343,71 @@ models:
 
       - name: width_cm
         description: Product width in centimeters
+
+      - name: created_at
+        description: Timestamp when this record was created in the data warehouse
+        data_tests:
+          - not_null
+
+      - name: updated_at
+        description: Timestamp when this record was last updated in the data warehouse
+        data_tests:
+          - not_null
+
+  # Cohorts dimension model
+  - name: dim_cohorts
+    description: >
+      Cohort dimension table grouping customers by their first purchase month.
+      Use this to slice metrics by acquisition cohort in Power BI dashboards.
+      Links to dim_customers and fct_cohort_retention via cohort_key.
+    columns:
+      - name: cohort_key
+        description: Surrogate key for the cohort dimension, generated from cohort_month
+        data_tests:
+          - unique
+          - not_null
+
+      - name: cohort_month
+        description: First day of the cohort month (e.g., 2017-01-01)
+        data_tests:
+          - unique
+          - not_null
+
+      - name: cohort_month_name
+        description: Human-readable cohort name (e.g., "Jan 2017")
+        data_tests:
+          - not_null
+
+      - name: cohort_year
+        description: Year of the cohort (e.g., 2017)
+        data_tests:
+          - not_null
+
+      - name: year_quarter
+        description: Year and quarter (e.g., "2017-Q1")
+        data_tests:
+          - not_null
+
+      - name: cohort_size
+        description: Number of customers in this cohort
+        data_tests:
+          - not_null
+
+      - name: total_cohort_orders
+        description: Total orders placed by all customers in this cohort
+        data_tests:
+          - not_null
+
+      - name: total_cohort_revenue
+        description: Total revenue from all customers in this cohort (BRL)
+        data_tests:
+          - not_null
+
+      - name: avg_order_value
+        description: Average order value for this cohort (total_revenue / total_orders)
+
+      - name: avg_customer_value
+        description: Average revenue per customer in this cohort (total_revenue / cohort_size)
 
       - name: created_at
         description: Timestamp when this record was created in the data warehouse
