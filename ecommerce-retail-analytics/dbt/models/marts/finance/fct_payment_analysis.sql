@@ -11,6 +11,11 @@ orders as (
     from {{ ref('stg_ecommerce__orders') }}
 ),
 
+dim_dates as (
+    select date_key, date
+    from {{ ref('dim_dates') }}
+),
+
 payments_enriched as (
     select
         p.order_id,
@@ -36,11 +41,6 @@ monthly_aggregates as (
         max(payment_installments) as max_installments
     from payments_enriched
     group by payment_type, year_month
-),
-
-dim_dates as (
-    select date_key, date
-    from {{ ref('dim_dates') }}
 ),
 
 final as (

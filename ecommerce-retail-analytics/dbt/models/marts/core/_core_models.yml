@@ -1,7 +1,8 @@
   # Core dimension models for customers, sellers, products, and dates. 
+  # Fact models for orders and order items. These are the foundational tables that capture transactions in the e-commerce retail ecosystem.
   # These tables are designed to be the foundation for all downstream marts and analyses, 
   # providing a single source of truth for key entities and their attributes. 
-  #They include comprehensive data quality tests to ensure reliability and consistency across the analytics ecosystem.
+  # They include comprehensive data quality tests to ensure reliability and consistency across the analytics ecosystem.
 
 version: 2
 
