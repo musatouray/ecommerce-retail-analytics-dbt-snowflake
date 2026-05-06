@@ -1,7 +1,7 @@
 -- Cohort dimension table grouping customers by their first purchase month
 -- Use this to slice metrics by acquisition cohort in Power BI dashboards
 -- Note: cohort_key is generated from cohort_month using dbt_utils.generate_surrogate_key
---       and must match the cohort_key FK in dim_customers for proper joins
+-- and must match the cohort_key FK in dim_customers for proper joins
 
 with customer_cohorts as (
     -- Assign customers to cohorts based on their first order month

@@ -155,6 +155,92 @@ models:
         data_tests:
           - not_null
 
+  - name: fct_clv_customer
+    description: >
+      Customer Lifetime Value fact table with historical and predicted CLV.
+      Each customer is scored and segmented by their value relative to cohort benchmarks.
+      Use this for customer valuation, acquisition ROI, and identifying high-value customers.
+    columns:
+      - name: clv_key
+        description: Surrogate key for the CLV record
+        data_tests:
+          - unique
+          - not_null
+
+      - name: customer_unique_id
+        description: Unique customer identifier (grain of the table)
+        data_tests:
+          - unique
+          - not_null
+
+      - name: cohort_key
+        description: Foreign key to dim_cohorts
+        data_tests:
+          - not_null
+
+      - name: total_orders
+        description: Total number of orders placed by the customer
+        data_tests:
+          - not_null
+
+      - name: average_order_value
+        description: Average value per order (may be NULL for edge cases)
+
+      - name: historical_clv
+        description: Total revenue the customer has generated to date
+        data_tests:
+          - not_null
+
+      - name: expected_ltv
+        description: Cohort benchmark - average CLV for customers in the same cohort
+        data_tests:
+          - not_null
+
+      - name: predicted_ltv
+        description: Predicted lifetime value (max of historical or cohort average)
+        data_tests:
+          - not_null
+
+      - name: value_vs_cohort
+        description: Difference between historical CLV and cohort average (positive = above average)
+        data_tests:
+          - not_null
+
+      - name: clv_score
+        description: Score used for segmentation (same as predicted_ltv)
+        data_tests:
+          - not_null
+
+      - name: clv_decile
+        description: CLV decile (1-10, where 10 = top 10%)
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+      - name: clv_segment
+        description: CLV segment based on decile (Platinum, Gold, Silver, Bronze)
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - Platinum
+                  - Gold
+                  - Silver
+                  - Bronze
+
+      - name: created_at
+        description: Timestamp when the record was created
+        data_tests:
+          - not_null
+
+      - name: updated_at
+        description: Timestamp when the record was last updated
+        data_tests:
+          - not_null
+
 seeds:
   - name: rfm_segment_definitions
     description: >
