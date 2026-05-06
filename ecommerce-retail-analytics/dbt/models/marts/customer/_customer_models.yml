@@ -241,6 +241,90 @@ models:
         data_tests:
           - not_null
 
+  - name: fct_churn_risk
+    description: >
+      Churn risk fact table identifying customers at risk of churning or already churned.
+      Uses additive scoring based on dormancy, purchase frequency, satisfaction, and value.
+      Use this for retention campaigns, win-back targeting, and customer health monitoring.
+    columns:
+      - name: churn_risk_key
+        description: Surrogate key for the churn risk record
+        data_tests:
+          - unique
+          - not_null
+
+      - name: customer_unique_id
+        description: Unique customer identifier (grain of the table)
+        data_tests:
+          - unique
+          - not_null
+
+      - name: cohort_key
+        description: Foreign key to dim_cohorts
+        data_tests:
+          - not_null
+
+      - name: days_since_last_order
+        description: Number of days since customer's last purchase
+        data_tests:
+          - not_null
+
+      - name: is_single_purchaser
+        description: TRUE if customer has only made one purchase (high churn risk)
+        data_tests:
+          - not_null
+
+      - name: churn_status
+        description: Customer status based on dormancy (Active, Cooling, At Risk, Churned)
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - Active
+                  - Cooling
+                  - At Risk
+                  - Churned
+
+      - name: customer_nps_segment
+        description: Customer satisfaction segment based on review scores
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - promoter
+                  - neutral
+                  - detractor
+                  - unknown
+
+      - name: churn_risk_score
+        description: Composite churn risk score (0-100, higher = more at risk)
+        data_tests:
+          - not_null
+
+      - name: churn_risk_segment
+        description: Risk segment based on composite score
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values:
+                  - Critical
+                  - High
+                  - Medium
+                  - Low
+
+      - name: created_at
+        description: Timestamp when the record was created
+        data_tests:
+          - not_null
+
+      - name: updated_at
+        description: Timestamp when the record was last updated
+        data_tests:
+          - not_null
+
 seeds:
   - name: rfm_segment_definitions
     description: >
