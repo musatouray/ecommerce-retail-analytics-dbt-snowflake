@@ -15,7 +15,7 @@ select
     year(date_day) as year,
     yearofweekiso(date_day) as iso_year,
     yearofweekiso(date_day) || '-W' || lpad(weekiso(date_day), 2, '0') as iso_year_week,
-    year(date_day) || '-Q' || date_part('quarter', date_day) as year_quarter,
+    year(date_day) || '-Q' || quarter(date_day) as year_quarter,
     to_char(date_day, 'YYYY-MM') as year_month,
     quarter(date_day) as quarter_number,
     'Q' || quarter(date_day) as quarter_name,

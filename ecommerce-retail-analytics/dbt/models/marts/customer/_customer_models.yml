@@ -4,6 +4,7 @@
 version: 2
 
 models:
+  # RFM segmentation model scoring customers on Recency, Frequency, and Monetary value.
   - name: fct_rfm_segments
     description: >
       RFM segmentation fact table scoring customers on Recency, Frequency, and Monetary value.
@@ -92,6 +93,7 @@ models:
         data_tests:
           - not_null
 
+  # Cohort retention model tracking customer retention by acquisition month and period.
   - name: fct_cohort_retention
     description: >
       Cohort retention fact table tracking customer retention by acquisition month.
@@ -155,6 +157,7 @@ models:
         data_tests:
           - not_null
 
+  # CLV model scoring customers on historical and predicted lifetime value relative to cohort benchmarks.
   - name: fct_clv_customer
     description: >
       Customer Lifetime Value fact table with historical and predicted CLV.
@@ -241,6 +244,7 @@ models:
         data_tests:
           - not_null
 
+  # Churn risk model scoring customers on dormancy, purchase frequency, satisfaction, and value.
   - name: fct_churn_risk
     description: >
       Churn risk fact table identifying customers at risk of churning or already churned.

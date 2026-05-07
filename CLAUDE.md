@@ -53,16 +53,24 @@ ecommerce-retail-analytics-dbt-snowflake/
 ├── INSTALLATION.md                # Setup guide
 ├── INSTRUCTIONS.md                # Execution guide
 │
+├── docs/
+│   └── interview-guides/          # SQL pattern study guides
+│       ├── 01-rfm-analysis.md
+│       ├── 02-cohort-analysis.md
+│       ├── 03-customer-lifetime-value.md
+│       └── 04-churn-indicators.md
+│
 └── ecommerce-retail-analytics/
     ├── .env                       # Environment variables (gitignored)
     ├── pyproject.toml             # Python dependencies
     │
+    ├── snowflake/                 # Snowflake setup SQL scripts
+    │   ├── 1-roles-and-user-config.sql
+    │   ├── 2-warehouse-config.sql
+    │   ├── 3-database-schemas-config.sql
+    │   └── 4-grant-access-config.sql
+    │
     ├── scripts/
-    │   ├── config/                # Snowflake setup SQL scripts
-    │   │   ├── 1-roles-and-user-config.sql
-    │   │   ├── 2-warehouse-config.sql
-    │   │   ├── 3-database-schemas-config.sql
-    │   │   └── 4-grant-access-config.sql
     │   ├── download_kaggle_data.py
     │   └── load_to_snowflake.py
     │
@@ -75,6 +83,9 @@ ecommerce-retail-analytics-dbt-snowflake/
         ├── macros/
         │   ├── generate_schema_name.sql  # Custom schema naming
         │   └── generate_date_spine.sql   # Date spine generator for dim_dates
+        │
+        ├── seeds/
+        │   └── rfm_segment_definitions.csv
         │
         └── models/
             ├── staging/           # Clean and type raw data
@@ -91,10 +102,17 @@ ecommerce-retail-analytics-dbt-snowflake/
             └── marts/             # Fact and dimension tables
                 ├── core/          # Shared dimensions & facts
                 │   ├── dim_customers.sql
+                │   ├── dim_cohorts.sql
                 │   ├── dim_dates.sql
                 │   ├── dim_products.sql
                 │   ├── dim_sellers.sql
-                │   └── fct_orders.sql
+                │   ├── fct_orders.sql
+                │   └── fct_order_items.sql
+                ├── customer/      # Customer analytics
+                │   ├── fct_rfm_segments.sql
+                │   ├── fct_cohort_retention.sql
+                │   ├── fct_clv_customer.sql
+                │   └── fct_churn_risk.sql
                 ├── finance/       # Revenue & payment analytics
                 │   ├── fct_daily_revenue.sql
                 │   └── fct_payment_analysis.sql
@@ -120,7 +138,7 @@ ecommerce-retail-analytics-dbt-snowflake/
 | `INTERMEDIATE` | Joined and enriched | Views |
 | `MARTS` | Fact and dimension tables | Tables |
 
-Note: Mart models are organized into subfolders (`core/`, `finance/`, `marketing/`) for code organization, but all deploy to the single `MARTS` schema.
+Note: Mart models are organized into subfolders (`core/`, `customer/`, `finance/`, `marketing/`) for code organization, but all deploy to the single `MARTS` schema.
 
 ## dbt Conventions
 
@@ -231,11 +249,22 @@ select * from renamed
 
 | Model | Grain | Description |
 |-------|-------|-------------|
-| dim_customers | customer_unique_id | Customer dimension with attributes and location |
+| dim_customers | customer_unique_id | Customer dimension with attributes, location, and cohort assignment |
+| dim_cohorts | cohort_month | Acquisition cohort dimension with aggregate metrics |
 | dim_dates | date | Date dimension generated from order date range |
 | dim_products | product_id | Product dimension with English category names |
 | dim_sellers | seller_id | Seller dimension with location |
 | fct_orders | order_id | Order fact table with metrics |
+| fct_order_items | (order_id, order_item_id) | Order item fact table with product and seller details |
+
+### Customer (`marts/customer/`)
+
+| Model | Grain | Description |
+|-------|-------|-------------|
+| fct_rfm_segments | customer_unique_id | RFM scoring and segmentation (Champions, At Risk, etc.) |
+| fct_cohort_retention | (cohort_month, period_number) | Cohort retention rates by period |
+| fct_clv_customer | customer_unique_id | Customer Lifetime Value with predictions and segments |
+| fct_churn_risk | customer_unique_id | Churn risk scoring and status (Active, Cooling, At Risk, Churned) |
 
 ### Finance (`marts/finance/`)
 
