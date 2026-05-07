@@ -4,68 +4,183 @@
 version: 2
 
 models:
-  # Daily revenue fact table
-  - name: fct_daily_revenue
+  # Daily revenue time series fact table with comprehensive time intelligence
+  - name: fct_daily_revenue_time_series
     description: >
-      Daily revenue fact table aggregated at date grain.
-      Use this for revenue trends, daily performance, and time-series analysis.
-      One row per day with orders.
+      Daily revenue fact table with comprehensive time intelligence metrics.
+      Includes prior period comparisons (WoW, MoM, YoY), moving averages (7d, 28d, 90d, 365d),
+      running totals (YTD, QTD, MTD, WTD), and growth rates.
+      One row per calendar day (includes days with no orders).
     columns:
       - name: date_key
-        description: Foreign key to dim_dates for the order date
+        description: Foreign key to dim_dates
         data_tests:
           - unique
           - not_null
 
+      - name: date
+        description: Calendar date
+        data_tests:
+          - not_null
+
+      - name: year
+        description: Calendar year
+        data_tests:
+          - not_null
+
+      - name: quarter_number
+        description: Quarter number (1-4)
+        data_tests:
+          - not_null
+
+      - name: month
+        description: Month number (1-12)
+        data_tests:
+          - not_null
+
+      - name: iso_year_week
+        description: ISO year and week (e.g., 2017-W01)
+        data_tests:
+          - not_null
+
       - name: total_orders
-        description: Total number of distinct orders placed on this date
+        description: Total distinct orders on this date (0 if no orders)
         data_tests:
           - not_null
 
       - name: delivered_orders
-        description: Number of orders with 'delivered' status
+        description: Orders with delivered status
         data_tests:
           - not_null
 
       - name: canceled_orders
-        description: Number of orders with 'canceled' status
+        description: Orders with canceled status
         data_tests:
           - not_null
 
-      - name: total_price
-        description: Sum of item prices for all orders on this date (BRL)
+      - name: total_revenue
+        description: Sum of item prices (excludes freight)
         data_tests:
           - not_null
 
       - name: total_freight
-        description: Sum of freight costs for all orders on this date (BRL)
+        description: Sum of freight costs
         data_tests:
           - not_null
 
       - name: gross_revenue
-        description: Total revenue including freight (total_price + total_freight)
+        description: Total revenue including freight
         data_tests:
           - not_null
 
-      - name: total_payment_value
-        description: Sum of payment values collected on this date (BRL)
-
       - name: average_order_value
-        description: Average payment value per order on this date (BRL)
+        description: Average order value (NULL if no orders)
 
       - name: total_reviews
-        description: Total number of reviews for orders on this date
+        description: Total reviews submitted
+        data_tests:
+          - not_null
 
-      - name: average_review_score
-        description: Average review score for orders on this date (1-5 scale)
+      - name: avg_review_score
+        description: Average review score (NULL if no reviews)
+
+      - name: orders_prev_week
+        description: Orders from same day last week
+
+      - name: revenue_prev_week
+        description: Revenue from same day last week
+
+      - name: orders_prev_month
+        description: Orders from same day last month
+
+      - name: revenue_prev_month
+        description: Revenue from same day last month
+
+      - name: orders_prev_year
+        description: Orders from same day last year
+
+      - name: revenue_prev_year
+        description: Revenue from same day last year
+
+      - name: rolling_avg_orders_7d
+        description: 7-day rolling average of orders
+
+      - name: rolling_avg_revenue_7d
+        description: 7-day rolling average of revenue
+
+      - name: rolling_avg_orders_28d
+        description: 28-day rolling average of orders
+
+      - name: rolling_avg_revenue_28d
+        description: 28-day rolling average of revenue
+
+      - name: rolling_avg_orders_90d
+        description: 90-day rolling average of orders
+
+      - name: rolling_avg_revenue_90d
+        description: 90-day rolling average of revenue
+
+      - name: rolling_avg_orders_365d
+        description: 365-day rolling average of orders
+
+      - name: rolling_avg_revenue_365d
+        description: 365-day rolling average of revenue
+
+      - name: cumulative_orders
+        description: Cumulative orders since first date
+
+      - name: cumulative_revenue
+        description: Cumulative revenue since first date
+
+      - name: ytd_orders
+        description: Year-to-date orders
+
+      - name: ytd_revenue
+        description: Year-to-date revenue
+
+      - name: qtd_orders
+        description: Quarter-to-date orders
+
+      - name: qtd_revenue
+        description: Quarter-to-date revenue
+
+      - name: mtd_orders
+        description: Month-to-date orders
+
+      - name: mtd_revenue
+        description: Month-to-date revenue
+
+      - name: wtd_orders
+        description: Week-to-date orders (ISO week)
+
+      - name: wtd_revenue
+        description: Week-to-date revenue (ISO week)
+
+      - name: order_growth_wow_pct
+        description: Week-over-week order growth percentage
+
+      - name: revenue_growth_wow_pct
+        description: Week-over-week revenue growth percentage
+
+      - name: order_growth_mom_pct
+        description: Month-over-month order growth percentage
+
+      - name: revenue_growth_mom_pct
+        description: Month-over-month revenue growth percentage
+
+      - name: order_growth_yoy_pct
+        description: Year-over-year order growth percentage
+
+      - name: revenue_growth_yoy_pct
+        description: Year-over-year revenue growth percentage
 
       - name: created_at
-        description: Timestamp when this record was created in the data warehouse
+        description: Timestamp when this record was created
         data_tests:
           - not_null
 
       - name: updated_at
-        description: Timestamp when this record was last updated in the data warehouse
+        description: Timestamp when this record was last updated
         data_tests:
           - not_null
 
