@@ -675,3 +675,124 @@ models:
         description: Timestamp when this record was last updated in the data warehouse
         data_tests:
           - not_null
+
+  # Order funnel fact table
+  - name: fct_orders_funnel
+    description: >
+      Order funnel fact table tracking conversion rates through order lifecycle stages.
+      Use this for funnel visualization, drop-off analysis, and cycle time monitoring.
+      Grain is one row per month.
+    columns:
+      - name: funnel_key
+        description: Surrogate key for the funnel record, generated from funnel_month
+        data_tests:
+          - unique
+          - not_null
+
+      - name: date_key
+        description: Foreign key to dim_dates (first of month)
+        data_tests:
+          - not_null
+
+      - name: month_date
+        description: First day of the month
+        data_tests:
+          - not_null
+
+      - name: month_year
+        description: Human-readable month-year (e.g., "Jan-2017")
+        data_tests:
+          - not_null
+
+      - name: orders_placed
+        description: Total orders placed in this month
+        data_tests:
+          - not_null
+
+      - name: orders_approved
+        description: Orders that were approved (payment confirmed)
+        data_tests:
+          - not_null
+
+      - name: orders_shipped
+        description: Orders handed to carrier for delivery
+        data_tests:
+          - not_null
+
+      - name: orders_delivered
+        description: Orders successfully delivered to customer
+        data_tests:
+          - not_null
+
+      - name: orders_reviewed
+        description: Orders that received at least one review
+        data_tests:
+          - not_null
+
+      - name: orders_canceled
+        description: Orders that were canceled
+        data_tests:
+          - not_null
+
+      - name: orders_unavailable
+        description: Orders marked as unavailable
+        data_tests:
+          - not_null
+
+      - name: dropped_before_approval
+        description: Orders that dropped before approval stage
+
+      - name: dropped_before_shipping
+        description: Orders that dropped between approval and shipping
+
+      - name: dropped_before_delivery
+        description: Orders that dropped between shipping and delivery
+
+      - name: dropped_before_review
+        description: Orders delivered but not reviewed (can be negative if reviews submitted late)
+
+      - name: placed_to_approved_pct
+        description: Conversion rate from placed to approved (%)
+
+      - name: approved_to_shipped_pct
+        description: Conversion rate from approved to shipped (%)
+
+      - name: shipped_to_delivered_pct
+        description: Conversion rate from shipped to delivered (%)
+
+      - name: delivered_to_reviewed_pct
+        description: Conversion rate from delivered to reviewed (%)
+
+      - name: overall_delivery_rate
+        description: Overall conversion rate from placed to delivered (%)
+
+      - name: overall_review_rate
+        description: Overall conversion rate from placed to reviewed (%)
+
+      - name: cancellation_rate
+        description: Percentage of orders canceled (%)
+
+      - name: unavailability_rate
+        description: Percentage of orders marked unavailable (%)
+
+      - name: avg_days_to_approval
+        description: Average days from order placement to approval
+
+      - name: avg_days_to_ship
+        description: Average days from approval to carrier pickup
+
+      - name: avg_days_in_transit
+        description: Average days from carrier pickup to customer delivery
+
+      - name: avg_days_to_delivery
+        description: Average days from order placement to customer delivery
+
+      - name: created_at
+        description: Timestamp when this record was created
+        data_tests:
+          - not_null
+
+      - name: updated_at
+        description: Timestamp when this record was last updated
+        data_tests:
+          - not_null
