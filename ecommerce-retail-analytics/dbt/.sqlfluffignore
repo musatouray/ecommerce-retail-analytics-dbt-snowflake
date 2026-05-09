@@ -1,0 +1,7 @@
+# Ignore dbt generated files
+target/
+dbt_packages/
+logs/
+
+# Ignore macros (often have complex jinja)
+macros/

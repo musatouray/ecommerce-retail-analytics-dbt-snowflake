@@ -1,0 +1,87 @@
+[sqlfluff]
+# dbt-style SQL formatting (lowercase keywords)
+# Lenient mode - warnings only, doesn't fail CI
+
+dialect = snowflake
+templater = dbt
+runaway_limit = 10
+max_line_length = 120
+indent_unit = space
+
+# Exclude generated files
+exclude_rules = None
+
+[sqlfluff:indentation]
+# 4 spaces for indentation (dbt standard)
+tab_space_size = 4
+indent_unit = space
+
+[sqlfluff:templater:dbt]
+project_dir = ./
+profiles_dir = ~/.dbt
+profile = ecommerce_retail_analytics
+target = dev
+
+[sqlfluff:templater:jinja]
+apply_dbt_builtins = True
+
+# ----- RULE CONFIGURATIONS -----
+
+[sqlfluff:rules]
+# Allow some flexibility (lenient mode)
+allow_scalar = True
+single_table_references = consistent
+
+# L010: Keywords should be lowercase (dbt style)
+[sqlfluff:rules:capitalisation.keywords]
+capitalisation_policy = lower
+
+# L014: Identifiers should be lowercase
+[sqlfluff:rules:capitalisation.identifiers]
+capitalisation_policy = lower
+
+# L030: Function names should be lowercase
+[sqlfluff:rules:capitalisation.functions]
+capitalisation_policy = lower
+
+# L040: Boolean/null literals should be lowercase
+[sqlfluff:rules:capitalisation.literals]
+capitalisation_policy = lower
+
+# L003: Indentation (lenient - just warn)
+[sqlfluff:rules:indentation.indent]
+indent_unit = space
+tab_space_size = 4
+
+# L016: Line length (120 chars is reasonable)
+[sqlfluff:rules:layout.long_lines]
+max_line_length = 120
+ignore_comment_lines = True
+ignore_comment_clauses = True
+
+# L022: Blank line after CTE
+[sqlfluff:rules:layout.cte_newline]
+# Require blank line after CTE closing bracket
+comma_newline = True
+
+# L036: Select targets should be on separate lines
+[sqlfluff:rules:layout.select_targets]
+wildcard_policy = single
+
+# ----- DISABLED RULES (too strict for existing codebase) -----
+
+[sqlfluff:rules:aliasing.table]
+# AL01: Allow implicit aliases for now
+aliasing = explicit
+
+[sqlfluff:rules:aliasing.column]
+# AL02: Allow implicit column aliases for now
+aliasing = explicit
+
+[sqlfluff:rules:aliasing.expression]
+# AL03: Expression aliases
+allow_scalar = True
+
+[sqlfluff:rules:ambiguous.column_references]
+# AM04: Allow ambiguous column references (common in dbt)
+group_by_and_order_by_style = implicit

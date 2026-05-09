@@ -1,0 +1,191 @@
+# dbt Continuous Integration (CI) Pipeline
+# Runs on every Pull Request to main branch
+# Implements Slim CI - only tests modified models and their downstream dependencies
+
+name: dbt CI
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'ecommerce-retail-analytics/dbt/**'
+      - '.github/workflows/dbt-ci.yml'
+
+env:
+  DBT_PROJECT_DIR: ecommerce-retail-analytics/dbt
+
+jobs:
+  # Job 1: Code Quality Checks (Lenient)
+  lint:
+    name: Code Quality
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install SQLFluff
+        run: pip install sqlfluff sqlfluff-templater-dbt dbt-snowflake==1.7.0
+
+      - name: Lint SQL files (lenient - warnings only)
+        working-directory: ${{ env.DBT_PROJECT_DIR }}
+        run: |
+          echo "Running SQLFluff linter (lenient mode - warnings only)..."
+          sqlfluff lint models/ --dialect snowflake --config .sqlfluff || true
+        # Lenient: || true means warnings don't fail the build
+
+  # Job 2: dbt Build (Slim CI)
+  dbt-build:
+    name: dbt Build & Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dbt
+        run: |
+          pip install dbt-snowflake==1.7.0
+          dbt --version
+
+      # Write private key to file (required for Snowflake keypair auth)
+      - name: Setup Snowflake private key
+        run: |
+          echo "${{ secrets.SNOWFLAKE_PRIVATE_KEY }}" > /tmp/rsa_key.p8
+          chmod 600 /tmp/rsa_key.p8
+
+      - name: Create profiles.yml for CI
+        run: |
+          mkdir -p ~/.dbt
+          cat > ~/.dbt/profiles.yml << 'EOF'
+          ecommerce_retail_analytics:
+            target: ci
+            outputs:
+              ci:
+                type: snowflake
+                account: "${{ secrets.SNOWFLAKE_ACCOUNT }}"
+                user: "${{ secrets.SNOWFLAKE_USER }}"
+                role: "${{ secrets.SNOWFLAKE_ROLE }}"
+                warehouse: "${{ secrets.SNOWFLAKE_WAREHOUSE }}"
+                database: "${{ secrets.SNOWFLAKE_DATABASE }}"
+                schema: CI_PR_${{ github.event.pull_request.number }}
+                private_key_path: /tmp/rsa_key.p8
+                private_key_passphrase: "${{ secrets.SNOWFLAKE_PRIVATE_KEY_PASSPHRASE }}"
+                threads: 4
+          EOF
+
+      - name: Install dbt packages
+        working-directory: ${{ env.DBT_PROJECT_DIR }}
+        run: dbt deps
+
+      - name: Verify dbt connection
+        working-directory: ${{ env.DBT_PROJECT_DIR }}
+        run: dbt debug
+
+      # Download production manifest for state comparison (Slim CI)
+      - name: Download production manifest
+        uses: actions/download-artifact@v4
+        with:
+          name: prod-manifest
+          path: ${{ env.DBT_PROJECT_DIR }}/prod-manifest
+        continue-on-error: true
+
+      - name: Check for production manifest
+        id: check-manifest
+        working-directory: ${{ env.DBT_PROJECT_DIR }}
+        run: |
+          if [ -f "prod-manifest/manifest.json" ]; then
+            echo "manifest_exists=true" >> $GITHUB_OUTPUT
+            echo "Production manifest found - running Slim CI"
+          else
+            echo "manifest_exists=false" >> $GITHUB_OUTPUT
+            echo "No production manifest - running full build"
+          fi
+
+      # Slim CI: Only build modified models + downstream dependencies
+      - name: dbt build (Slim CI)
+        if: steps.check-manifest.outputs.manifest_exists == 'true'
+        working-directory: ${{ env.DBT_PROJECT_DIR }}
+        run: |
+          echo "Running Slim CI - modified models + downstream dependencies"
+          dbt build --select state:modified+ --defer --state prod-manifest
+
+      # Full build if no manifest exists
+      - name: dbt build (Full)
+        if: steps.check-manifest.outputs.manifest_exists != 'true'
+        working-directory: ${{ env.DBT_PROJECT_DIR }}
+        run: |
+          echo "Running full dbt build"
+          dbt build
+
+      - name: Generate docs
+        working-directory: ${{ env.DBT_PROJECT_DIR }}
+        run: dbt docs generate
+
+      # Upload manifest for future Slim CI
+      - name: Upload CI manifest
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci-manifest-${{ github.event.pull_request.number }}
+          path: ${{ env.DBT_PROJECT_DIR }}/target/manifest.json
+
+      # Cleanup private key
+      - name: Cleanup
+        if: always()
+        run: rm -f /tmp/rsa_key.p8
+
+  # Job 3: PR Comment with Results
+  comment:
+    name: PR Summary
+    runs-on: ubuntu-latest
+    needs: [lint, dbt-build]
+    if: always()
+    permissions:
+      pull-requests: write
+
+    steps:
+      - name: Comment on PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const lintResult = '${{ needs.lint.result }}';
+            const buildResult = '${{ needs.dbt-build.result }}';
+
+            const statusEmoji = (result) => result === 'success' ? '✅' : result === 'failure' ? '❌' : '⚠️';
+
+            const body = `## dbt CI Results
+
+            | Check | Status |
+            |-------|--------|
+            | Code Quality (SQLFluff) | ${statusEmoji(lintResult)} ${lintResult} |
+            | dbt Build & Test | ${statusEmoji(buildResult)} ${buildResult} |
+
+            ${buildResult === 'success' ? '🎉 All checks passed! Ready for review.' : '⚠️ Some checks need attention.'}
+
+            <details>
+            <summary>What was tested?</summary>
+
+            - **Slim CI**: Only modified models and their downstream dependencies
+            - **Schema**: Tests ran in isolated schema \`CI_PR_${{ github.event.pull_request.number }}\`
+            - **Production Safe**: CI uses separate schema, no production impact
+
+            </details>
+            `;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });
