@@ -18,6 +18,9 @@ funnel_calculations as (
         count(delivered_customer_date) as orders_delivered,
         count(case when review_count > 0 then 1 end) as orders_reviewed,
 
+        -- Add total revenue and average order value for additional funnel insights
+        sum(total_price) as total_revenue,
+
         -- Funnel exit counts
         sum(case when order_status = 'canceled' then 1 else 0 end) as orders_canceled,
         sum(case when order_status = 'unavailable' then 1 else 0 end) as orders_unavailable,
@@ -66,6 +69,9 @@ final as (
         -- Cancellation & unavailability rates
         round(orders_canceled * 100.0 / nullif(orders_placed, 0), 2) as cancellation_rate,
         round(orders_unavailable * 100.0 / nullif(orders_placed, 0), 2) as unavailability_rate,
+
+        -- Average order value
+        round(total_revenue / nullif(orders_placed, 0), 2) as avg_order_value,
 
         -- Cycle times
         round(avg_days_to_approval, 1) as avg_days_to_approval,

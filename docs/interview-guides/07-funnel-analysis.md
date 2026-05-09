@@ -3,6 +3,7 @@
 ## What is Funnel Analysis?
 
 Funnel Analysis tracks conversion rates through sequential stages of a process. It answers:
+
 - "What percentage of orders get delivered?"
 - "Where are customers dropping off?"
 - "How long does each stage take?"
