@@ -2,520 +2,229 @@
 
 ## E-Commerce Retail Analytics Platform
 
-**Prepared by:** Data Engineering Team
-**Platform:** dbt + Snowflake
-**Dataset:** Brazilian E-Commerce (Olist) - 100K+ Orders
+**Dataset:** Brazilian E-Commerce | 100,000+ Orders | 96,000+ Customers
 
 ---
 
-# Executive Overview
+## Executive Overview
 
-This document showcases **8 advanced analytics patterns** implemented to drive business intelligence and decision-making. Each pattern addresses specific business questions and delivers actionable insights.
+This analytics platform answers the questions that drive business growth:
 
-| Pattern | Business Question | Key Insight |
-|---------|-------------------|-------------|
-| RFM Analysis | Who are our best customers? | 12% are Champions worth 2x average |
-| Cohort Analysis | How do customers behave over time? | Retention drops to <1% after Month 1 |
-| Customer Lifetime Value | How much is each customer worth? | Platinum customers worth $637 each |
-| Churn Risk | Who is about to leave? | 46% of customers at Critical risk |
-| Pareto Analysis | Which products drive revenue? | 28% of products drive 80% of revenue |
-| Time Intelligence | How are we trending? | 7-day moving average smooths volatility |
-| Funnel Analysis | Where do we lose orders? | 97% delivery rate, 12-day avg delivery |
-| Market Basket | What's bought together? | Computer accessories: 7,000+ lift |
+| Business Question | Pattern | Key Finding |
+|-------------------|---------|-------------|
+| Who are our best customers? | RFM Analysis | 12% are Champions worth 2x average |
+| Are customers coming back? | Cohort Analysis | 99% don't return after first purchase |
+| What's each customer worth? | Lifetime Value | Platinum tier = $637 per customer |
+| Who's about to leave? | Churn Risk | 46% at critical risk level |
+| Which products matter most? | Pareto (80/20) | 28% of products drive 80% of revenue |
+| How are we trending? | Time Intelligence | Revenue up 300% week-over-week |
+| Where do orders fail? | Funnel Analysis | 97% delivery success rate |
+| What sells together? | Market Basket | Computer accessories: 67% cross-buy rate |
 
 ---
-
-<div style="page-break-after: always;"></div>
 
 # 1. RFM Analysis
+### Understanding Customer Value
 
-## Business Question
-> "Who are our most valuable customers, and how should we engage different segments?"
+**Question:** *"Who are our most valuable customers, and how should we treat each segment?"*
 
-## What It Measures
-- **Recency**: Days since last purchase (are they still engaged?)
-- **Frequency**: Number of orders (are they loyal?)
-- **Monetary**: Total spending (are they valuable?)
+RFM scores customers on three dimensions:
+- **Recency** - When did they last buy?
+- **Frequency** - How often do they buy?
+- **Monetary** - How much do they spend?
 
-## Sample Output
+### Results
 
-| Segment | Customers | Avg Revenue | Action |
-|---------|-----------|-------------|--------|
-| Champions | 11,607 | $308 | Reward & retain |
-| Cant Lose Them | 782 | $365 | Win back immediately |
-| Potential Loyalists | 10,211 | $169 | Nurture to Champions |
-| At Risk | 3,127 | $172 | Re-engagement campaign |
+| Segment | Customers | Avg Spend | Recommended Action |
+|---------|-----------|-----------|-------------------|
+| Champions | 11,607 | $308 | VIP treatment, early access |
+| Can't Lose Them | 782 | $365 | Urgent win-back campaign |
+| Potential Loyalists | 10,211 | $169 | Nurture with rewards program |
+| At Risk | 3,127 | $172 | Re-engagement emails |
 | Hibernating | 28,263 | $164 | Low-cost reactivation |
 
-## Visualization
-
-```
-Customer Segments by Value
-
-Champions        ████████████████████████████████████  $308
-Cant Lose Them   ██████████████████████████████████████ $365
-At Risk          ███████████████████  $172
-Pot. Loyalists   ███████████████████  $169
-Hibernating      ██████████████████   $164
-                 $0        $100       $200       $300    $400
-                          Average Revenue per Customer
-```
-
-## Business Impact
-- **Targeted Marketing**: Focus 70% of budget on Champions + Potential Loyalists
-- **Retention Priority**: "Cant Lose Them" segment has highest value - prioritize win-back
-- **Cost Efficiency**: Reduce spend on Hibernating customers (low ROI)
+### Business Impact
+- **Champions** (12% of customers) generate disproportionate value - protect them
+- **Can't Lose Them** have the highest spend but are slipping away - act now
+- **Hibernating** is the largest segment - small improvements yield big returns
 
 ---
-
-<div style="page-break-after: always;"></div>
 
 # 2. Cohort Analysis
+### Customer Retention Over Time
 
-## Business Question
-> "How do customers acquired in different months behave over their lifecycle?"
+**Question:** *"Do customers acquired in different periods behave differently over time?"*
 
-## What It Measures
-- **Cohort**: Customers grouped by first purchase month
-- **Retention Rate**: % still active in each subsequent month
-- **Churn Pattern**: When do customers stop buying?
+Cohort analysis groups customers by their first purchase month, then tracks what percentage return in subsequent months.
 
-## Sample Output
+### Results
 
-| Cohort | Month 0 | Month 1 | Month 2 | Month 3 | Month 4 |
-|--------|---------|---------|---------|---------|---------|
-| Jan-17 | 100% (754) | 0.4% | 0.3% | 0.1% | 0.4% |
-| Feb-17 | 100% (1,705) | 0.2% | 0.3% | 0.1% | 0.2% |
-| Mar-17 | 100% (2,521) | 0.3% | 0.2% | 0.2% | 0.1% |
+| Cohort | Size | Month 1 | Month 2 | Month 3 | Month 4 |
+|--------|------|---------|---------|---------|---------|
+| Jan 2017 | 754 | 0.4% | 0.3% | 0.1% | 0.4% |
+| Feb 2017 | 1,705 | 0.2% | 0.3% | 0.1% | 0.2% |
+| Mar 2017 | 2,521 | 0.3% | 0.2% | 0.2% | 0.1% |
 
-## Visualization
-
-```
-Retention Curve by Cohort (% Active)
-100% ┤■ ■ ■ ■ ■ ■
-     │
- 80% ┤
-     │
- 60% ┤
-     │
- 40% ┤
-     │
- 20% ┤
-     │
-  1% ┤    ▪ ▪ ▪ ▪ ▪  ← Retention drops sharply after Month 0
-     └────┬────┬────┬────┬────┬────
-         M0   M1   M2   M3   M4   M5
-
-■ = 100% (first purchase)   ▪ = <1% (returning customers)
-```
-
-## Business Impact
-- **Critical Insight**: 99%+ of customers never return after first purchase
-- **Opportunity**: Even 1% retention improvement = significant revenue
-- **Action**: Implement post-purchase engagement within 30 days
+### Business Impact
+- **Critical Finding:** Less than 1% of customers make a second purchase
+- **Opportunity:** Even a 1% retention improvement doubles repeat customers
+- **Action:** Implement post-purchase engagement within first 30 days
 
 ---
 
-<div style="page-break-after: always;"></div>
+# 3. Customer Lifetime Value
+### Predicting Customer Worth
 
-# 3. Customer Lifetime Value (CLV)
+**Question:** *"How much revenue can we expect from each customer over their lifetime?"*
 
-## Business Question
-> "What is each customer worth over their entire relationship with us?"
+CLV combines historical spending with cohort-based predictions to estimate total customer value.
 
-## What It Measures
-- **Historical CLV**: Total spent to date
-- **Predicted CLV**: Expected future value based on cohort behavior
-- **CLV Segment**: Platinum, Gold, Silver, Bronze tiers
+### Results
 
-## Sample Output
-
-| Segment | Customers | Avg Historical | Avg Predicted | Growth Potential |
-|---------|-----------|----------------|---------------|------------------|
+| Tier | Customers | Historical Spend | Predicted Value | Growth Potential |
+|------|-----------|------------------|-----------------|------------------|
 | Platinum | 9,542 | $637 | $637 | Maintain |
 | Gold | 19,084 | $202 | $221 | +9% |
 | Silver | 28,626 | $93 | $172 | +85% |
 | Bronze | 38,168 | $85 | $161 | +89% |
 
-## Visualization
-
-```
-Customer Lifetime Value by Segment
-
-                    Historical CLV    Predicted CLV
-                    ─────────────────────────────────
-Platinum ($637)     ████████████████████████████████████████
-                    ████████████████████████████████████████
-
-Gold ($221)         ████████████████████
-                    ██████████████████████  (+9%)
-
-Silver ($172)       █████████
-                    █████████████████████████████  (+85%)
-
-Bronze ($161)       ████████
-                    ████████████████████████████  (+89%)
-
-                    $0       $200      $400       $600
-```
-
-## Business Impact
-- **Investment Priority**: Silver/Bronze customers have highest growth potential
-- **Platinum Protection**: 10% of customers generate disproportionate value
-- **CAC Guidance**: Acquire customers for less than predicted CLV
+### Business Impact
+- **Platinum customers** (10%) are worth 4x more than Bronze - prioritize retention
+- **Silver & Bronze** have 85%+ growth potential - invest in nurturing
+- **Acquisition Budget:** Spend up to predicted CLV to acquire new customers profitably
 
 ---
-
-<div style="page-break-after: always;"></div>
 
 # 4. Churn Risk Indicators
+### Identifying At-Risk Customers
 
-## Business Question
-> "Which customers are at risk of leaving, and why?"
+**Question:** *"Which customers are about to stop buying, and can we save them?"*
 
-## What It Measures
-- **Recency Risk**: How long since last purchase
-- **Frequency Risk**: Single purchasers are higher risk
-- **Sentiment Risk**: Low review scores indicate dissatisfaction
-- **Combined Score**: 0-100 additive risk model
+Churn risk scoring combines multiple warning signals into a single 0-100 score.
 
-## Sample Output
+### Results
 
-| Risk Level | Customers | Avg Days Inactive | Avg Risk Score |
-|------------|-----------|-------------------|----------------|
-| Critical | 43,586 (46%) | 284 days | 83 |
-| High | 41,775 (44%) | 243 days | 64 |
-| Medium | 9,699 (10%) | 74 days | 36 |
-| Low | 360 (<1%) | 32 days | 9 |
+| Risk Level | Customers | % of Total | Avg Days Inactive | Risk Score |
+|------------|-----------|------------|-------------------|------------|
+| Critical | 43,586 | 46% | 284 days | 83 |
+| High | 41,775 | 44% | 243 days | 64 |
+| Medium | 9,699 | 10% | 74 days | 36 |
+| Low | 360 | <1% | 32 days | 9 |
 
-## Visualization
-
-```
-Churn Risk Distribution
-
-                    ┌─────────────────────────────────────┐
-     Critical (46%) │█████████████████████████████████████│ 83 score
-                    └─────────────────────────────────────┘
-                    ┌────────────────────────────────────┐
-         High (44%) │████████████████████████████████████│ 64 score
-                    └────────────────────────────────────┘
-                    ┌────────┐
-       Medium (10%) │████████│ 36 score
-                    └────────┘
-                    ┌┐
-          Low (<1%) ││ 9 score
-                    └┘
-
-     Customers:     0        20K       40K       60K
-```
-
-## Business Impact
-- **Urgent Action**: 46% at Critical risk = immediate intervention needed
-- **Resource Allocation**: Focus retention on High-risk before they become Critical
-- **Early Warning**: Medium-risk customers are the intervention sweet spot
+### Business Impact
+- **46% at Critical Risk** - nearly half the customer base needs intervention
+- **Medium Risk** (10%) is the sweet spot for intervention - not too late to save
+- **Low Risk** customers are rare gems - study what makes them different
 
 ---
-
-<div style="page-break-after: always;"></div>
 
 # 5. Pareto Analysis (80/20 Rule)
+### Finding the Products That Matter
 
-## Business Question
-> "Which products are driving the majority of our revenue?"
+**Question:** *"Which products drive the majority of our revenue?"*
 
-## What It Measures
-- **Revenue Rank**: Products ordered by revenue contribution
-- **Cumulative %**: Running total of revenue
-- **ABC Classification**: A (top 80%), B (next 15%), C (final 5%)
+The Pareto principle states that roughly 80% of results come from 20% of causes.
 
-## Sample Output
+### Results
 
-| Segment | Products | Revenue | Cumulative % |
-|---------|----------|---------|--------------|
-| A (Top 80%) | 9,252 (28%) | $12.7M | 80% |
-| B (Next 15%) | 11,759 (36%) | $2.4M | 95% |
-| C (Bottom 5%) | 11,940 (36%) | $0.8M | 100% |
+| Segment | Products | % of Catalog | Revenue | % of Revenue |
+|---------|----------|--------------|---------|--------------|
+| A (Top) | 9,252 | 28% | $12.7M | 80% |
+| B (Middle) | 11,759 | 36% | $2.4M | 15% |
+| C (Bottom) | 11,940 | 36% | $0.8M | 5% |
 
-## Visualization
-
-```
-Pareto Curve: Products vs Revenue
-
-100% ┤                                            ●────●
-     │                                       ●────┘
- 95% ┤                                  ●────┘
-     │                             ●────┘         Segment B
- 80% ┤                        ●────┘              (36% products
-     │                   ●────┘                    = 15% revenue)
- 60% ┤              ●────┘
-     │         ●────┘              Segment A
- 40% ┤    ●────┘                   (28% products = 80% revenue)
-     │●───┘
- 20% ┤
-     │
-  0% └─────┬──────┬──────┬──────┬──────┬──────
-          0%    20%    40%    60%    80%   100%
-                    % of Products
-
-         ████ = A Products (Focus)
-         ▒▒▒▒ = B Products (Monitor)
-         ░░░░ = C Products (Review)
-```
-
-## Business Impact
-- **Inventory Focus**: 28% of products generate 80% of revenue
-- **Stock Priority**: Ensure A-segment products never stock out
-- **Portfolio Review**: Consider discontinuing low-performing C products
+### Business Impact
+- **28% of products generate 80% of revenue** - focus inventory management here
+- **A-segment products** should never stock out
+- **C-segment products** (36% of catalog, 5% of revenue) - consider discontinuing
 
 ---
-
-<div style="page-break-after: always;"></div>
 
 # 6. Time Intelligence
+### Tracking Performance Over Time
 
-## Business Question
-> "How are we performing compared to last week/month/year?"
+**Question:** *"How are we performing compared to last week, month, and year?"*
 
-## What It Measures
-- **Prior Period Comparison**: WoW, MoM, YoY growth rates
-- **Moving Averages**: 7-day, 28-day trends (smooths daily noise)
-- **Running Totals**: YTD, QTD, MTD cumulative performance
+Time intelligence adds context to daily numbers by comparing to prior periods and smoothing noise with moving averages.
 
-## Sample Output
+### Results (January 2018)
 
-| Date | Orders | Revenue | WoW Growth | 7-Day MA |
-|------|--------|---------|------------|----------|
+| Date | Orders | Revenue | vs Last Week | 7-Day Trend |
+|------|--------|---------|--------------|-------------|
 | Jan 1 | 73 | $8,392 | -19% | $14,001 |
 | Jan 2 | 203 | $29,411 | +21% | $14,682 |
-| Jan 3 | 222 | $36,746 | +34% | $16,708 |
 | Jan 4 | 255 | $39,916 | +75% | $19,537 |
-| Jan 5 | 209 | $32,227 | +57% | $21,205 |
 | Jan 8 | 292 | $45,169 | +300% | $30,788 |
 
-## Visualization
-
-```
-Daily Revenue vs 7-Day Moving Average (Jan 2018)
-
-$50K ┤            ●
-     │        ●       ●   ●                    ● = Daily Revenue
-$40K ┤      ●   ●   ●                          ─ = 7-Day MA
-     │    ●
-$30K ┤  ●─────────────────────────────
-     │ ─────────                    ──────────
-$20K ┤
-     │
-$10K ┤●
-     │
-  $0 └──┬───┬───┬───┬───┬───┬───┬───┬───┬──
-       1   2   3   4   5   6   7   8   9  10
-                    January 2018
-
-Moving average reveals underlying trend despite daily volatility
-```
-
-## Business Impact
-- **Trend Detection**: 7-day MA shows true growth trajectory
-- **Anomaly Detection**: Spikes vs MA indicate unusual events
-- **YoY Comparison**: Accounts for seasonality in performance evaluation
+### Business Impact
+- **7-day moving average** reveals true trend beneath daily volatility
+- **Week-over-week comparison** shows Jan 8 had 300% growth vs prior week
+- **Anomaly detection:** When daily revenue exceeds 150% of 7-day average, investigate
 
 ---
-
-<div style="page-break-after: always;"></div>
 
 # 7. Funnel Analysis
+### Order Fulfillment Performance
 
-## Business Question
-> "Where are we losing customers in the order fulfillment process?"
+**Question:** *"Where are we losing orders in the fulfillment process?"*
 
-## What It Measures
-- **Stage Counts**: Orders at each process stage
-- **Conversion Rates**: % progressing to next stage
-- **Cycle Times**: Average days between stages
-- **Drop-off Points**: Where orders fail
+Funnel analysis tracks conversion rates through each stage of order processing.
 
-## Sample Output
+### Results
 
-| Month | Orders Placed | Orders Delivered | Delivery Rate | Avg Days |
-|-------|---------------|------------------|---------------|----------|
-| Jan-17 | 789 | 750 | 95.1% | 13.3 |
-| Feb-17 | 1,733 | 1,653 | 95.4% | 13.8 |
-| May-17 | 3,660 | 3,545 | 96.9% | 12.0 |
-| Jul-17 | 3,969 | 3,872 | 97.6% | 12.2 |
+| Stage | Orders | Conversion | Avg Time |
+|-------|--------|------------|----------|
+| Placed | 3,969 | 100% | - |
+| Approved | 3,930 | 99% | 0.5 days |
+| Shipped | 3,890 | 98% | 3.2 days |
+| Delivered | 3,872 | 97.6% | 12.2 days total |
+| Reviewed | ~1,750 | 45% | varies |
 
-## Visualization
-
-```
-Order Fulfillment Funnel
-
-PLACED     ████████████████████████████████████████  100% (3,969)
-              │
-              ▼ 99% approved
-APPROVED   ██████████████████████████████████████    99%
-              │
-              ▼ 98% shipped
-SHIPPED    ████████████████████████████████████      98%
-              │
-              ▼ 99% delivered
-DELIVERED  ██████████████████████████████████        97.6% (3,872)
-              │
-              ▼ 45% reviewed
-REVIEWED   ███████████████                           ~45%
-
-
-    Avg Cycle Time: 12.2 days (Placed → Delivered)
-
-    Drop-off Analysis:
-    ├── 1% fail at approval (payment issues)
-    ├── 1% fail at shipping (fulfillment issues)
-    └── 1% fail at delivery (logistics issues)
-```
-
-## Business Impact
-- **High Performance**: 97%+ delivery rate indicates strong operations
-- **Bottleneck Identified**: Review rate (45%) is opportunity for engagement
-- **SLA Tracking**: 12-day average delivery supports customer expectations
+### Business Impact
+- **97.6% delivery rate** indicates strong operational performance
+- **12.2-day delivery time** sets customer expectations
+- **45% review rate** - opportunity to increase customer feedback
 
 ---
 
-<div style="page-break-after: always;"></div>
-
 # 8. Market Basket Analysis
+### Products Bought Together
 
-## Business Question
-> "What products are frequently purchased together?"
+**Question:** *"What products are frequently purchased together?"*
 
-## What It Measures
-- **Support**: How often does this pair appear in orders?
-- **Confidence**: If customer buys A, what's probability they buy B?
-- **Lift**: Is this pair bought together more than random chance?
+Market basket analysis identifies product pairs that appear in the same order more often than chance would predict.
 
-## Sample Output
+### Results
 
 | Category A | Category B | Co-Purchases | Confidence | Lift |
 |------------|------------|--------------|------------|------|
-| Computers | Computers | 6 | 67% | 7,309 |
-| Computers | Computers | 5 | 63% | 6,167 |
-| Bed/Bath | Bed/Bath | 6 | 40% | 3,289 |
-| Auto | Auto | 6 | 24% | 623 |
-| Auto | Auto | 17 | 19% | 337 |
+| Computer Accessories | Computer Accessories | 6 | 67% | 7,309x |
+| Bed & Bath | Bed & Bath | 6 | 40% | 3,289x |
+| Auto Parts | Auto Parts | 17 | 19% | 337x |
+| Garden Tools | Garden Tools | 11 | 15% | 10x |
 
-## Visualization
+**Key Metrics:**
+- **Confidence 67%** = When customers buy Product A, 67% also buy Product B
+- **Lift 7,309x** = This pair is bought together 7,309x more than random chance
 
-```
-Product Association Strength (Lift)
-
-Lift > 1 = Products bought together MORE than random chance
-Lift = 1 = No association (random)
-Lift < 1 = Products bought together LESS than expected
-
-                                                    Lift Score
-Computer Accessories │████████████████████████████████│ 7,309
-(same category)      │                                │
-                     │                                │
-Bed & Bath          │███████████████                  │ 3,289
-(same category)      │                                │
-                     │                                │
-Auto Parts          │███████                          │ 623
-(same category)      │                                │
-                     │                                │
-Garden Tools        │█                                │ 10
-(same category)      │                                │
-                     └────────────────────────────────┘
-                     1        1000      3000     7000+
-
-
-Key Insight: Same-category products have highest affinity
-             Computer accessories buyers often buy multiple items
-```
-
-## Business Impact
-- **Bundle Opportunities**: Create packages from high-lift pairs
-- **Cross-Sell**: "Customers who bought X also bought Y" recommendations
-- **Store Layout**: Place high-affinity products near each other
+### Business Impact
+- **Bundle opportunities:** Create packages from high-lift product pairs
+- **"Customers also bought"** recommendations drive incremental revenue
+- **Same-category items** have highest affinity - upsell within categories
 
 ---
 
-<div style="page-break-after: always;"></div>
+# Key Insights Summary
 
-# Technical Implementation
-
-## Platform Architecture
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                      DATA PLATFORM                          │
-├─────────────────────────────────────────────────────────────┤
-│                                                             │
-│   ┌─────────┐    ┌─────────┐    ┌─────────┐    ┌─────────┐ │
-│   │  RAW    │───▶│ STAGING │───▶│  INT    │───▶│  MARTS  │ │
-│   │ (CSV)   │    │ (Clean) │    │ (Join)  │    │ (Serve) │ │
-│   └─────────┘    └─────────┘    └─────────┘    └─────────┘ │
-│                                                             │
-│   Source Data    Type Cast      Enrich        Analytics    │
-│   100K+ Orders   Deduplicate    Aggregate     8 Patterns   │
-│                                                             │
-├─────────────────────────────────────────────────────────────┤
-│  Technologies: Snowflake (Warehouse) + dbt (Transformation) │
-└─────────────────────────────────────────────────────────────┘
-```
-
-## Models Delivered
-
-| Layer | Model Count | Purpose |
-|-------|-------------|---------|
-| Staging | 9 models | Clean and type source data |
-| Intermediate | 2 models | Join and enrich |
-| Marts - Core | 7 models | Shared dimensions & facts |
-| Marts - Customer | 4 models | RFM, Cohort, CLV, Churn |
-| Marts - Finance | 3 models | Time Series, Pareto, Payments |
-| Marts - Marketing | 3 models | Basket, Category, Geography |
-| **Total** | **28 models** | End-to-end pipeline |
-
-## Data Quality
-
-- **100+ Tests**: Uniqueness, not-null, relationships, accepted values
-- **Documentation**: Full column descriptions and lineage
-- **Version Control**: Git-based change management
+| Insight | Metric | Action |
+|---------|--------|--------|
+| Champions are 2x more valuable | $308 vs $164 avg | Protect with VIP program |
+| 99% don't return | <1% Month 1 retention | Post-purchase engagement |
+| Half are at risk | 46% Critical churn | Intervention campaign |
+| 28% drives 80% | Pareto distribution | Inventory prioritization |
+| 97% orders delivered | Funnel success | Maintain operations |
+| Computer accessories bundle | 67% confidence | Cross-sell opportunity |
 
 ---
 
-<div style="page-break-after: always;"></div>
-
-# Summary: Business Value Delivered
-
-## Analytics Capabilities
-
-| Capability | Enables |
-|------------|---------|
-| Customer Segmentation | Targeted marketing campaigns |
-| Retention Analysis | Proactive churn prevention |
-| Lifetime Value | Customer acquisition budgeting |
-| Product Prioritization | Inventory optimization |
-| Trend Analysis | Executive dashboards |
-| Process Monitoring | Operational excellence |
-| Recommendation Engine | Revenue uplift |
-
-## Key Metrics at a Glance
-
-| Metric | Value | Insight |
-|--------|-------|---------|
-| Total Customers | 95,420 | Analyzed and segmented |
-| Champions | 11,607 (12%) | High-value, engaged |
-| Critical Churn Risk | 43,586 (46%) | Requires intervention |
-| A-Segment Products | 9,252 (28%) | Drive 80% of revenue |
-| Delivery Rate | 97%+ | Strong operations |
-| Product Pairs | 22 | Cross-sell opportunities |
-
-## Ready for Production
-
-This analytics platform is:
-- **Scalable**: Handles 100K+ orders, designed for growth
-- **Maintainable**: Modular dbt models with tests
-- **Documented**: Full lineage and business definitions
-- **Actionable**: Insights tied to business decisions
-
----
-
-*Generated from E-Commerce Retail Analytics Platform*
-*Built with dbt + Snowflake*
+*E-Commerce Retail Analytics Platform*
