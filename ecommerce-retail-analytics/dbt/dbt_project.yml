@@ -27,6 +27,9 @@ vars:
   gold_value_threshold: 1000
   silver_value_threshold: 100
 
+  # Market basket analysis thresholds
+  market_basket_min_pair_count: 5
+
 models:
   ecommerce_retail_analytics:
     staging:

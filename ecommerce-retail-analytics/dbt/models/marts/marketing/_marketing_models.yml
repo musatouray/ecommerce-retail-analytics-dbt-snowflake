@@ -150,3 +150,77 @@ models:
         description: Timestamp when this record was last updated in the data warehouse
         data_tests:
           - not_null
+
+  # Market basket analysis fact table
+  - name: fct_market_basket
+    description: >
+      Market basket analysis fact table identifying products frequently purchased together.
+      Use this for cross-sell recommendations, bundle creation, and product affinity analysis.
+      One row per product pair (ordered by product_id to avoid duplicates).
+    columns:
+      - name: basket_pair_key
+        description: Surrogate key for the product pair (hash of product_a and product_b)
+        data_tests:
+          - unique
+          - not_null
+
+      - name: product_a
+        description: First product ID in the pair (lower product_id)
+        data_tests:
+          - not_null
+
+      - name: product_b
+        description: Second product ID in the pair (higher product_id)
+        data_tests:
+          - not_null
+
+      - name: category_a
+        description: Product category for product_a (English)
+
+      - name: category_b
+        description: Product category for product_b (English)
+
+      - name: pair_count
+        description: Number of orders containing both products
+        data_tests:
+          - not_null
+
+      - name: product_a_order_count
+        description: Total orders containing product_a
+        data_tests:
+          - not_null
+
+      - name: product_b_order_count
+        description: Total orders containing product_b
+        data_tests:
+          - not_null
+
+      - name: support_pct
+        description: Support percentage - how often this pair appears in all orders
+        data_tests:
+          - not_null
+
+      - name: confidence_a_to_b_pct
+        description: Confidence A→B - probability of buying B given A was purchased
+        data_tests:
+          - not_null
+
+      - name: confidence_b_to_a_pct
+        description: Confidence B→A - probability of buying A given B was purchased
+        data_tests:
+          - not_null
+
+      - name: lift
+        description: Lift - how much more likely the pair is vs random chance (>1 = positive association)
+        data_tests:
+          - not_null
+
+      - name: created_at
+        description: Timestamp when this record was created
+        data_tests:
+          - not_null
+
+      - name: updated_at
+        description: Timestamp when this record was last updated
+        data_tests:
+          - not_null
