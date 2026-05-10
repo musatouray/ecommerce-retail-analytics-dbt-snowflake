@@ -46,7 +46,7 @@ jobs:
 
       - name: Install dbt
         run: |
-          pip install dbt-snowflake==1.7.0
+          pip install dbt-snowflake==1.9.0
           dbt --version
 
       # Write private key to file (required for Snowflake keypair auth)
