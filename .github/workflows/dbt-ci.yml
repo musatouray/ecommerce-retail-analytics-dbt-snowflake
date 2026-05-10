@@ -84,20 +84,20 @@ jobs:
       - name: Create profiles.yml for CI
         run: |
           mkdir -p ~/.dbt
-          cat > ~/.dbt/profiles.yml << 'EOF'
+          cat > ~/.dbt/profiles.yml << EOF
           ecommerce_retail_analytics:
             target: ci
             outputs:
               ci:
                 type: snowflake
-                account: "${{ secrets.SNOWFLAKE_ACCOUNT }}"
-                user: "${{ secrets.SNOWFLAKE_USER }}"
-                role: "${{ secrets.SNOWFLAKE_ROLE }}"
-                warehouse: "${{ secrets.SNOWFLAKE_WAREHOUSE }}"
-                database: "${{ secrets.SNOWFLAKE_DATABASE_DEV }}"
+                account: ${{ secrets.SNOWFLAKE_ACCOUNT }}
+                user: ${{ secrets.SNOWFLAKE_USER }}
+                role: ${{ secrets.SNOWFLAKE_ROLE }}
+                warehouse: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
+                database: ${{ secrets.SNOWFLAKE_DATABASE_DEV }}
                 schema: CI_PR_${{ github.event.pull_request.number }}
                 private_key_path: /tmp/rsa_key.p8
-                private_key_passphrase: "${{ secrets.SNOWFLAKE_PRIVATE_KEY_PASSPHRASE }}"
+                private_key_passphrase: ${{ secrets.SNOWFLAKE_PRIVATE_KEY_PASSPHRASE }}
                 threads: 4
           EOF
 
