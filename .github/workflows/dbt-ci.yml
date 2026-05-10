@@ -1,6 +1,12 @@
 # dbt Continuous Integration (CI) Pipeline
 # Runs on every Pull Request to main branch
 # Implements Slim CI - only tests modified models and their downstream dependencies
+#
+# MEDALLION ARCHITECTURE:
+#   Bronze + Silver: ECOMMERCE_RETAIL_DB_DEV.RAW + STAGING (shared source)
+#   Gold (CI Test):  ECOMMERCE_RETAIL_DB_DEV.CI_PR_xxx (isolated per PR)
+#
+# CI tests run in isolated schema, no impact on dev or prod
 
 name: dbt CI
 
@@ -12,7 +18,7 @@ on:
       - '.github/workflows/dbt-ci.yml'
 
 env:
-  DBT_PROJECT_DIR: ecommerce-retail-analytics/dbt
+  DBT_PROJECT_PATH: ecommerce-retail-analytics/dbt
 
 jobs:
   # Job 1: Code Quality Checks (Lenient)
@@ -29,11 +35,11 @@ jobs:
           python-version: '3.11'
 
       - name: Install SQLFluff
-        run: pip install sqlfluff sqlfluff-templater-dbt dbt-snowflake==1.7.0
+        run: pip install sqlfluff sqlfluff-templater-dbt dbt-snowflake==1.9.0
 
       - name: Lint SQL files (lenient - warnings only)
-        working-directory: ${{ env.DBT_PROJECT_DIR }}
         run: |
+          cd ${{ env.DBT_PROJECT_PATH }}
           echo "Running SQLFluff linter (lenient mode - warnings only)..."
           sqlfluff lint models/ --dialect snowflake --config .sqlfluff || true
         # Lenient: || true means warnings don't fail the build
@@ -54,9 +60,19 @@ jobs:
         with:
           python-version: '3.11'
 
+      - name: Debug directory structure
+        run: |
+          echo "Current directory: $(pwd)"
+          echo "Listing root:"
+          ls -la
+          echo "Listing ecommerce-retail-analytics:"
+          ls -la ecommerce-retail-analytics/ || echo "Directory not found"
+          echo "Listing dbt folder:"
+          ls -la ecommerce-retail-analytics/dbt/ || echo "dbt folder not found"
+
       - name: Install dbt
         run: |
-          pip install dbt-snowflake==1.7.0
+          pip install dbt-snowflake==1.9.0
           dbt --version
 
       # Write private key to file (required for Snowflake keypair auth)
@@ -65,46 +81,57 @@ jobs:
           echo "${{ secrets.SNOWFLAKE_PRIVATE_KEY }}" > /tmp/rsa_key.p8
           chmod 600 /tmp/rsa_key.p8
 
+      - name: Validate Snowflake account format
+        run: |
+          ACCOUNT="$(echo '${{ secrets.SNOWFLAKE_ACCOUNT }}' | xargs)"
+          echo "Using Snowflake account identifier: $ACCOUNT"
+          if echo "$ACCOUNT" | grep -Eq '^https?://|snowflakecomputing\.com'; then
+            echo "ERROR: SNOWFLAKE_ACCOUNT must be an account identifier (e.g., xy12345.us-east-1), not a URL or hostname"
+            exit 1
+          fi
+
       - name: Create profiles.yml for CI
         run: |
           mkdir -p ~/.dbt
-          cat > ~/.dbt/profiles.yml << 'EOF'
+          cat > ~/.dbt/profiles.yml << EOF
           ecommerce_retail_analytics:
             target: ci
             outputs:
               ci:
                 type: snowflake
-                account: "${{ secrets.SNOWFLAKE_ACCOUNT }}"
-                user: "${{ secrets.SNOWFLAKE_USER }}"
-                role: "${{ secrets.SNOWFLAKE_ROLE }}"
-                warehouse: "${{ secrets.SNOWFLAKE_WAREHOUSE }}"
-                database: "${{ secrets.SNOWFLAKE_DATABASE }}"
+                account: "$(echo '${{ secrets.SNOWFLAKE_ACCOUNT }}' | xargs)"
+                user: "$(echo '${{ secrets.SNOWFLAKE_USER }}' | xargs)"
+                role: "$(echo '${{ secrets.SNOWFLAKE_ROLE }}' | xargs)"
+                warehouse: "$(echo '${{ secrets.SNOWFLAKE_WAREHOUSE }}' | xargs)"
+                database: "$(echo '${{ secrets.SNOWFLAKE_DATABASE_DEV }}' | xargs)"
                 schema: CI_PR_${{ github.event.pull_request.number }}
                 private_key_path: /tmp/rsa_key.p8
-                private_key_passphrase: "${{ secrets.SNOWFLAKE_PRIVATE_KEY_PASSPHRASE }}"
+                private_key_passphrase: "$(echo '${{ secrets.SNOWFLAKE_PRIVATE_KEY_PASSPHRASE }}' | xargs)"
                 threads: 4
           EOF
 
       - name: Install dbt packages
-        working-directory: ${{ env.DBT_PROJECT_DIR }}
-        run: dbt deps
+        run: |
+          cd ${{ env.DBT_PROJECT_PATH }}
+          dbt deps
 
       - name: Verify dbt connection
-        working-directory: ${{ env.DBT_PROJECT_DIR }}
-        run: dbt debug
+        run: |
+          cd ${{ env.DBT_PROJECT_PATH }}
+          dbt debug
 
       # Download production manifest for state comparison (Slim CI)
       - name: Download production manifest
         uses: actions/download-artifact@v4
         with:
           name: prod-manifest
-          path: ${{ env.DBT_PROJECT_DIR }}/prod-manifest
+          path: ${{ env.DBT_PROJECT_PATH }}/prod-manifest
         continue-on-error: true
 
       - name: Check for production manifest
         id: check-manifest
-        working-directory: ${{ env.DBT_PROJECT_DIR }}
         run: |
+          cd ${{ env.DBT_PROJECT_PATH }}
           if [ -f "prod-manifest/manifest.json" ]; then
             echo "manifest_exists=true" >> $GITHUB_OUTPUT
             echo "Production manifest found - running Slim CI"
@@ -116,29 +143,30 @@ jobs:
       # Slim CI: Only build modified models + downstream dependencies
       - name: dbt build (Slim CI)
         if: steps.check-manifest.outputs.manifest_exists == 'true'
-        working-directory: ${{ env.DBT_PROJECT_DIR }}
         run: |
+          cd ${{ env.DBT_PROJECT_PATH }}
           echo "Running Slim CI - modified models + downstream dependencies"
           dbt build --select state:modified+ --defer --state prod-manifest
 
       # Full build if no manifest exists
       - name: dbt build (Full)
         if: steps.check-manifest.outputs.manifest_exists != 'true'
-        working-directory: ${{ env.DBT_PROJECT_DIR }}
         run: |
+          cd ${{ env.DBT_PROJECT_PATH }}
           echo "Running full dbt build"
           dbt build
 
       - name: Generate docs
-        working-directory: ${{ env.DBT_PROJECT_DIR }}
-        run: dbt docs generate
+        run: |
+          cd ${{ env.DBT_PROJECT_PATH }}
+          dbt docs generate
 
       # Upload manifest for future Slim CI
       - name: Upload CI manifest
         uses: actions/upload-artifact@v4
         with:
           name: ci-manifest-${{ github.event.pull_request.number }}
-          path: ${{ env.DBT_PROJECT_DIR }}/target/manifest.json
+          path: ${{ env.DBT_PROJECT_PATH }}/target/manifest.json
 
       # Cleanup private key
       - name: Cleanup

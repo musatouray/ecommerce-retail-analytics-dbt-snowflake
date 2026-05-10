@@ -1,6 +1,12 @@
 # dbt Continuous Deployment (CD) Pipeline
 # Runs on merge to main branch
-# Deploys to production Snowflake environment
+# Deploys to PRODUCTION Snowflake database
+#
+# MEDALLION ARCHITECTURE:
+#   Bronze + Silver: ECOMMERCE_RETAIL_DB_DEV.RAW + STAGING (shared source)
+#   Gold (Prod):     ECOMMERCE_RETAIL_DB_PROD.INTERMEDIATE + MARTS
+#
+# Only merged code reaches production - protected by branch rules
 
 name: dbt CD
 
@@ -21,7 +27,7 @@ on:
         type: boolean
 
 env:
-  DBT_PROJECT_DIR: ecommerce-retail-analytics/dbt
+  DBT_PROJECT_PATH: ecommerce-retail-analytics/dbt
 
 jobs:
   deploy:
@@ -40,7 +46,7 @@ jobs:
 
       - name: Install dbt
         run: |
-          pip install dbt-snowflake==1.7.0
+          pip install dbt-snowflake==1.9.0
           dbt --version
 
       # Write private key to file (required for Snowflake keypair auth)
@@ -49,38 +55,50 @@ jobs:
           echo "${{ secrets.SNOWFLAKE_PRIVATE_KEY }}" > /tmp/rsa_key.p8
           chmod 600 /tmp/rsa_key.p8
 
+      - name: Validate Snowflake account format
+        run: |
+          ACCOUNT="$(echo '${{ secrets.SNOWFLAKE_ACCOUNT }}' | xargs)"
+          echo "Using Snowflake account identifier: $ACCOUNT"
+          if echo "$ACCOUNT" | grep -Eq '^https?://|snowflakecomputing\.com'; then
+            echo "ERROR: SNOWFLAKE_ACCOUNT must be an account identifier (e.g., xy12345.us-east-1), not a URL or hostname"
+            exit 1
+          fi
+
+      # PRODUCTION profile - uses ECOMMERCE_RETAIL_DB_PROD
       - name: Create profiles.yml for Production
         run: |
           mkdir -p ~/.dbt
-          cat > ~/.dbt/profiles.yml << 'EOF'
+          cat > ~/.dbt/profiles.yml << EOF
           ecommerce_retail_analytics:
             target: prod
             outputs:
               prod:
                 type: snowflake
-                account: "${{ secrets.SNOWFLAKE_ACCOUNT }}"
-                user: "${{ secrets.SNOWFLAKE_USER }}"
-                role: "${{ secrets.SNOWFLAKE_ROLE }}"
-                warehouse: "${{ secrets.SNOWFLAKE_WAREHOUSE }}"
-                database: "${{ secrets.SNOWFLAKE_DATABASE }}"
-                schema: RAW
+                account: "$(echo '${{ secrets.SNOWFLAKE_ACCOUNT }}' | xargs)"
+                user: "$(echo '${{ secrets.SNOWFLAKE_USER }}' | xargs)"
+                role: "$(echo '${{ secrets.SNOWFLAKE_ROLE }}' | xargs)"
+                warehouse: "$(echo '${{ secrets.SNOWFLAKE_WAREHOUSE }}' | xargs)"
+                database: "$(echo '${{ secrets.SNOWFLAKE_DATABASE_PROD }}' | xargs)"
+                schema: MARTS
                 private_key_path: /tmp/rsa_key.p8
-                private_key_passphrase: "${{ secrets.SNOWFLAKE_PRIVATE_KEY_PASSPHRASE }}"
+                private_key_passphrase: "$(echo '${{ secrets.SNOWFLAKE_PRIVATE_KEY_PASSPHRASE }}' | xargs)"
                 threads: 4
           EOF
 
       - name: Install dbt packages
-        working-directory: ${{ env.DBT_PROJECT_DIR }}
-        run: dbt deps
+        run: |
+          cd ${{ env.DBT_PROJECT_PATH }}
+          dbt deps
 
       - name: Verify dbt connection
-        working-directory: ${{ env.DBT_PROJECT_DIR }}
-        run: dbt debug
+        run: |
+          cd ${{ env.DBT_PROJECT_PATH }}
+          dbt debug
 
       # Run dbt build (run + test)
       - name: dbt build
-        working-directory: ${{ env.DBT_PROJECT_DIR }}
         run: |
+          cd ${{ env.DBT_PROJECT_PATH }}
           if [ "${{ github.event.inputs.full_refresh }}" == "true" ]; then
             echo "Running dbt build with --full-refresh"
             dbt build --full-refresh
@@ -91,15 +109,16 @@ jobs:
 
       # Generate documentation
       - name: Generate dbt docs
-        working-directory: ${{ env.DBT_PROJECT_DIR }}
-        run: dbt docs generate
+        run: |
+          cd ${{ env.DBT_PROJECT_PATH }}
+          dbt docs generate
 
       # Save production manifest for Slim CI comparisons
       - name: Upload production manifest
         uses: actions/upload-artifact@v4
         with:
           name: prod-manifest
-          path: ${{ env.DBT_PROJECT_DIR }}/target/manifest.json
+          path: ${{ env.DBT_PROJECT_PATH }}/target/manifest.json
           retention-days: 90
 
       # Upload docs artifact
@@ -108,9 +127,9 @@ jobs:
         with:
           name: dbt-docs
           path: |
-            ${{ env.DBT_PROJECT_DIR }}/target/catalog.json
-            ${{ env.DBT_PROJECT_DIR }}/target/manifest.json
-            ${{ env.DBT_PROJECT_DIR }}/target/index.html
+            ${{ env.DBT_PROJECT_PATH }}/target/catalog.json
+            ${{ env.DBT_PROJECT_PATH }}/target/manifest.json
+            ${{ env.DBT_PROJECT_PATH }}/target/index.html
 
       # Cleanup private key
       - name: Cleanup
@@ -129,6 +148,7 @@ jobs:
         run: |
           if [ "${{ needs.deploy.result }}" == "success" ]; then
             echo "✅ Production deployment successful!"
+            echo "Database: ECOMMERCE_RETAIL_DB_PROD"
             echo "Commit: ${{ github.sha }}"
             echo "Actor: ${{ github.actor }}"
           else

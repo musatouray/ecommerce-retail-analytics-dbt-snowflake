@@ -1,12 +1,18 @@
 # Source generation for raw data tables
 # Data source integrity tests: Add generic tests like not null, unique
+#
+# MEDALLION ARCHITECTURE:
+#   Bronze (RAW) + Silver (STAGING) live in DEV database
+#   Both Dev and Prod environments read from the same Bronze layer
+#   This ensures single source of truth and no data duplication
+#
 version: 2
 
 sources:
   - name: raw
-    database: "{{ target.database }}"
-    schema: "{{ target.schema }}"
-    description: "Source definitions for staging models in ecommerce_retail_analytics project."
+    database: ECOMMERCE_RETAIL_DB_DEV
+    schema: raw
+    description: "Bronze Layer - Raw source data (single source of truth for all environments)"
 
     tables:
       # Customers

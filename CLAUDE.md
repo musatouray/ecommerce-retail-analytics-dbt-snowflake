@@ -10,10 +10,11 @@ E-Commerce Analytics project using dbt + Snowflake to analyze the Olist Brazilia
 
 | Component | Tool | Version/Notes |
 |-----------|------|---------------|
-| Warehouse | Snowflake | Database: `ECOMMERCE_RETAIL_DB` |
+| Warehouse | Snowflake | DEV + PROD databases (Medallion architecture) |
 | Transform | dbt | dbt-fusion 2.0.0-preview |
+| CI/CD | GitHub Actions | Slim CI + Auto-deploy to Prod |
 | Python | uv | Package manager |
-| Visualization | Power BI | Connects to Snowflake marts |
+| Visualization | Power BI | Connects to PROD.MARTS |
 
 ## Key Commands
 
@@ -125,18 +126,35 @@ ecommerce-retail-analytics-dbt-snowflake/
 
 | Setting | Value |
 |---------|-------|
-| Database | `ECOMMERCE_RETAIL_DB` |
 | Warehouse | `ECOMMERCE_RETAIL_WH` |
 | Role | `LEAD_DATA_ENGINEER_ROLE` |
 
-### Schema Architecture
+### Medallion Architecture (2 Databases)
 
-| Schema | Purpose | Materialization |
-|--------|---------|-----------------|
-| `RAW` | Source data from Kaggle CSV | Tables |
-| `STAGING` | Cleaned, typed, deduplicated | Views |
-| `INTERMEDIATE` | Joined and enriched | Views |
-| `MARTS` | Fact and dimension tables | Tables |
+```
+ECOMMERCE_RETAIL_DB_DEV (Bronze + Silver + Gold-Dev)
+├── RAW           ← Bronze: Source data (single source of truth)
+├── STAGING       ← Silver: Cleaned views (shared across environments)
+├── INTERMEDIATE  ← Gold: Dev transformations
+└── MARTS         ← Gold: Dev analytics tables
+
+ECOMMERCE_RETAIL_DB_PROD (Gold-Prod Only)
+├── INTERMEDIATE  ← Gold: Prod transformations
+└── MARTS         ← Gold: Prod analytics (dashboards connect here)
+```
+
+| Database | Schemas | Purpose |
+|----------|---------|---------|
+| `ECOMMERCE_RETAIL_DB_DEV` | RAW, STAGING, INTERMEDIATE, MARTS | Development + Bronze/Silver layers |
+| `ECOMMERCE_RETAIL_DB_PROD` | INTERMEDIATE, MARTS | Production Gold layer only |
+
+### CI/CD Environment Mapping
+
+| Environment | Database | What Gets Built |
+|-------------|----------|-----------------|
+| Local Dev | `_DEV` | All schemas |
+| CI (PR) | `_DEV.CI_PR_xxx` | Isolated test schema |
+| CD (Main) | `_PROD` | INTERMEDIATE + MARTS only |
 
 Note: Mart models are organized into subfolders (`core/`, `customer/`, `finance/`, `marketing/`) for code organization, but all deploy to the single `MARTS` schema.
 

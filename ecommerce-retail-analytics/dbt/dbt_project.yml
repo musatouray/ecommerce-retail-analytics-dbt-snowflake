@@ -32,7 +32,11 @@ vars:
 
 models:
   ecommerce_retail_analytics:
+    # MEDALLION ARCHITECTURE:
+    # - Staging (Silver) always goes to DEV database (shared across environments)
+    # - Intermediate + Marts (Gold) go to target database (DEV or PROD)
     staging:
+      +database: ECOMMERCE_RETAIL_DB_DEV  # Silver layer always in DEV
       +schema: staging
       +materialized: view
     intermediate:
