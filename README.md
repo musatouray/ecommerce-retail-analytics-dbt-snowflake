@@ -240,9 +240,8 @@ ecommerce-retail-analytics-dbt-snowflake/
     ├── snowflake/              # Snowflake setup scripts
     │   ├── 1-roles-and-user-config.sql
     │   ├── 2-warehouse-config.sql
-    │   ├── 3-database-schemas-config.sql
-    │   ├── 4-grant-access-config.sql
-    │   └── 5-prod-environment-config.sql  # Medallion 2-database setup
+    │   ├── 3-database-schemas-config.sql  # Medallion 2-database setup
+    │   └── 4-grant-access-config.sql
     │
     ├── scripts/                # Data extraction and loading
     │   ├── download_kaggle_data.py

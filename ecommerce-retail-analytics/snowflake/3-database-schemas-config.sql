@@ -1,69 +1,92 @@
--- =================================================
--- E-COMMERCE RETAIL ANALYTICS
--- 3. Database and Schemas Setup
--- =================================================
--- Run as: SYSADMIN
--- Purpose: Create database and schema structure for layered dbt architecture
--- =================================================
+-- ============================================================================
+-- MEDALLION ARCHITECTURE WITH ENVIRONMENT SEPARATION
+-- ============================================================================
+--
+-- Architecture:
+--   ECOMMERCE_RETAIL_DB_DEV  → Bronze + Silver + Gold (Dev)
+--   ECOMMERCE_RETAIL_DB_PROD → Gold only (reads from DEV.Silver)
+--
+-- Medallion Layers:
+--   Bronze (RAW)        → Immutable source data
+--   Silver (STAGING)    → Cleaned, validated, typed
+--   Gold (INT + MARTS)  → Business aggregates, analytics-ready
+--
+-- Key Design Decisions:
+--   1. Bronze + Silver in DEV only (no duplication, cost-efficient)
+--   2. Gold layer separated by environment (Dev vs Prod)
+--   3. PROD reads from DEV.STAGING via cross-database reference
+--   4. Only business logic (Gold) needs environment isolation
+--
+-- ============================================================================
 
 USE ROLE SYSADMIN;
 
--- =================================================
--- DATABASE
--- =================================================
+-- ============================================================================
+-- STEP 1: CREATE DEV DATABASE (Bronze + Silver + Gold)
+-- ============================================================================
+-- This is the landing zone for raw data and the development environment
 
-CREATE DATABASE IF NOT EXISTS ECOMMERCE_RETAIL_DB
-    COMMENT = 'E-Commerce retail analytics data warehouse';
+CREATE DATABASE IF NOT EXISTS ECOMMERCE_RETAIL_DB_DEV
+    COMMENT = 'Development: Bronze (RAW) + Silver (STAGING) + Gold (INT/MARTS)';
 
--- =================================================
--- SCHEMAS
--- =================================================
+-- Bronze Layer (Raw, immutable source data)
+CREATE SCHEMA IF NOT EXISTS ECOMMERCE_RETAIL_DB_DEV.RAW
+    COMMENT = 'Bronze Layer - Raw source data from Kaggle CSV';
 
--- RAW: Landing zone for source data
-CREATE SCHEMA IF NOT EXISTS ECOMMERCE_RETAIL_DB.RAW
-    COMMENT = 'Landing zone: raw CSV/JSON data from external sources (Kaggle)';
+-- Silver Layer (Cleaned, validated)
+CREATE SCHEMA IF NOT EXISTS ECOMMERCE_RETAIL_DB_DEV.STAGING
+    COMMENT = 'Silver Layer - Cleaned and typed data';
 
--- STAGING: Cleaned and typed source data
-CREATE SCHEMA IF NOT EXISTS ECOMMERCE_RETAIL_DB.STAGING
-    COMMENT = 'dbt staging layer: cleaned, typed, and deduplicated source data';
+-- Gold Layer (Business aggregates - Dev)
+CREATE SCHEMA IF NOT EXISTS ECOMMERCE_RETAIL_DB_DEV.INTERMEDIATE
+    COMMENT = 'Gold Layer - Joined and enriched models (Dev)';
 
--- INTERMEDIATE: Business logic transformations
-CREATE SCHEMA IF NOT EXISTS ECOMMERCE_RETAIL_DB.INTERMEDIATE
-    COMMENT = 'dbt intermediate layer: joined and enriched business entities';
+CREATE SCHEMA IF NOT EXISTS ECOMMERCE_RETAIL_DB_DEV.MARTS
+    COMMENT = 'Gold Layer - Fact and dimension tables (Dev)';
 
--- MARTS: Business-ready analytics tables
-CREATE SCHEMA IF NOT EXISTS ECOMMERCE_RETAIL_DB.MARTS
-    COMMENT = 'dbt marts layer: fact and dimension tables for BI consumption';
 
--- SEEDS: Reference/lookup data
-CREATE SCHEMA IF NOT EXISTS ECOMMERCE_RETAIL_DB.SEEDS
-    COMMENT = 'dbt seeds: static reference data loaded from CSV files';
+-- ============================================================================
+-- STEP 2: CREATE PROD DATABASE (Gold Only)
+-- ============================================================================
+-- Production only contains business-critical analytics tables
+-- Reads from DEV.STAGING (Silver layer) via cross-database reference
 
--- =================================================
--- SCHEMA ARCHITECTURE
--- =================================================
+CREATE DATABASE IF NOT EXISTS ECOMMERCE_RETAIL_DB_PROD
+    COMMENT = 'Production: Gold layer only (INT/MARTS) - Dashboards connect here';
+
+-- Gold Layer (Business aggregates - Prod)
+CREATE SCHEMA IF NOT EXISTS ECOMMERCE_RETAIL_DB_PROD.INTERMEDIATE
+    COMMENT = 'Gold Layer - Joined and enriched models (Prod)';
+
+CREATE SCHEMA IF NOT EXISTS ECOMMERCE_RETAIL_DB_PROD.MARTS
+    COMMENT = 'Gold Layer - Fact and dimension tables (Prod) - BI tools connect here';
+
+
+-- ============================================================================
+-- ARCHITECTURE DIAGRAM
+-- ============================================================================
 --
---  External Sources (Kaggle CSV)
---           │
---           ▼
---    ┌──────────────┐
---    │     RAW      │  Landing zone (tables)
---    └──────┬───────┘
---           │
---           ▼
---    ┌──────────────┐
---    │   STAGING    │  Clean + type cast (views)
---    └──────┬───────┘
---           │
---           ▼
---    ┌──────────────┐
---    │ INTERMEDIATE │  Join + enrich (tables)
---    └──────┬───────┘
---           │
---           ▼
---    ┌──────────────┐
---    │    MARTS     │  Fact + Dimension (tables)
---    └──────────────┘
---           │
---           ▼
---      Power BI / Analytics
+--  ┌─────────────────────────────────────────────────────────────────────────┐
+--  │                    MEDALLION + ENVIRONMENT ARCHITECTURE                 │
+--  ├─────────────────────────────────────────────────────────────────────────┤
+--  │                                                                          │
+--  │   ECOMMERCE_RETAIL_DB_DEV                                               │
+--  │   ┌─────────────────────────────────────────────────────────────────┐   │
+--  │   │ BRONZE (RAW)          │ Source data lands here                  │   │
+--  │   ├───────────────────────┼─────────────────────────────────────────┤   │
+--  │   │ SILVER (STAGING)      │ Cleaned views ──────────────────────┐   │   │
+--  │   ├───────────────────────┼─────────────────────────────────────│───┤   │
+--  │   │ GOLD (INT + MARTS)    │ Dev analytics                       │   │   │
+--  │   └───────────────────────┴─────────────────────────────────────│───┘   │
+--  │                                                                  │       │
+--  │   ECOMMERCE_RETAIL_DB_PROD                                       │       │
+--  │   ┌───────────────────────┬─────────────────────────────────────│───┐   │
+--  │   │ GOLD (INT + MARTS)    │ Prod analytics  ◄────────────────────┘   │   │
+--  │   │                       │ (reads from DEV.STAGING)                 │   │
+--  │   └───────────────────────┴──────────────────────────────────────────┘   │
+--  │                                                                          │
+--  │   ✅ Medallion: Bronze → Silver → Gold                                  │
+--  │   ✅ Cost Efficient: No Bronze/Silver duplication                       │
+--  │   ✅ Environment Isolation: Dev and Prod separated                      │
+--  │                                                                          │
+--  └─────────────────────────────────────────────────────────────────────────┘
