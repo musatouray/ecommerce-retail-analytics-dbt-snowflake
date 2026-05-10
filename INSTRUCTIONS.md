@@ -169,6 +169,7 @@ Run the SQL scripts in `ecommerce-retail-analytics/snowflake/` folder in order:
 2-warehouse-config.sql           # Create compute warehouse
 3-database-schemas-config.sql    # Create DEV + PROD databases (medallion setup)
 4-grant-access-config.sql        # Grant permissions to both databases
+5-verify-setup.sql               # Verify databases, schemas, and grants
 ```
 
 Or run this SQL directly for the 2-database medallion architecture:

@@ -241,7 +241,8 @@ ecommerce-retail-analytics-dbt-snowflake/
     │   ├── 1-roles-and-user-config.sql
     │   ├── 2-warehouse-config.sql
     │   ├── 3-database-schemas-config.sql  # Medallion 2-database setup
-    │   └── 4-grant-access-config.sql
+    │   ├── 4-grant-access-config.sql
+    │   └── 5-verify-setup.sql
     │
     ├── scripts/                # Data extraction and loading
     │   ├── download_kaggle_data.py
