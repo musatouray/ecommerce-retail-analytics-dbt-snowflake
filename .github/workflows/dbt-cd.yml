@@ -27,7 +27,7 @@ on:
         type: boolean
 
 env:
-  DBT_PROJECT_DIR: ecommerce-retail-analytics/dbt
+  PROJECT_DIR: ecommerce-retail-analytics/dbt
 
 jobs:
   deploy:
@@ -77,16 +77,16 @@ jobs:
           EOF
 
       - name: Install dbt packages
-        working-directory: ${{ env.DBT_PROJECT_DIR }}
+        working-directory: ${{ env.PROJECT_DIR }}
         run: dbt deps
 
       - name: Verify dbt connection
-        working-directory: ${{ env.DBT_PROJECT_DIR }}
+        working-directory: ${{ env.PROJECT_DIR }}
         run: dbt debug
 
       # Run dbt build (run + test)
       - name: dbt build
-        working-directory: ${{ env.DBT_PROJECT_DIR }}
+        working-directory: ${{ env.PROJECT_DIR }}
         run: |
           if [ "${{ github.event.inputs.full_refresh }}" == "true" ]; then
             echo "Running dbt build with --full-refresh"
@@ -98,7 +98,7 @@ jobs:
 
       # Generate documentation
       - name: Generate dbt docs
-        working-directory: ${{ env.DBT_PROJECT_DIR }}
+        working-directory: ${{ env.PROJECT_DIR }}
         run: dbt docs generate
 
       # Save production manifest for Slim CI comparisons
@@ -106,7 +106,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: prod-manifest
-          path: ${{ env.DBT_PROJECT_DIR }}/target/manifest.json
+          path: ${{ env.PROJECT_DIR }}/target/manifest.json
           retention-days: 90
 
       # Upload docs artifact
@@ -115,9 +115,9 @@ jobs:
         with:
           name: dbt-docs
           path: |
-            ${{ env.DBT_PROJECT_DIR }}/target/catalog.json
-            ${{ env.DBT_PROJECT_DIR }}/target/manifest.json
-            ${{ env.DBT_PROJECT_DIR }}/target/index.html
+            ${{ env.PROJECT_DIR }}/target/catalog.json
+            ${{ env.PROJECT_DIR }}/target/manifest.json
+            ${{ env.PROJECT_DIR }}/target/index.html
 
       # Cleanup private key
       - name: Cleanup
