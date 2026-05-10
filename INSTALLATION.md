@@ -88,7 +88,7 @@ Configure these in your repository settings (Settings > Secrets and variables > 
 | `SNOWFLAKE_WAREHOUSE` | Compute warehouse |
 | `SNOWFLAKE_DATABASE_DEV` | Dev database (`ECOMMERCE_RETAIL_DB_DEV`) |
 | `SNOWFLAKE_DATABASE_PROD` | Prod database (`ECOMMERCE_RETAIL_DB_PROD`) |
-| `SNOWFLAKE_PRIVATE_KEY` | Base64-encoded private key content |
+| `SNOWFLAKE_PRIVATE_KEY` | Private key content (paste full key including headers) |
 | `SNOWFLAKE_PRIVATE_KEY_PASSPHRASE` | Private key passphrase (if encrypted) |
 
 ## 4. Set Up Snowflake Key-Pair Authentication

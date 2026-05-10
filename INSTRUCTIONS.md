@@ -485,7 +485,7 @@ Configure these secrets (Settings > Secrets and variables > Actions):
 | `SNOWFLAKE_WAREHOUSE` | Compute warehouse |
 | `SNOWFLAKE_DATABASE_DEV` | `ECOMMERCE_RETAIL_DB_DEV` |
 | `SNOWFLAKE_DATABASE_PROD` | `ECOMMERCE_RETAIL_DB_PROD` |
-| `SNOWFLAKE_PRIVATE_KEY` | Base64 encoded private key |
+| `SNOWFLAKE_PRIVATE_KEY` | Private key content (full key with headers) |
 | `SNOWFLAKE_PRIVATE_KEY_PASSPHRASE` | Key passphrase (if encrypted) |
 
 ### 7.3 CI/CD Workflow
