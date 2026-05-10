@@ -27,7 +27,7 @@ on:
         type: boolean
 
 env:
-  PROJECT_DIR: ecommerce-retail-analytics/dbt
+  DBT_PROJECT_PATH: ecommerce-retail-analytics/dbt
 
 jobs:
   deploy:
@@ -77,17 +77,19 @@ jobs:
           EOF
 
       - name: Install dbt packages
-        working-directory: ${{ env.PROJECT_DIR }}
-        run: dbt deps
+        run: |
+          cd ${{ env.DBT_PROJECT_PATH }}
+          dbt deps
 
       - name: Verify dbt connection
-        working-directory: ${{ env.PROJECT_DIR }}
-        run: dbt debug
+        run: |
+          cd ${{ env.DBT_PROJECT_PATH }}
+          dbt debug
 
       # Run dbt build (run + test)
       - name: dbt build
-        working-directory: ${{ env.PROJECT_DIR }}
         run: |
+          cd ${{ env.DBT_PROJECT_PATH }}
           if [ "${{ github.event.inputs.full_refresh }}" == "true" ]; then
             echo "Running dbt build with --full-refresh"
             dbt build --full-refresh
@@ -98,15 +100,16 @@ jobs:
 
       # Generate documentation
       - name: Generate dbt docs
-        working-directory: ${{ env.PROJECT_DIR }}
-        run: dbt docs generate
+        run: |
+          cd ${{ env.DBT_PROJECT_PATH }}
+          dbt docs generate
 
       # Save production manifest for Slim CI comparisons
       - name: Upload production manifest
         uses: actions/upload-artifact@v4
         with:
           name: prod-manifest
-          path: ${{ env.PROJECT_DIR }}/target/manifest.json
+          path: ${{ env.DBT_PROJECT_PATH }}/target/manifest.json
           retention-days: 90
 
       # Upload docs artifact
@@ -115,9 +118,9 @@ jobs:
         with:
           name: dbt-docs
           path: |
-            ${{ env.PROJECT_DIR }}/target/catalog.json
-            ${{ env.PROJECT_DIR }}/target/manifest.json
-            ${{ env.PROJECT_DIR }}/target/index.html
+            ${{ env.DBT_PROJECT_PATH }}/target/catalog.json
+            ${{ env.DBT_PROJECT_PATH }}/target/manifest.json
+            ${{ env.DBT_PROJECT_PATH }}/target/index.html
 
       # Cleanup private key
       - name: Cleanup

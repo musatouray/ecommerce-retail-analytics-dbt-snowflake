@@ -18,7 +18,7 @@ on:
       - '.github/workflows/dbt-ci.yml'
 
 env:
-  PROJECT_DIR: ecommerce-retail-analytics/dbt
+  DBT_PROJECT_PATH: ecommerce-retail-analytics/dbt
 
 jobs:
   # Job 1: Code Quality Checks (Lenient)
@@ -38,8 +38,8 @@ jobs:
         run: pip install sqlfluff sqlfluff-templater-dbt dbt-snowflake==1.9.0
 
       - name: Lint SQL files (lenient - warnings only)
-        working-directory: ${{ env.PROJECT_DIR }}
         run: |
+          cd ${{ env.DBT_PROJECT_PATH }}
           echo "Running SQLFluff linter (lenient mode - warnings only)..."
           sqlfluff lint models/ --dialect snowflake --config .sqlfluff || true
         # Lenient: || true means warnings don't fail the build
@@ -102,25 +102,27 @@ jobs:
           EOF
 
       - name: Install dbt packages
-        working-directory: ${{ env.PROJECT_DIR }}
-        run: dbt deps
+        run: |
+          cd ${{ env.DBT_PROJECT_PATH }}
+          dbt deps
 
       - name: Verify dbt connection
-        working-directory: ${{ env.PROJECT_DIR }}
-        run: dbt debug
+        run: |
+          cd ${{ env.DBT_PROJECT_PATH }}
+          dbt debug
 
       # Download production manifest for state comparison (Slim CI)
       - name: Download production manifest
         uses: actions/download-artifact@v4
         with:
           name: prod-manifest
-          path: ${{ env.PROJECT_DIR }}/prod-manifest
+          path: ${{ env.DBT_PROJECT_PATH }}/prod-manifest
         continue-on-error: true
 
       - name: Check for production manifest
         id: check-manifest
-        working-directory: ${{ env.PROJECT_DIR }}
         run: |
+          cd ${{ env.DBT_PROJECT_PATH }}
           if [ -f "prod-manifest/manifest.json" ]; then
             echo "manifest_exists=true" >> $GITHUB_OUTPUT
             echo "Production manifest found - running Slim CI"
@@ -132,29 +134,30 @@ jobs:
       # Slim CI: Only build modified models + downstream dependencies
       - name: dbt build (Slim CI)
         if: steps.check-manifest.outputs.manifest_exists == 'true'
-        working-directory: ${{ env.PROJECT_DIR }}
         run: |
+          cd ${{ env.DBT_PROJECT_PATH }}
           echo "Running Slim CI - modified models + downstream dependencies"
           dbt build --select state:modified+ --defer --state prod-manifest
 
       # Full build if no manifest exists
       - name: dbt build (Full)
         if: steps.check-manifest.outputs.manifest_exists != 'true'
-        working-directory: ${{ env.PROJECT_DIR }}
         run: |
+          cd ${{ env.DBT_PROJECT_PATH }}
           echo "Running full dbt build"
           dbt build
 
       - name: Generate docs
-        working-directory: ${{ env.PROJECT_DIR }}
-        run: dbt docs generate
+        run: |
+          cd ${{ env.DBT_PROJECT_PATH }}
+          dbt docs generate
 
       # Upload manifest for future Slim CI
       - name: Upload CI manifest
         uses: actions/upload-artifact@v4
         with:
           name: ci-manifest-${{ github.event.pull_request.number }}
-          path: ${{ env.PROJECT_DIR }}/target/manifest.json
+          path: ${{ env.DBT_PROJECT_PATH }}/target/manifest.json
 
       # Cleanup private key
       - name: Cleanup
