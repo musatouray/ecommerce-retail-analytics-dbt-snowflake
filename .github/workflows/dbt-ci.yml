@@ -1,6 +1,12 @@
 # dbt Continuous Integration (CI) Pipeline
 # Runs on every Pull Request to main branch
 # Implements Slim CI - only tests modified models and their downstream dependencies
+#
+# MEDALLION ARCHITECTURE:
+#   Bronze + Silver: ECOMMERCE_RETAIL_DB_DEV.RAW + STAGING (shared source)
+#   Gold (CI Test):  ECOMMERCE_RETAIL_DB_DEV.CI_PR_xxx (isolated per PR)
+#
+# CI tests run in isolated schema, no impact on dev or prod
 
 name: dbt CI
 

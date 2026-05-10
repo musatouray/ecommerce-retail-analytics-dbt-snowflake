@@ -1,6 +1,12 @@
 # dbt Continuous Deployment (CD) Pipeline
 # Runs on merge to main branch
-# Deploys to production Snowflake environment
+# Deploys to PRODUCTION Snowflake database
+#
+# MEDALLION ARCHITECTURE:
+#   Bronze + Silver: ECOMMERCE_RETAIL_DB_DEV.RAW + STAGING (shared source)
+#   Gold (Prod):     ECOMMERCE_RETAIL_DB_PROD.INTERMEDIATE + MARTS
+#
+# Only merged code reaches production - protected by branch rules
 
 name: dbt CD
 
@@ -49,6 +55,7 @@ jobs:
           echo "${{ secrets.SNOWFLAKE_PRIVATE_KEY }}" > /tmp/rsa_key.p8
           chmod 600 /tmp/rsa_key.p8
 
+      # PRODUCTION profile - uses ECOMMERCE_RETAIL_DB_PROD
       - name: Create profiles.yml for Production
         run: |
           mkdir -p ~/.dbt
@@ -62,7 +69,7 @@ jobs:
                 user: "${{ secrets.SNOWFLAKE_USER }}"
                 role: "${{ secrets.SNOWFLAKE_ROLE }}"
                 warehouse: "${{ secrets.SNOWFLAKE_WAREHOUSE }}"
-                database: "${{ secrets.SNOWFLAKE_DATABASE }}"
+                database: "${{ secrets.SNOWFLAKE_DATABASE_PROD }}"
                 schema: RAW
                 private_key_path: /tmp/rsa_key.p8
                 private_key_passphrase: "${{ secrets.SNOWFLAKE_PRIVATE_KEY_PASSPHRASE }}"
@@ -129,6 +136,7 @@ jobs:
         run: |
           if [ "${{ needs.deploy.result }}" == "success" ]; then
             echo "✅ Production deployment successful!"
+            echo "Database: ECOMMERCE_RETAIL_DB_PROD"
             echo "Commit: ${{ github.sha }}"
             echo "Actor: ${{ github.actor }}"
           else
