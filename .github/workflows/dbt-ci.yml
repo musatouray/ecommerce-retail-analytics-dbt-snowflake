@@ -81,6 +81,15 @@ jobs:
           echo "${{ secrets.SNOWFLAKE_PRIVATE_KEY }}" > /tmp/rsa_key.p8
           chmod 600 /tmp/rsa_key.p8
 
+      - name: Validate Snowflake account format
+        run: |
+          ACCOUNT="$(echo '${{ secrets.SNOWFLAKE_ACCOUNT }}' | xargs)"
+          echo "Using Snowflake account identifier: $ACCOUNT"
+          if echo "$ACCOUNT" | grep -Eq '^https?://|snowflakecomputing\.com'; then
+            echo "ERROR: SNOWFLAKE_ACCOUNT must be an account identifier (e.g., xy12345.us-east-1), not a URL or hostname"
+            exit 1
+          fi
+
       - name: Create profiles.yml for CI
         run: |
           mkdir -p ~/.dbt
@@ -90,14 +99,14 @@ jobs:
             outputs:
               ci:
                 type: snowflake
-                account: ${{ secrets.SNOWFLAKE_ACCOUNT }}
-                user: ${{ secrets.SNOWFLAKE_USER }}
-                role: ${{ secrets.SNOWFLAKE_ROLE }}
-                warehouse: ${{ secrets.SNOWFLAKE_WAREHOUSE }}
-                database: ${{ secrets.SNOWFLAKE_DATABASE_DEV }}
+                account: "$(echo '${{ secrets.SNOWFLAKE_ACCOUNT }}' | xargs)"
+                user: "$(echo '${{ secrets.SNOWFLAKE_USER }}' | xargs)"
+                role: "$(echo '${{ secrets.SNOWFLAKE_ROLE }}' | xargs)"
+                warehouse: "$(echo '${{ secrets.SNOWFLAKE_WAREHOUSE }}' | xargs)"
+                database: "$(echo '${{ secrets.SNOWFLAKE_DATABASE_DEV }}' | xargs)"
                 schema: CI_PR_${{ github.event.pull_request.number }}
                 private_key_path: /tmp/rsa_key.p8
-                private_key_passphrase: ${{ secrets.SNOWFLAKE_PRIVATE_KEY_PASSPHRASE }}
+                private_key_passphrase: "$(echo '${{ secrets.SNOWFLAKE_PRIVATE_KEY_PASSPHRASE }}' | xargs)"
                 threads: 4
           EOF
 
