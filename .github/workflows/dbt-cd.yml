@@ -70,7 +70,7 @@ jobs:
                 role: "${{ secrets.SNOWFLAKE_ROLE }}"
                 warehouse: "${{ secrets.SNOWFLAKE_WAREHOUSE }}"
                 database: "${{ secrets.SNOWFLAKE_DATABASE_PROD }}"
-                schema: RAW
+                schema: MARTS
                 private_key_path: /tmp/rsa_key.p8
                 private_key_passphrase: "${{ secrets.SNOWFLAKE_PRIVATE_KEY_PASSPHRASE }}"
                 threads: 4

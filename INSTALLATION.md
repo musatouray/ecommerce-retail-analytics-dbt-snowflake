@@ -165,7 +165,7 @@ ecommerce_retail_analytics:
       user: "{{ env_var('SNOWFLAKE_USER') }}"
       database: ECOMMERCE_RETAIL_DB_PROD
       warehouse: "{{ env_var('SNOWFLAKE_WAREHOUSE') }}"
-      schema: RAW
+      schema: MARTS
       role: "{{ env_var('SNOWFLAKE_ROLE') }}"
       private_key_path: ~/.snowflake/rsa_key.p8
       private_key_passphrase: "{{ env_var('SNOWFLAKE_PRIVATE_KEY_PASSPHRASE') }}"

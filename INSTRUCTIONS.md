@@ -311,7 +311,7 @@ ecommerce_retail_analytics:
       role: "{{ env_var('SNOWFLAKE_ROLE') }}"
       warehouse: "{{ env_var('SNOWFLAKE_WAREHOUSE') }}"
       database: ECOMMERCE_RETAIL_DB_PROD
-      schema: RAW
+      schema: MARTS
       threads: 4
       private_key_path: ~/.snowflake/rsa_key.p8
       private_key_passphrase: "{{ env_var('SNOWFLAKE_PRIVATE_KEY_PASSPHRASE') }}"

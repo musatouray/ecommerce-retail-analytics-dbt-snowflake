@@ -60,6 +60,16 @@ jobs:
         with:
           python-version: '3.11'
 
+      - name: Debug directory structure
+        run: |
+          echo "Current directory: $(pwd)"
+          echo "Listing root:"
+          ls -la
+          echo "Listing ecommerce-retail-analytics:"
+          ls -la ecommerce-retail-analytics/ || echo "Directory not found"
+          echo "Listing dbt folder:"
+          ls -la ecommerce-retail-analytics/dbt/ || echo "dbt folder not found"
+
       - name: Install dbt
         run: |
           pip install dbt-snowflake==1.9.0
