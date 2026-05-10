@@ -77,16 +77,18 @@ Create `.env` file (never commit this):
 # Snowflake
 SNOWFLAKE_ACCOUNT=your_account.region
 SNOWFLAKE_USER=your_username
-SNOWFLAKE_PASSWORD=your_password
-SNOWFLAKE_ROLE=ACCOUNTADMIN
-SNOWFLAKE_WAREHOUSE=ECOMMERCE_WH
-SNOWFLAKE_DATABASE=ECOMMERCE_ANALYTICS
+SNOWFLAKE_ROLE=LEAD_DATA_ENGINEER_ROLE
+SNOWFLAKE_WAREHOUSE=ECOMMERCE_RETAIL_WH
+SNOWFLAKE_DATABASE=ECOMMERCE_RETAIL_DB_DEV
 SNOWFLAKE_SCHEMA=RAW
+SNOWFLAKE_PRIVATE_KEY_PASSPHRASE=your_passphrase  # if key is encrypted
 
 # Kaggle (optional if using kaggle.json)
 KAGGLE_USERNAME=your_kaggle_username
 KAGGLE_KEY=your_kaggle_api_key
 ```
+
+**Note:** Use key-pair authentication instead of password for security and CI/CD.
 
 ### 1.5 Create .gitignore
 
@@ -157,25 +159,45 @@ uv run python scripts/download_kaggle_data.py
 
 ## Phase 3: Snowflake Setup
 
-### 3.1 Create Snowflake Resources
+### 3.1 Create Snowflake Resources (Medallion Architecture)
 
-Run this SQL in Snowflake worksheet:
+Run the SQL scripts in `ecommerce-retail-analytics/snowflake/` folder in order:
+
+```bash
+# Execute in Snowflake worksheet (in order):
+1-roles-and-user-config.sql      # Create roles and service account
+2-warehouse-config.sql           # Create compute warehouse
+3-database-schemas-config.sql    # Create DEV database schemas
+4-grant-access-config.sql        # Grant permissions
+5-prod-environment-config.sql    # Create PROD database (medallion setup)
+```
+
+Or run this SQL directly for the 2-database medallion architecture:
 
 ```sql
 -- Create warehouse
-CREATE WAREHOUSE IF NOT EXISTS ECOMMERCE_WH
+CREATE WAREHOUSE IF NOT EXISTS ECOMMERCE_RETAIL_WH
     WAREHOUSE_SIZE = 'X-SMALL'
     AUTO_SUSPEND = 60
     AUTO_RESUME = TRUE;
 
--- Create database and schemas
-CREATE DATABASE IF NOT EXISTS ECOMMERCE_ANALYTICS;
-USE DATABASE ECOMMERCE_ANALYTICS;
+-- DEV Database (Bronze + Silver + Gold)
+CREATE DATABASE IF NOT EXISTS ECOMMERCE_RETAIL_DB_DEV
+    COMMENT = 'Development: Bronze (RAW) + Silver (STAGING) + Gold (INT/MARTS)';
 
-CREATE SCHEMA IF NOT EXISTS RAW;
-CREATE SCHEMA IF NOT EXISTS STAGING;
-CREATE SCHEMA IF NOT EXISTS INTERMEDIATE;
-CREATE SCHEMA IF NOT EXISTS MARTS;
+USE DATABASE ECOMMERCE_RETAIL_DB_DEV;
+CREATE SCHEMA IF NOT EXISTS RAW COMMENT = 'Bronze Layer - Raw source data';
+CREATE SCHEMA IF NOT EXISTS STAGING COMMENT = 'Silver Layer - Cleaned and typed';
+CREATE SCHEMA IF NOT EXISTS INTERMEDIATE COMMENT = 'Gold Layer - Joined models (Dev)';
+CREATE SCHEMA IF NOT EXISTS MARTS COMMENT = 'Gold Layer - Fact/Dim tables (Dev)';
+
+-- PROD Database (Gold Only)
+CREATE DATABASE IF NOT EXISTS ECOMMERCE_RETAIL_DB_PROD
+    COMMENT = 'Production: Gold layer only - BI tools connect here';
+
+USE DATABASE ECOMMERCE_RETAIL_DB_PROD;
+CREATE SCHEMA IF NOT EXISTS INTERMEDIATE COMMENT = 'Gold Layer - Joined models (Prod)';
+CREATE SCHEMA IF NOT EXISTS MARTS COMMENT = 'Gold Layer - Fact/Dim tables (Prod)';
 ```
 
 ### 3.2 Create Data Loading Script
@@ -212,10 +234,21 @@ uv run python scripts/load_to_snowflake.py
 ### 3.4 Verify Data in Snowflake
 
 ```sql
-USE ECOMMERCE_ANALYTICS.RAW;
+USE ECOMMERCE_RETAIL_DB_DEV.RAW;
 SELECT 'orders' as table_name, COUNT(*) as row_count FROM orders
 UNION ALL SELECT 'customers', COUNT(*) FROM customers
 UNION ALL SELECT 'products', COUNT(*) FROM products;
+
+-- Verify medallion architecture setup
+SELECT
+    'DEV' as database_name, 'Bronze' as layer, 'RAW' as schema_name, COUNT(*) as table_count
+FROM ECOMMERCE_RETAIL_DB_DEV.INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'RAW'
+UNION ALL
+SELECT 'DEV', 'Silver', 'STAGING', COUNT(*)
+FROM ECOMMERCE_RETAIL_DB_DEV.INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'STAGING'
+UNION ALL
+SELECT 'PROD', 'Gold', 'MARTS', COUNT(*)
+FROM ECOMMERCE_RETAIL_DB_PROD.INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'MARTS';
 ```
 
 ---
@@ -256,20 +289,35 @@ models:
 Create `~/.dbt/profiles.yml` (or `dbt_project/profiles.yml`):
 
 ```yaml
-ecommerce_analytics:
+ecommerce_retail_analytics:
   target: dev
   outputs:
     dev:
       type: snowflake
       account: "{{ env_var('SNOWFLAKE_ACCOUNT') }}"
       user: "{{ env_var('SNOWFLAKE_USER') }}"
-      password: "{{ env_var('SNOWFLAKE_PASSWORD') }}"
       role: "{{ env_var('SNOWFLAKE_ROLE') }}"
       warehouse: "{{ env_var('SNOWFLAKE_WAREHOUSE') }}"
-      database: ECOMMERCE_ANALYTICS
-      schema: STAGING
+      database: ECOMMERCE_RETAIL_DB_DEV
+      schema: RAW
       threads: 4
+      private_key_path: ~/.snowflake/rsa_key.p8
+      private_key_passphrase: "{{ env_var('SNOWFLAKE_PRIVATE_KEY_PASSPHRASE') }}"
+
+    prod:
+      type: snowflake
+      account: "{{ env_var('SNOWFLAKE_ACCOUNT') }}"
+      user: "{{ env_var('SNOWFLAKE_USER') }}"
+      role: "{{ env_var('SNOWFLAKE_ROLE') }}"
+      warehouse: "{{ env_var('SNOWFLAKE_WAREHOUSE') }}"
+      database: ECOMMERCE_RETAIL_DB_PROD
+      schema: RAW
+      threads: 4
+      private_key_path: ~/.snowflake/rsa_key.p8
+      private_key_passphrase: "{{ env_var('SNOWFLAKE_PRIVATE_KEY_PASSPHRASE') }}"
 ```
+
+**Note:** Use key-pair authentication (recommended) instead of password for security and CI/CD compatibility.
 
 ### 4.3 Create packages.yml
 
@@ -298,8 +346,8 @@ uv run dbt deps
 Create `dbt_project/models/staging/ecommerce/_sources.yml`:
 
 **Define sources for all 9 RAW tables with:**
-- Database: ECOMMERCE_RETAIL_DB
-- Schema: RAW
+- Database: `ECOMMERCE_RETAIL_DB_DEV` (Bronze layer - single source of truth)
+- Schema: `RAW`
 - Column descriptions
 
 ### 5.2 Create Staging Models
@@ -374,17 +422,19 @@ uv run dbt docs serve
 
 ## Phase 6: Power BI Connection
 
-### 6.1 Connect to Snowflake
+### 6.1 Connect to Snowflake (Production)
 
 1. Open Power BI Desktop
 2. Get Data → Snowflake
 3. Server: `your_account.snowflakecomputing.com`
-4. Warehouse: `ECOMMERCE_WH`
+4. Warehouse: `ECOMMERCE_RETAIL_WH`
 5. Sign in with Snowflake credentials
+
+**Important:** Connect to the **PROD** database for production dashboards.
 
 ### 6.2 Import Tables
 
-From `ECOMMERCE_ANALYTICS.MARTS` schema:
+From `ECOMMERCE_RETAIL_DB_PROD.MARTS` schema:
 - dim_customers
 - dim_dates
 - dim_products
@@ -411,6 +461,49 @@ Connect dimension tables to fact tables:
 - Payment method distribution (pie chart)
 - Delivery performance (KPI cards)
 - Customer segments (donut chart)
+
+---
+
+## Phase 7: CI/CD Setup (GitHub Actions)
+
+### 7.1 Branch Protection
+
+Configure branch protection rules in GitHub (Settings > Branches):
+- Require pull request reviews before merging
+- Require status checks to pass (dbt-build job)
+- Require branches to be up to date
+
+### 7.2 GitHub Secrets
+
+Configure these secrets (Settings > Secrets and variables > Actions):
+
+| Secret | Description |
+|--------|-------------|
+| `SNOWFLAKE_ACCOUNT` | Account identifier |
+| `SNOWFLAKE_USER` | Service account username |
+| `SNOWFLAKE_ROLE` | Role with permissions |
+| `SNOWFLAKE_WAREHOUSE` | Compute warehouse |
+| `SNOWFLAKE_DATABASE` | `ECOMMERCE_RETAIL_DB_DEV` |
+| `SNOWFLAKE_DATABASE_PROD` | `ECOMMERCE_RETAIL_DB_PROD` |
+| `SNOWFLAKE_PRIVATE_KEY` | Base64 encoded private key |
+| `SNOWFLAKE_PRIVATE_KEY_PASSPHRASE` | Key passphrase (if encrypted) |
+
+### 7.3 CI/CD Workflow
+
+The project includes two GitHub Actions workflows:
+
+**CI Pipeline (`.github/workflows/dbt-ci.yml`)**:
+- Triggers on PR to main branch
+- Runs SQLFluff linting (lenient mode)
+- Runs Slim CI (only modified models + downstream)
+- Tests in isolated `CI_PR_xxx` schema
+- Comments results on PR
+
+**CD Pipeline (`.github/workflows/dbt-cd.yml`)**:
+- Triggers on merge to main branch
+- Deploys to PROD database
+- Generates documentation
+- Saves production manifest for Slim CI
 
 ---
 

@@ -82,20 +82,51 @@ Beyond basic reporting, this project showcases **advanced SQL patterns** used by
 │    Kaggle    │      │  Snowflake   │      │     dbt      │      │   Power BI   │
 │   (Source)   │─────▶│  (Warehouse) │─────▶│ (Transform)  │─────▶│   (Visualize)│
 └──────────────┘      └──────────────┘      └──────────────┘      └──────────────┘
-     CSV via              RAW Schema           Staging,            Dashboards &
-    Kaggle API                               Intermediate,          Reports
-                                               & Marts
+     CSV via           2-Database            GitHub Actions       Dashboards &
+    Kaggle API         Medallion              CI/CD                Reports
 ```
+
+### Medallion Architecture (2-Database Pattern)
+
+```
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                    MEDALLION + ENVIRONMENT ARCHITECTURE                         │
+├─────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                 │
+│   ECOMMERCE_RETAIL_DB_DEV                                                       │
+│   ┌─────────────────────────────────────────────────────────────────────────┐   │
+│   │ BRONZE (RAW)          │ Source data lands here (CSV from Kaggle)       │   │
+│   ├───────────────────────┼─────────────────────────────────────────────────┤   │
+│   │ SILVER (STAGING)      │ Cleaned views ─────────────────────────────┐   │   │
+│   ├───────────────────────┼────────────────────────────────────────────│───┤   │
+│   │ GOLD (INT + MARTS)    │ Dev analytics                              │   │   │
+│   └───────────────────────┴────────────────────────────────────────────│───┘   │
+│                                                                         │       │
+│   ECOMMERCE_RETAIL_DB_PROD                                              │       │
+│   ┌───────────────────────┬────────────────────────────────────────────│───┐   │
+│   │ GOLD (INT + MARTS)    │ Prod analytics  ◄───────────────────────────┘   │   │
+│   │                       │ (reads from DEV.STAGING)                        │   │
+│   └───────────────────────┴─────────────────────────────────────────────────┘   │
+│                                                                                 │
+└─────────────────────────────────────────────────────────────────────────────────┘
+```
+
+**Key Design Decisions:**
+- **Bronze + Silver in DEV only** - No data duplication, cost efficient
+- **Gold layer separated** - Dev and Prod environments isolated
+- **Cross-database reference** - PROD reads from DEV.STAGING (single source of truth)
+- **CI/CD with GitHub Actions** - Automated testing and deployment
 
 ### Data Flow
 
 1. **Extract**: Download CSV files from Kaggle using the Kaggle API
-2. **Load**: Ingest raw CSV data into Snowflake's RAW schema
+2. **Load**: Ingest raw CSV data into Snowflake's Bronze layer (`DEV.RAW`)
 3. **Transform**: Use dbt to build layered transformations:
-   - **Staging**: Clean and standardize raw data
-   - **Intermediate**: Join and enrich data with business logic
-   - **Marts**: Create dimensional models for analytics
-4. **Visualize**: Connect Power BI to Snowflake marts for reporting
+   - **Bronze (RAW)**: Raw source data, immutable
+   - **Silver (STAGING)**: Cleaned, typed, validated views
+   - **Gold (INT + MARTS)**: Business aggregates, analytics-ready tables
+4. **CI/CD**: GitHub Actions validates PRs and deploys to production
+5. **Visualize**: Connect Power BI to `PROD.MARTS` for dashboards
 
 ## Tech Stack
 
@@ -126,35 +157,29 @@ The Olist dataset includes:
 
 ## Data Model
 
-### Layered Architecture
+### Layered Architecture (Medallion Pattern)
 
 ```
+ECOMMERCE_RETAIL_DB_DEV (Bronze + Silver + Gold-Dev)
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                              MARTS LAYER                                │
-│  ┌───────────┐  ┌───────────┐  ┌───────────┐  ┌───────────┐            │
-│  │   Core    │  │  Customer │  │  Finance  │  │ Marketing │            │
-│  │ fct_orders│  │ fct_rfm_  │  │ fct_daily_│  │fct_category│            │
-│  │ dim_*     │  │ segments  │  │ revenue   │  │_performance│            │
-│  │           │  │ fct_clv_  │  │           │  │            │            │
-│  │           │  │ customer  │  │           │  │            │            │
-│  └───────────┘  └───────────┘  └───────────┘  └───────────┘            │
+│ BRONZE (RAW)           Raw CSV data loaded via Python                   │
 ├─────────────────────────────────────────────────────────────────────────┤
-│                         INTERMEDIATE LAYER                              │
-│  ┌─────────────────────┐  ┌─────────────────────┐                       │
-│  │ int_orders_enriched │  │ int_order_items_    │                       │
-│  │                     │  │ enriched            │                       │
-│  └─────────────────────┘  └─────────────────────┘                       │
+│ SILVER (STAGING)       Cleaned, typed, validated views                  │
+│  stg_ecommerce__orders, stg_ecommerce__customers, ...                   │
 ├─────────────────────────────────────────────────────────────────────────┤
-│                           STAGING LAYER                                 │
-│  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐                   │
-│  │stg_ecomm_│ │stg_ecomm_│ │stg_ecomm_│ │stg_ecomm_│  ...              │
-│  │_orders   │ │_customers│ │_products │ │_sellers  │                   │
-│  └──────────┘ └──────────┘ └──────────┘ └──────────┘                   │
+│ GOLD (INTERMEDIATE)    Joined and enriched models                       │
+│  int_orders_enriched, int_order_items_enriched                          │
 ├─────────────────────────────────────────────────────────────────────────┤
-│                            RAW LAYER                                    │
-│  ┌──────────────────────────────────────────────────────────────────┐  │
-│  │  Snowflake RAW Schema (CSV data loaded via Python)               │  │
-│  └──────────────────────────────────────────────────────────────────┘  │
+│ GOLD (MARTS)           Fact and dimension tables (Dev)                  │
+│  Core | Customer | Finance | Marketing                                  │
+└─────────────────────────────────────────────────────────────────────────┘
+
+ECOMMERCE_RETAIL_DB_PROD (Gold Only - Dashboards Connect Here)
+┌─────────────────────────────────────────────────────────────────────────┐
+│ GOLD (INTERMEDIATE)    Reads from DEV.STAGING                           │
+├─────────────────────────────────────────────────────────────────────────┤
+│ GOLD (MARTS)           Production analytics tables                      │
+│  dim_* | fct_* (BI tools connect here)                                  │
 └─────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -194,6 +219,11 @@ ecommerce-retail-analytics-dbt-snowflake/
 ├── INSTALLATION.md             # Setup and installation guide
 ├── INSTRUCTIONS.md             # Detailed execution guide
 │
+├── .github/
+│   └── workflows/
+│       ├── dbt-ci.yml          # CI: PR validation with Slim CI
+│       └── dbt-cd.yml          # CD: Deploy to production on merge
+│
 ├── docs/
 │   └── interview-guides/       # SQL pattern study guides
 │       ├── 01-rfm-analysis.md
@@ -211,7 +241,8 @@ ecommerce-retail-analytics-dbt-snowflake/
     │   ├── 1-roles-and-user-config.sql
     │   ├── 2-warehouse-config.sql
     │   ├── 3-database-schemas-config.sql
-    │   └── 4-grant-access-config.sql
+    │   ├── 4-grant-access-config.sql
+    │   └── 5-prod-environment-config.sql  # Medallion 2-database setup
     │
     ├── scripts/                # Data extraction and loading
     │   ├── download_kaggle_data.py
@@ -222,9 +253,10 @@ ecommerce-retail-analytics-dbt-snowflake/
     └── dbt/
         ├── dbt_project.yml
         ├── packages.yml
+        ├── .sqlfluff            # SQL linting configuration
         ├── models/
-        │   ├── staging/        # Staging models + sources.yml
-        │   ├── intermediate/   # Enriched models
+        │   ├── staging/        # Silver layer (always in DEV)
+        │   ├── intermediate/   # Gold layer
         │   └── marts/
         │       ├── core/       # Shared dimensions & core facts
         │       ├── customer/   # Customer analytics (RFM, CLV, Churn)

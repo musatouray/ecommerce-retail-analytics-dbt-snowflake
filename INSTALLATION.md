@@ -7,17 +7,31 @@
 - Snowflake account with key-pair authentication
 - Kaggle account (for data download)
 
-## Snowflake Schemas
+## Snowflake Architecture (Medallion Pattern)
 
-This project uses the following schemas:
+This project uses a **2-database medallion architecture** for environment isolation:
 
-| Schema | Purpose |
-|--------|---------|
-| `RAW` | Source data from Kaggle CSV |
-| `STAGING` | Cleaned, typed staging views |
-| `INTERMEDIATE` | Joined and enriched views |
-| `MARTS` | Fact and dimension tables |
-| `SEEDS` | Static reference data |
+### ECOMMERCE_RETAIL_DB_DEV (Development)
+
+| Schema | Medallion Layer | Purpose |
+|--------|-----------------|---------|
+| `RAW` | Bronze | Source data from Kaggle CSV (immutable) |
+| `STAGING` | Silver | Cleaned, typed, validated views |
+| `INTERMEDIATE` | Gold | Joined and enriched views |
+| `MARTS` | Gold | Fact and dimension tables (Dev) |
+
+### ECOMMERCE_RETAIL_DB_PROD (Production)
+
+| Schema | Medallion Layer | Purpose |
+|--------|-----------------|---------|
+| `INTERMEDIATE` | Gold | Reads from DEV.STAGING |
+| `MARTS` | Gold | Production analytics (BI tools connect here) |
+
+**Key Points:**
+- Bronze + Silver layers exist only in DEV (no data duplication)
+- PROD reads from DEV.STAGING via cross-database reference
+- CI runs in isolated `CI_PR_xxx` schema in DEV database
+- CD deploys Gold layer to PROD on merge to main
 
 ## 1. Clone the Repository
 
@@ -50,17 +64,32 @@ cp .env.example .env
 
 Required environment variables:
 
-| Variable | Description |
-|----------|-------------|
-| `SNOWFLAKE_ACCOUNT` | Your Snowflake account identifier |
-| `SNOWFLAKE_USER` | Your Snowflake username |
-| `SNOWFLAKE_DATABASE` | Target database name |
-| `SNOWFLAKE_WAREHOUSE` | Compute warehouse name |
-| `SNOWFLAKE_SCHEMA` | Target schema name |
-| `SNOWFLAKE_ROLE` | Your Snowflake role |
-| `SNOWFLAKE_PRIVATE_KEY_PASSPHRASE` | Passphrase for your private key (if encrypted) |
-| `KAGGLE_USERNAME` | Your Kaggle username |
-| `KAGGLE_KEY` | Your Kaggle API key |
+| Variable | Description | Example |
+|----------|-------------|---------|
+| `SNOWFLAKE_ACCOUNT` | Your Snowflake account identifier | `abc123.us-east-1` |
+| `SNOWFLAKE_USER` | Your Snowflake username | `LEAD_DATA_ENGINEER` |
+| `SNOWFLAKE_DATABASE` | Dev database name | `ECOMMERCE_RETAIL_DB_DEV` |
+| `SNOWFLAKE_WAREHOUSE` | Compute warehouse name | `ECOMMERCE_RETAIL_WH` |
+| `SNOWFLAKE_SCHEMA` | Default schema | `RAW` |
+| `SNOWFLAKE_ROLE` | Your Snowflake role | `LEAD_DATA_ENGINEER_ROLE` |
+| `SNOWFLAKE_PRIVATE_KEY_PASSPHRASE` | Passphrase for private key (if encrypted) | |
+| `KAGGLE_USERNAME` | Your Kaggle username | |
+| `KAGGLE_KEY` | Your Kaggle API key | |
+
+### GitHub Secrets (for CI/CD)
+
+Configure these in your repository settings (Settings > Secrets and variables > Actions):
+
+| Secret | Description |
+|--------|-------------|
+| `SNOWFLAKE_ACCOUNT` | Snowflake account identifier |
+| `SNOWFLAKE_USER` | Service account username |
+| `SNOWFLAKE_ROLE` | Role with appropriate permissions |
+| `SNOWFLAKE_WAREHOUSE` | Compute warehouse |
+| `SNOWFLAKE_DATABASE` | Dev database (`ECOMMERCE_RETAIL_DB_DEV`) |
+| `SNOWFLAKE_DATABASE_PROD` | Prod database (`ECOMMERCE_RETAIL_DB_PROD`) |
+| `SNOWFLAKE_PRIVATE_KEY` | Base64-encoded private key content |
+| `SNOWFLAKE_PRIVATE_KEY_PASSPHRASE` | Private key passphrase (if encrypted) |
 
 ## 4. Set Up Snowflake Key-Pair Authentication
 
@@ -115,18 +144,34 @@ Create `~/.dbt/profiles.yml`:
 ecommerce_retail_analytics:
   target: dev
   outputs:
+    # Development - uses ECOMMERCE_RETAIL_DB_DEV
     dev:
       type: snowflake
-      threads: 16
+      threads: 4
       account: "{{ env_var('SNOWFLAKE_ACCOUNT') }}"
       user: "{{ env_var('SNOWFLAKE_USER') }}"
-      database: "{{ env_var('SNOWFLAKE_DATABASE') }}"
+      database: ECOMMERCE_RETAIL_DB_DEV
       warehouse: "{{ env_var('SNOWFLAKE_WAREHOUSE') }}"
-      schema: "{{ env_var('SNOWFLAKE_SCHEMA') }}"
+      schema: RAW
       role: "{{ env_var('SNOWFLAKE_ROLE') }}"
       private_key_path: ~/.snowflake/rsa_key.p8
-      private_key_passphrase: "{{ env_var('SNOWFLAKE_PRIVATE_KEY_PASSPHRASE') }}"  # if using passphrase
+      private_key_passphrase: "{{ env_var('SNOWFLAKE_PRIVATE_KEY_PASSPHRASE') }}"
+
+    # Production - uses ECOMMERCE_RETAIL_DB_PROD (CD pipeline only)
+    prod:
+      type: snowflake
+      threads: 4
+      account: "{{ env_var('SNOWFLAKE_ACCOUNT') }}"
+      user: "{{ env_var('SNOWFLAKE_USER') }}"
+      database: ECOMMERCE_RETAIL_DB_PROD
+      warehouse: "{{ env_var('SNOWFLAKE_WAREHOUSE') }}"
+      schema: RAW
+      role: "{{ env_var('SNOWFLAKE_ROLE') }}"
+      private_key_path: ~/.snowflake/rsa_key.p8
+      private_key_passphrase: "{{ env_var('SNOWFLAKE_PRIVATE_KEY_PASSPHRASE') }}"
 ```
+
+**Note:** The staging models are configured to always deploy to DEV database via `dbt_project.yml`, regardless of target. Only Gold layer (intermediate + marts) goes to the target database.
 
 ## 6. Verify Connection
 
