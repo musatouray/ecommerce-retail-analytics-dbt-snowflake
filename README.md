@@ -225,7 +225,7 @@ ecommerce-retail-analytics-dbt-snowflake/
 │       └── dbt-cd.yml          # CD: Deploy to production on merge
 │
 ├── docs/
-│   └── interview-guides/       # SQL pattern study guides
+│   └── SQL Analytical Patterns/  # SQL pattern study guides
 │       ├── 01-rfm-analysis.md
 │       ├── 02-cohort-analysis.md
 │       ├── 03-customer-lifetime-value.md
