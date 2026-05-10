@@ -84,7 +84,7 @@ jobs:
                 user: "${{ secrets.SNOWFLAKE_USER }}"
                 role: "${{ secrets.SNOWFLAKE_ROLE }}"
                 warehouse: "${{ secrets.SNOWFLAKE_WAREHOUSE }}"
-                database: "${{ secrets.SNOWFLAKE_DATABASE }}"
+                database: "${{ secrets.SNOWFLAKE_DATABASE_DEV }}"
                 schema: CI_PR_${{ github.event.pull_request.number }}
                 private_key_path: /tmp/rsa_key.p8
                 private_key_passphrase: "${{ secrets.SNOWFLAKE_PRIVATE_KEY_PASSPHRASE }}"

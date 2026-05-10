@@ -86,7 +86,7 @@ Configure these in your repository settings (Settings > Secrets and variables > 
 | `SNOWFLAKE_USER` | Service account username |
 | `SNOWFLAKE_ROLE` | Role with appropriate permissions |
 | `SNOWFLAKE_WAREHOUSE` | Compute warehouse |
-| `SNOWFLAKE_DATABASE` | Dev database (`ECOMMERCE_RETAIL_DB_DEV`) |
+| `SNOWFLAKE_DATABASE_DEV` | Dev database (`ECOMMERCE_RETAIL_DB_DEV`) |
 | `SNOWFLAKE_DATABASE_PROD` | Prod database (`ECOMMERCE_RETAIL_DB_PROD`) |
 | `SNOWFLAKE_PRIVATE_KEY` | Base64-encoded private key content |
 | `SNOWFLAKE_PRIVATE_KEY_PASSPHRASE` | Private key passphrase (if encrypted) |

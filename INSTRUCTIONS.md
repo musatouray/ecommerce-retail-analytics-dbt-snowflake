@@ -483,7 +483,7 @@ Configure these secrets (Settings > Secrets and variables > Actions):
 | `SNOWFLAKE_USER` | Service account username |
 | `SNOWFLAKE_ROLE` | Role with permissions |
 | `SNOWFLAKE_WAREHOUSE` | Compute warehouse |
-| `SNOWFLAKE_DATABASE` | `ECOMMERCE_RETAIL_DB_DEV` |
+| `SNOWFLAKE_DATABASE_DEV` | `ECOMMERCE_RETAIL_DB_DEV` |
 | `SNOWFLAKE_DATABASE_PROD` | `ECOMMERCE_RETAIL_DB_PROD` |
 | `SNOWFLAKE_PRIVATE_KEY` | Base64 encoded private key |
 | `SNOWFLAKE_PRIVATE_KEY_PASSPHRASE` | Key passphrase (if encrypted) |
