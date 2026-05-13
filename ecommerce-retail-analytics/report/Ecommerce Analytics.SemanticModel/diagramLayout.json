@@ -1,0 +1,260 @@
+{
+  "version": "1.1.0",
+  "diagrams": [
+    {
+      "ordinal": 0,
+      "scrollPosition": {
+        "x": 987.20001220703125,
+        "y": 0
+      },
+      "nodes": [
+        {
+          "location": {
+            "x": 1504.381579012781,
+            "y": 392.40683827026146
+          },
+          "nodeIndex": "DIM_COHORTS",
+          "nodeLineageTag": "58eefc92-76e0-4c4b-a158-cc4511b059ac",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 749.948003311709,
+            "y": 0
+          },
+          "nodeIndex": "DIM_CUSTOMERS",
+          "nodeLineageTag": "b5f7505e-a37a-47d9-bfd1-99a4d36404b2",
+          "size": {
+            "height": 152,
+            "width": 234
+          },
+          "zIndex": 0,
+          "expandedHeight": 300
+        },
+        {
+          "location": {
+            "x": 1396.2078327898894,
+            "y": 9.20341913513073
+          },
+          "nodeIndex": "DIM_DATES",
+          "nodeLineageTag": "b4cf66a4-55c7-458b-be19-6f24ccc2c2e6",
+          "size": {
+            "height": 104,
+            "width": 234
+          },
+          "zIndex": 0,
+          "expandedHeight": 300
+        },
+        {
+          "location": {
+            "x": 50,
+            "y": -50
+          },
+          "nodeIndex": "DIM_PRODUCTS",
+          "nodeLineageTag": "d13f411b-6e61-4583-af51-62ff5350c900",
+          "size": {
+            "height": 104,
+            "width": 234
+          },
+          "zIndex": 0,
+          "expandedHeight": 300
+        },
+        {
+          "location": {
+            "x": 407.37139957884892,
+            "y": 0
+          },
+          "nodeIndex": "DIM_SELLERS",
+          "nodeLineageTag": "1a7fd715-ad20-46cf-b32d-5e9773ccaed1",
+          "size": {
+            "height": 104,
+            "width": 234
+          },
+          "zIndex": 0,
+          "expandedHeight": 300
+        },
+        {
+          "location": {
+            "x": 2122.2078327898894,
+            "y": 55.20341913513073
+          },
+          "nodeIndex": "FCT_CATEGORY_PERFORMANCE",
+          "nodeLineageTag": "afbddc3f-026b-4b7c-9501-def0fd10b2e1",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1238.2504022866788,
+            "y": 735.74589072594176
+          },
+          "nodeIndex": "FCT_CHURN_RISK",
+          "nodeLineageTag": "722b1b9f-7172-4f69-bc82-3782b4bccfb4",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1165.6951718035971,
+            "y": 411.75803656843181
+          },
+          "nodeIndex": "FCT_CLV_CUSTOMER",
+          "nodeLineageTag": "b544e3f2-4033-4220-a741-c0e080343fc5",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1822.2078327898894,
+            "y": 395.0106321410492
+          },
+          "nodeIndex": "FCT_COHORT_RETENTION",
+          "nodeLineageTag": "202dd212-ce20-40d4-a849-593f800ab56b",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1768.2078327898894,
+            "y": 48.20341913513073
+          },
+          "nodeIndex": "FCT_DAILY_REVENUE_TIME_SERIES",
+          "nodeLineageTag": "f5968804-34e6-401e-84f0-4b221af16acc",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 2279.2078327898894,
+            "y": 390.20341913513073
+          },
+          "nodeIndex": "FCT_GEO_PERFORMANCE",
+          "nodeLineageTag": "73d68d39-9807-4b18-87eb-a37d2d26c4d9",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 2415.2078327898894,
+            "y": 55.20341913513073
+          },
+          "nodeIndex": "FCT_MARKET_BASKET",
+          "nodeLineageTag": "a151dc8c-67f0-4c78-a37a-353e565cdc4e",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 222.28615722981954,
+            "y": 412.26815781940968
+          },
+          "nodeIndex": "FCT_ORDER_ITEMS",
+          "nodeLineageTag": "0e4f458f-0dfd-4cf5-bd7e-68cdfbb34b61",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 549.15037116523149,
+            "y": 416.40148388504645
+          },
+          "nodeIndex": "FCT_ORDERS",
+          "nodeLineageTag": "75a2ace9-4107-4c92-8e4e-a8d4733f9e84",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 2740.2078327898894,
+            "y": 52.20341913513073
+          },
+          "nodeIndex": "FCT_ORDERS_FUNNEL",
+          "nodeLineageTag": "89d189d6-0651-4c0f-ad91-53e719a3f412",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 869.37167298736063,
+            "y": 416.3804094678826
+          },
+          "nodeIndex": "FCT_PARETO_PRODUCTS",
+          "nodeLineageTag": "bd3ba747-2729-475d-98b5-e389110b86f5",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 2555.8076863055144,
+            "y": 409.20341913513073
+          },
+          "nodeIndex": "FCT_PAYMENT_ANALYSIS",
+          "nodeLineageTag": "2f8d2dab-28cb-405d-95b4-44d14e7309b5",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1102.6980869944334,
+            "y": 21.85501239121686
+          },
+          "nodeIndex": "FCT_RFM_SEGMENTS",
+          "nodeLineageTag": "5d5cd826-5672-4bef-93ed-7b84e9a2a9ee",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        }
+      ],
+      "name": "All tables",
+      "zoomValue": 100,
+      "pinKeyFieldsToTop": false,
+      "showExtraHeaderInfo": false,
+      "hideKeyFieldsWhenCollapsed": false,
+      "tablesLocked": false
+    }
+  ],
+  "selectedDiagram": "All tables",
+  "defaultDiagram": "All tables"
+}

@@ -1,0 +1,215 @@
+table FCT_ORDERS
+	lineageTag: 75a2ace9-4107-4c92-8e4e-a8d4733f9e84
+
+	column ORDER_KEY
+		dataType: string
+		lineageTag: 7ca1aa79-170c-4aa8-af69-9b157790d237
+		summarizeBy: none
+		sourceColumn: ORDER_KEY
+
+		annotation SummarizationSetBy = Automatic
+
+	column ORDER_ID
+		dataType: string
+		lineageTag: 4d9e4274-e1ad-4712-bbaa-67d0f25a2389
+		summarizeBy: none
+		sourceColumn: ORDER_ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column CUSTOMER_KEY
+		dataType: string
+		lineageTag: aea5a544-421f-4a41-bef7-d6598bb4263f
+		summarizeBy: none
+		sourceColumn: CUSTOMER_KEY
+
+		annotation SummarizationSetBy = Automatic
+
+	column ORDER_DATE_KEY
+		dataType: double
+		lineageTag: 440d2e17-04af-4c2f-9863-09f7a85e9c1c
+		summarizeBy: sum
+		sourceColumn: ORDER_DATE_KEY
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column APPROVAL_DATE_KEY
+		dataType: double
+		lineageTag: 0d0f3a9c-9589-4593-b9ca-93f849eee367
+		summarizeBy: sum
+		sourceColumn: APPROVAL_DATE_KEY
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column DELIVERY_DATE_KEY
+		dataType: double
+		lineageTag: e4a4fc2f-e179-4582-8547-9829bdc773d9
+		summarizeBy: sum
+		sourceColumn: DELIVERY_DATE_KEY
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ESTIMATED_DELIVERY_DATE_KEY
+		dataType: double
+		lineageTag: e5df83e2-7ada-4999-b836-c571513ccbe6
+		summarizeBy: sum
+		sourceColumn: ESTIMATED_DELIVERY_DATE_KEY
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ORDER_STATUS
+		dataType: string
+		lineageTag: 6d0bfc68-ae5a-45a5-9522-ec3a01674133
+		summarizeBy: none
+		sourceColumn: ORDER_STATUS
+
+		annotation SummarizationSetBy = Automatic
+
+	column DELIVERY_DAYS
+		dataType: double
+		lineageTag: cd42f331-3a40-42c9-b606-5d01ee70b4ed
+		summarizeBy: sum
+		sourceColumn: DELIVERY_DAYS
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column FULFILLMENT_DAYS
+		dataType: double
+		lineageTag: dc51586b-7cf7-4695-96cb-12b729ea98dc
+		summarizeBy: sum
+		sourceColumn: FULFILLMENT_DAYS
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column SHIPPING_TRANSIT_DAYS
+		dataType: double
+		lineageTag: 93bbae7a-3768-44cd-88f6-e6da238abb07
+		summarizeBy: sum
+		sourceColumn: SHIPPING_TRANSIT_DAYS
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column IS_ON_TIME_DELIVERY
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: db69813c-c16a-434e-bc3a-6a0bff3cbc99
+		summarizeBy: none
+		sourceColumn: IS_ON_TIME_DELIVERY
+
+		annotation SummarizationSetBy = Automatic
+
+	column TOTAL_PRICE
+		dataType: double
+		lineageTag: 98a630fb-5b18-4b60-8428-75c33c7397b0
+		summarizeBy: sum
+		sourceColumn: TOTAL_PRICE
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column TOTAL_FREIGHT_VALUE
+		dataType: double
+		lineageTag: d52982e4-ff6f-436b-898d-eb12b4227580
+		summarizeBy: sum
+		sourceColumn: TOTAL_FREIGHT_VALUE
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column GROSS_ORDER_VALUE
+		dataType: double
+		lineageTag: da681881-a182-4864-824f-93484eafbbde
+		summarizeBy: sum
+		sourceColumn: GROSS_ORDER_VALUE
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column PAYMENT_COUNT
+		dataType: double
+		lineageTag: 49ff3acf-7354-47ef-8d5a-a3f1425c1c49
+		summarizeBy: sum
+		sourceColumn: PAYMENT_COUNT
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column TOTAL_PAYMENT_VALUE
+		dataType: double
+		lineageTag: f0b22108-b161-42ea-9f83-7045385fdd6f
+		summarizeBy: sum
+		sourceColumn: TOTAL_PAYMENT_VALUE
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column REVIEW_COUNT
+		dataType: double
+		lineageTag: ef1ef2f3-f3fc-484e-acc7-4114f56eddcc
+		summarizeBy: sum
+		sourceColumn: REVIEW_COUNT
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column REVIEW_SCORE
+		dataType: double
+		lineageTag: ab770784-d218-4f60-ab57-1213f0b3be9b
+		summarizeBy: sum
+		sourceColumn: REVIEW_SCORE
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column CREATED_AT
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 06bef0ba-6172-4af0-b260-acf06bebe1ef
+		summarizeBy: none
+		sourceColumn: CREATED_AT
+
+		annotation SummarizationSetBy = Automatic
+
+	column UPDATED_AT
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 91c6bbeb-8b41-46be-9f70-d835a3228e29
+		summarizeBy: none
+		sourceColumn: UPDATED_AT
+
+		annotation SummarizationSetBy = Automatic
+
+	partition FCT_ORDERS = m
+		mode: import
+		source =
+				let
+				    Source = Snowflake.Databases("SVIPRYH-HOB47754.snowflakecomputing.com","ECOMMERCE_RETAIL_WH",[Implementation="1.0"]),
+				    ECOMMERCE_RETAIL_DB_PROD_Database = Source{[Name="ECOMMERCE_RETAIL_DB_PROD",Kind="Database"]}[Data],
+				    MARTS_Schema = ECOMMERCE_RETAIL_DB_PROD_Database{[Name="MARTS",Kind="Schema"]}[Data],
+				    FCT_ORDERS_Table = MARTS_Schema{[Name="FCT_ORDERS",Kind="Table"]}[Data]
+				in
+				    FCT_ORDERS_Table
+
+	annotation PBI_ResultType = Table
+
