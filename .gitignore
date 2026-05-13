@@ -1,8 +1,9 @@
 # VS Code settings (contains credentials)
 .vscode/
 
-# Claude Code
-.claude/
+# Claude Code - ignore local settings, track workflow files
+.claude/settings.local.json
+.claude/todos.local.json
 
 # Logs
 logs/

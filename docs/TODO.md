@@ -41,18 +41,22 @@
 ## Agentic Analytics Engineering
 
 ✅ Agentic Analytics Engineering
-    ✅CONTEXT FILES
-        ▪ CLAUDE.md : Entry point for claude code. Points to AGENTS.md
+    ✅ CONTEXT FILES
+        ▪ CLAUDE.md : Entry point for Claude Code. Points to AGENTS.md
         ▪ AGENTS.md : The brain - describes role, context, tech stack, directory structure, and a menu of skills
-    ✅ SUB-AGENTS
-        ▪ code-reviewer : On-demand reviews SQL only. Does not write code. Called by skills on-demand
-        ▪ doc-reviewer : Reviews YAML descriptions, checks format, sentence quality, etc. on-demand
-    ✅ SKILLS - STEP-BY-STEP PROCEDURES
-        ▪ /develop : scaffolds SQL, builds logic and creates YAML following conventions
-        ▪ /test : Runs dbt tests, spot-checks via warehouse queries, impacts analysis across lineage
+    ✅ SUB-AGENTS (Read-Only Behavioral Modes)
+        ▪ code-reviewer : Reviews SQL for quality, performance, conventions. Does not write code.
+        ▪ doc-reviewer : Reviews YAML descriptions for clarity and completeness. Does not write YAML.
+        ▪ performance-analyst : Analyzes query performance, suggests optimizations and clustering keys.
+        ▪ data-quality-auditor : Reviews test coverage, identifies gaps in data contracts.
+        ▪ schema-designer : Reviews dimensional modeling decisions, star schema conformance.
+    ✅ SKILLS - STEP-BY-STEP PROCEDURES (in .claude/skills/<name>/SKILL.md)
+        ▪ /develop : Scaffolds SQL, builds logic and creates YAML following conventions
+        ▪ /test : Runs dbt tests, spot-checks via warehouse queries, impact analysis across lineage
         ▪ /deploy : Commits changes to repo, opens a draft PR with ticket context
         ▪ /check-test-failures : Queries production test results and suggests fixes
-    ✅ REFERENCES - LAZY-LOADED CONVENTIONS
+        ▪ /refactor : Optimizes existing models for performance or readability
+    ✅ REFERENCES - LAZY-LOADED CONVENTIONS (in .claude/references/)
         ▪ dbt-conventions.md : General conventions about dbt development
         ▪ sql-conventions.md : Loaded only when writing SQL
         ▪ yaml-conventions.md : How to produce correct YAML files

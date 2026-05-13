@@ -9,16 +9,19 @@
     )
 }}
 
-with order_items as (
+with
+{{ incremental_max_date_cte('order_date') }}
+
+order_items as (
     select *
     from {{ ref('int_order_items_enriched') }}
-    {{ incremental_filter('order_date') }}
+    {{ incremental_where_clause('order_date') }}
 ),
 
 orders as (
     select order_id, customer_unique_id
     from {{ ref('int_orders_enriched') }}
-    {{ incremental_filter('order_date') }}
+    {{ incremental_where_clause('order_date') }}
 ),
 
 dim_customers as (
@@ -58,6 +61,9 @@ final as (
         -- Role-playing date dimension keys
         d_order.date_key as order_date_key,
         d_delivery.date_key as delivery_date_key,
+
+        -- Date columns (for incremental filtering and direct queries)
+        oi.order_date,
 
         -- Order attributes
         oi.order_status,

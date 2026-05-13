@@ -9,10 +9,13 @@
     ) 
 }}
 
-with orders as (
+with
+{{ incremental_max_date_cte('order_date') }}
+
+orders as (
     select *
     from {{ ref('int_orders_enriched') }}
-    {{ incremental_filter('order_date') }}
+    {{ incremental_where_clause('order_date') }}
 ),
 
 dim_customers as (
@@ -41,6 +44,9 @@ final as (
         d_approval.date_key as approval_date_key,
         d_delivery.date_key as delivery_date_key,
         d_estimated.date_key as estimated_delivery_date_key,
+
+        -- Date columns (for incremental filtering and direct queries)
+        o.order_date,
 
         -- Order attributes
         o.order_status,
