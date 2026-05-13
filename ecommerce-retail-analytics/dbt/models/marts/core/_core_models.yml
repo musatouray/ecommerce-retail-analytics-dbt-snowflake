@@ -513,6 +513,35 @@ models:
       Fact table for orders at order grain (one row per order).
       Use this for order-level analytics: revenue trends, AOV, customer behavior.
       Includes role-playing date dimensions for multiple date contexts.
+    data_tests:
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "total_price >= 0 or total_price IS NULL"
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "total_freight_value >= 0 or total_freight_value IS NULL"
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "total_payment_value >= 0 or total_payment_value IS NULL"
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "review_score between 1 and 5 or review_score IS NULL"
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "approval_date_key IS NULL or approval_date_key >= order_date_key"
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "delivery_date_key IS NULL or delivery_date_key >= order_date_key"
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "estimated_delivery_date_key IS NULL or estimated_delivery_date_key >= order_date_key"
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "delivery_date_key IS NULL or approval_date_key IS NULL or delivery_date_key >= approval_date_key"
+          config:
+            severity: warn  # Some orders may have delivery before approval due to data issues, so we warn instead of failing
+            warn_if: ">= 1"  # Warn if any orders violate this condition
+            error_if: ">= 50"  # Fail if 50 or more orders violate this condition, indicating a systemic data issue
     columns:
       - name: order_key
         description: Surrogate key for the order fact, generated from order_id

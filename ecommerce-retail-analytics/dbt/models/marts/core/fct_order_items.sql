@@ -1,15 +1,24 @@
 -- Fact table for order items at line-item grain (one row per order item)
 -- Use this for product/seller analytics: category performance, seller metrics, basket analysis
 -- Uses role-playing dimensions for date contexts
+{{
+    config(
+        materialized = 'incremental',
+        unique_key = 'order_item_key',
+        incremental_strategy = 'merge'
+    )
+}}
 
 with order_items as (
     select *
     from {{ ref('int_order_items_enriched') }}
+    {{ incremental_filter('order_date') }}
 ),
 
 orders as (
     select order_id, customer_unique_id
     from {{ ref('int_orders_enriched') }}
+    {{ incremental_filter('order_date') }}
 ),
 
 dim_customers as (

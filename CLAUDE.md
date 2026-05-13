@@ -2,6 +2,31 @@
 
 This file provides context for Claude Code when working on this project.
 
+## Agentic Workflow
+
+For structured development workflows, see **[.claude/AGENTS.md](.claude/AGENTS.md)**.
+
+### Quick Reference: Skills
+
+| Command | Purpose |
+|---------|---------|
+| `/develop` | Scaffold new models (SQL + YAML) |
+| `/test` | Run tests & validate changes |
+| `/deploy` | Commit & open PR |
+| `/check-test-failures` | Diagnose production failures |
+| `/refactor` | Optimize existing models |
+
+### References (Load When Needed)
+
+| Reference | Use For |
+|-----------|---------|
+| `.claude/references/dbt-conventions.md` | dbt best practices |
+| `.claude/references/sql-conventions.md` | SQL style guide |
+| `.claude/references/yaml-conventions.md` | YAML documentation |
+| `.claude/references/data-warehouse.md` | Snowflake queries |
+
+---
+
 ## Project Overview
 
 E-Commerce Analytics project using dbt + Snowflake to analyze the Olist Brazilian E-Commerce dataset. The project implements RFM segmentation, cohort analysis, customer lifetime value, and other advanced SQL analytics patterns.
@@ -55,7 +80,9 @@ ecommerce-retail-analytics-dbt-snowflake/
 ├── INSTRUCTIONS.md                # Execution guide
 │
 ├── docs/
-│   └── interview-guides/          # SQL pattern study guides
+│   ├── AWS-SNOWFLAKE-INTEGRATION-SETUP.md  # S3 integration guide
+│   ├── CI-CD.md                            # CI/CD pipeline guide
+│   └── interview-guides/                   # SQL pattern study guides
 │       ├── 01-rfm-analysis.md
 │       ├── 02-cohort-analysis.md
 │       ├── 03-customer-lifetime-value.md
@@ -69,7 +96,9 @@ ecommerce-retail-analytics-dbt-snowflake/
     │   ├── 1-roles-and-user-config.sql
     │   ├── 2-warehouse-config.sql
     │   ├── 3-database-schemas-config.sql
-    │   └── 4-grant-access-config.sql
+    │   ├── 4-grant-access-config.sql
+    │   ├── 5-aws-storage-integration.sql  # S3 integration (ACCOUNTADMIN)
+    │   └── 6-stage-&-file-format.sql      # External stage + CSV format
     │
     ├── scripts/
     │   ├── download_kaggle_data.py
@@ -128,6 +157,29 @@ ecommerce-retail-analytics-dbt-snowflake/
 |---------|-------|
 | Warehouse | `ECOMMERCE_RETAIL_WH` |
 | Role | `LEAD_DATA_ENGINEER_ROLE` |
+| S3 Stage | `raw_ecommerce_s3_stage` |
+| Storage Integration | `s3_ecommerce_integration` |
+
+### AWS S3 Integration
+
+For incremental data pipelines, Snowflake connects to S3 via storage integration:
+
+```
+S3 Bucket (ecommerce-retail-analytics-raw/)
+    ↓
+Snowflake Storage Integration (s3_ecommerce_integration)
+    ↓
+External Stage (raw_ecommerce_s3_stage)
+    ↓
+COPY INTO RAW tables
+```
+
+**Key Resources:**
+- **S3 Bucket**: `ecommerce-retail-analytics-raw/` (folders per table)
+- **IAM Role**: `snowflake-ecommerce-s3-role` (Snowflake assumes this)
+- **IAM User**: `snowflake-data-engineer` (Airflow/Python uploads)
+
+See `docs/AWS-SNOWFLAKE-INTEGRATION-SETUP.md` for complete setup guide.
 
 ### Medallion Architecture (2 Databases)
 

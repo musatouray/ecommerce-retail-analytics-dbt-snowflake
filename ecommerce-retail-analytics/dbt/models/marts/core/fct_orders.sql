@@ -1,10 +1,18 @@
 -- Fact table for orders at order grain (one row per order)
 -- Use this for order-level analytics: revenue trends, AOV, customer behavior
 -- Uses role-playing dimensions for multiple date contexts
+{{ 
+    config(
+        materialized='incremental',
+        unique_key='order_key',
+        incremental_strategy='merge'
+    ) 
+}}
 
 with orders as (
     select *
     from {{ ref('int_orders_enriched') }}
+    {{ incremental_filter('order_date') }}
 ),
 
 dim_customers as (

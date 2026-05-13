@@ -105,6 +105,12 @@ models:
             combination_of_columns:
               - cohort_month
               - period_number
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "retention_rate >= 0 AND retention_rate <= 100"
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "round(retention_rate + churn_rate, 0) = 100"
     columns:
       - name: cohort_retention_key
         description: Surrogate key for the cohort retention record
@@ -157,11 +163,13 @@ models:
         data_tests:
           - not_null
 
-  # CLV model scoring customers on historical and predicted lifetime value relative to cohort benchmarks.
+  # CLV model using probabilistic recency prediction
+  # Model: P(purchase) = e^(-λt) where λ = purchase_rate, t = days_since_last_order
   - name: fct_clv_customer
     description: >
-      Customer Lifetime Value fact table with historical and predicted CLV.
-      Each customer is scored and segmented by their value relative to cohort benchmarks.
+      Customer Lifetime Value fact table with probabilistic CLV prediction.
+      Uses exponential decay model based on purchase recency and frequency to predict
+      future customer value. Each customer is scored and segmented by predicted CLV.
       Use this for customer valuation, acquisition ROI, and identifying high-value customers.
     columns:
       - name: clv_key
@@ -187,35 +195,57 @@ models:
           - not_null
 
       - name: average_order_value
-        description: Average value per order (may be NULL for edge cases)
+        description: Average value per order (may be NULL for single-order customers using cohort average)
 
       - name: historical_clv
-        description: Total revenue the customer has generated to date
+        description: Total revenue the customer has generated to date (actual spend)
         data_tests:
           - not_null
 
-      - name: expected_ltv
-        description: Cohort benchmark - average CLV for customers in the same cohort
+      - name: customer_age_days
+        description: Days since customer's first purchase (T in the model)
         data_tests:
           - not_null
 
-      - name: predicted_ltv
-        description: Predicted lifetime value (max of historical or cohort average)
+      - name: days_since_last_order
+        description: Recency - days since customer's last purchase (t in the model)
         data_tests:
           - not_null
 
-      - name: value_vs_cohort
-        description: Difference between historical CLV and cohort average (positive = above average)
-        data_tests:
-          - not_null
+      - name: avg_days_between_purchases
+        description: >
+          Average number of days between purchases. For repeat customers, calculated from their history.
+          For single-purchase customers, uses cohort average.
 
-      - name: clv_score
-        description: Score used for segmentation (same as predicted_ltv)
+      - name: purchase_rate_lambda
+        description: >
+          Purchase rate (λ) - frequency of purchases per day. Higher values indicate more frequent buyers.
+          Used in the exponential decay formula P = e^(-λt).
+
+      - name: purchase_probability
+        description: >
+          Probability that the customer will make another purchase, calculated as e^(-λt).
+          Ranges from ~1 (just purchased) to ~0 (long time since last purchase).
+          May be NULL for edge cases (e.g., multiple orders on same day where tenure = 0).
+
+      - name: expected_future_purchases
+        description: >
+          Predicted number of purchases in the next 365 days, based on purchase probability
+          and historical purchase frequency. Capped at 2x historical annual rate.
+
+      - name: predicted_future_value
+        description: >
+          Predicted revenue from future purchases (expected_future_purchases × average_order_value).
+
+      - name: predicted_clv
+        description: >
+          Total predicted Customer Lifetime Value = historical_clv + predicted_future_value.
+          This is the primary metric for customer valuation.
         data_tests:
           - not_null
 
       - name: clv_decile
-        description: CLV decile (1-10, where 10 = top 10%)
+        description: CLV decile (1-10, where 10 = top 10% most valuable customers)
         data_tests:
           - not_null
           - accepted_values:
@@ -223,7 +253,7 @@ models:
                 values: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
       - name: clv_segment
-        description: CLV segment based on decile (Platinum, Gold, Silver, Bronze)
+        description: CLV segment based on decile (Platinum=top 10%, Gold=top 30%, Silver=top 60%, Bronze=bottom 40%)
         data_tests:
           - not_null
           - accepted_values:
@@ -250,6 +280,10 @@ models:
       Churn risk fact table identifying customers at risk of churning or already churned.
       Uses additive scoring based on dormancy, purchase frequency, satisfaction, and value.
       Use this for retention campaigns, win-back targeting, and customer health monitoring.
+    data_tests:
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "churn_risk_score >= 0 AND churn_risk_score <= 100"
     columns:
       - name: churn_risk_key
         description: Surrogate key for the churn risk record

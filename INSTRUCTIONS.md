@@ -169,7 +169,8 @@ Run the SQL scripts in `ecommerce-retail-analytics/snowflake/` folder in order:
 2-warehouse-config.sql           # Create compute warehouse
 3-database-schemas-config.sql    # Create DEV + PROD databases (medallion setup)
 4-grant-access-config.sql        # Grant permissions to both databases
-5-verify-setup.sql               # Verify databases, schemas, and grants
+5-aws-storage-integration.sql    # (Optional) S3 integration - requires ACCOUNTADMIN
+6-stage-&-file-format.sql        # (Optional) External stage + CSV file format
 ```
 
 Or run this SQL directly for the 2-database medallion architecture:
@@ -249,6 +250,89 @@ FROM ECOMMERCE_RETAIL_DB_DEV.INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'STA
 UNION ALL
 SELECT 'PROD', 'Gold', 'MARTS', COUNT(*)
 FROM ECOMMERCE_RETAIL_DB_PROD.INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'MARTS';
+```
+
+---
+
+## Phase 3.5: AWS S3 Integration (Optional)
+
+If you plan to use the incremental data pipeline with generated data (Faker/Airflow), set up AWS S3 integration. Skip this phase if you're only using the static Kaggle dataset.
+
+> **Full guide**: See `docs/AWS-SNOWFLAKE-INTEGRATION-SETUP.md` for detailed instructions.
+
+### 3.5.1 AWS Setup
+
+1. **Create S3 bucket**: `ecommerce-retail-analytics-raw`
+2. **Create folder structure** for tables that will receive incremental data:
+   ```
+   orders/
+   order_items/
+   order_payments/
+   order_reviews/
+   customers/
+   ```
+3. **Create IAM resources**:
+   - Policy: `ecommerce-s3-pipeline-policy` (S3 read/write permissions)
+   - User: `snowflake-data-engineer` (for Airflow/Python to upload files)
+   - Role: `snowflake-ecommerce-s3-role` (for Snowflake to assume)
+
+### 3.5.2 Snowflake Storage Integration
+
+Run `5-aws-storage-integration.sql` as **ACCOUNTADMIN**:
+
+```sql
+USE ROLE ACCOUNTADMIN;
+
+CREATE OR REPLACE STORAGE INTEGRATION s3_ecommerce_integration
+  TYPE = EXTERNAL_STAGE
+  STORAGE_PROVIDER = 'S3'
+  ENABLED = TRUE
+  STORAGE_AWS_ROLE_ARN = 'arn:aws:iam::<your-account-id>:role/snowflake-ecommerce-s3-role'
+  STORAGE_ALLOWED_LOCATIONS = ('s3://ecommerce-retail-analytics-raw/');
+
+-- Get values for AWS trust policy
+DESC INTEGRATION s3_ecommerce_integration;
+-- Copy: STORAGE_AWS_IAM_USER_ARN and STORAGE_AWS_EXTERNAL_ID
+```
+
+### 3.5.3 Configure AWS Trust Relationship
+
+Update the IAM role's trust policy with values from `DESC INTEGRATION`:
+- **Principal**: Use `STORAGE_AWS_IAM_USER_ARN` (Snowflake's IAM user)
+- **ExternalId**: Use `STORAGE_AWS_EXTERNAL_ID`
+
+### 3.5.4 Create Stage and File Format
+
+Run `6-stage-&-file-format.sql` as **LEAD_DATA_ENGINEER_ROLE**:
+
+```sql
+USE ROLE LEAD_DATA_ENGINEER_ROLE;
+USE DATABASE ECOMMERCE_RETAIL_DB_DEV;
+USE SCHEMA RAW;
+
+CREATE OR REPLACE FILE FORMAT csv_format
+  TYPE = 'CSV'
+  FIELD_DELIMITER = ','
+  SKIP_HEADER = 1
+  NULL_IF = ('NULL', 'null', '')
+  EMPTY_FIELD_AS_NULL = TRUE
+  FIELD_OPTIONALLY_ENCLOSED_BY = '"';
+
+CREATE OR REPLACE STAGE raw_ecommerce_s3_stage
+  STORAGE_INTEGRATION = s3_ecommerce_integration
+  URL = 's3://ecommerce-retail-analytics-raw/'
+  FILE_FORMAT = csv_format;
+```
+
+### 3.5.5 Verify Integration
+
+```sql
+-- Should list files in S3 bucket (empty is OK if no files uploaded yet)
+LIST @raw_ecommerce_s3_stage;
+
+-- Test upload from terminal, then verify in Snowflake
+-- aws s3 cp test.csv s3://ecommerce-retail-analytics-raw/orders/test.csv
+-- LIST @raw_ecommerce_s3_stage/orders/;
 ```
 
 ---
@@ -548,3 +632,9 @@ uv run dbt docs serve     # View documentation
 ### Power BI connection issues
 - Use the full Snowflake URL: `account.snowflakecomputing.com`
 - Ensure your IP is whitelisted if using network policies
+
+### AWS S3 integration errors
+- `sts:AssumeRole` error: Update IAM role trust policy with `STORAGE_AWS_IAM_USER_ARN` from `DESC INTEGRATION`
+- `AccessDenied` on `aws s3 ls`: Use explicit bucket path `aws s3 ls s3://your-bucket/`
+- `LIST @stage` returns empty: This is OK if no files uploaded yet - not an error
+- See `docs/AWS-SNOWFLAKE-INTEGRATION-SETUP.md` for detailed troubleshooting
