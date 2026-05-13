@@ -1,10 +1,21 @@
 -- Fact table for orders at order grain (one row per order)
 -- Use this for order-level analytics: revenue trends, AOV, customer behavior
 -- Uses role-playing dimensions for multiple date contexts
+{{ 
+    config(
+        materialized='incremental',
+        unique_key='order_key',
+        incremental_strategy='merge'
+    ) 
+}}
 
-with orders as (
+with
+{{ incremental_max_date_cte('order_date') }}
+
+orders as (
     select *
     from {{ ref('int_orders_enriched') }}
+    {{ incremental_where_clause('order_date') }}
 ),
 
 dim_customers as (
@@ -33,6 +44,9 @@ final as (
         d_approval.date_key as approval_date_key,
         d_delivery.date_key as delivery_date_key,
         d_estimated.date_key as estimated_delivery_date_key,
+
+        -- Date columns (for incremental filtering and direct queries)
+        o.order_date,
 
         -- Order attributes
         o.order_status,

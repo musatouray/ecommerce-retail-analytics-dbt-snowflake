@@ -1,0 +1,150 @@
+table FCT_ORDER_ITEMS
+	lineageTag: 0e4f458f-0dfd-4cf5-bd7e-68cdfbb34b61
+
+	column ORDER_ITEM_KEY
+		dataType: string
+		lineageTag: 4f1830be-1345-4eb1-bcb4-79e0c0b8573b
+		summarizeBy: none
+		sourceColumn: ORDER_ITEM_KEY
+
+		annotation SummarizationSetBy = Automatic
+
+	column ORDER_ID
+		dataType: string
+		lineageTag: 0663d774-8ae0-4915-a97b-918a3fd6457b
+		summarizeBy: none
+		sourceColumn: ORDER_ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column ORDER_ITEM_ID
+		dataType: double
+		lineageTag: d921a3cc-1654-4d25-b006-003304af1213
+		summarizeBy: count
+		sourceColumn: ORDER_ITEM_ID
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column CUSTOMER_KEY
+		dataType: string
+		lineageTag: ee7918b3-d9d1-4fc8-865b-959a0e499954
+		summarizeBy: none
+		sourceColumn: CUSTOMER_KEY
+
+		annotation SummarizationSetBy = Automatic
+
+	column PRODUCT_KEY
+		dataType: string
+		lineageTag: 02f19c43-e4c5-412d-9a21-5399bfab28fb
+		summarizeBy: none
+		sourceColumn: PRODUCT_KEY
+
+		annotation SummarizationSetBy = Automatic
+
+	column SELLER_KEY
+		dataType: string
+		lineageTag: 8b14c6d6-4847-4dda-804e-c1a9a3fb0f66
+		summarizeBy: none
+		sourceColumn: SELLER_KEY
+
+		annotation SummarizationSetBy = Automatic
+
+	column ORDER_DATE_KEY
+		dataType: double
+		lineageTag: 575c141a-f7d4-4ffc-8515-07022b071ac9
+		summarizeBy: sum
+		sourceColumn: ORDER_DATE_KEY
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column DELIVERY_DATE_KEY
+		dataType: double
+		lineageTag: 60b64be3-8929-4e0d-be7a-75cc15f211b1
+		summarizeBy: sum
+		sourceColumn: DELIVERY_DATE_KEY
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ORDER_STATUS
+		dataType: string
+		lineageTag: 77c9cb4e-f7b0-4752-a9f4-2f938321d477
+		summarizeBy: none
+		sourceColumn: ORDER_STATUS
+
+		annotation SummarizationSetBy = Automatic
+
+	column PRODUCT_CATEGORY
+		dataType: string
+		lineageTag: f510f823-0186-4f93-8690-76f50a00c3b3
+		summarizeBy: none
+		sourceColumn: PRODUCT_CATEGORY
+
+		annotation SummarizationSetBy = Automatic
+
+	column ITEM_PRICE
+		dataType: double
+		lineageTag: e2a76e35-c94e-4b92-ba73-8fd8240cbbd0
+		summarizeBy: sum
+		sourceColumn: ITEM_PRICE
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ITEM_FREIGHT
+		dataType: double
+		lineageTag: ff9a123d-6527-4b7d-a886-a97eebd9e1da
+		summarizeBy: sum
+		sourceColumn: ITEM_FREIGHT
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column ITEM_TOTAL
+		dataType: double
+		lineageTag: 896c1e02-dd3c-4fdc-80a4-bfc52f30dc59
+		summarizeBy: sum
+		sourceColumn: ITEM_TOTAL
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column CREATED_AT
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: e5f4fa3c-60c2-4759-a3be-5a54c7a0a55f
+		summarizeBy: none
+		sourceColumn: CREATED_AT
+
+		annotation SummarizationSetBy = Automatic
+
+	column UPDATED_AT
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: d680fe59-a258-43f0-99ac-77ff2b528558
+		summarizeBy: none
+		sourceColumn: UPDATED_AT
+
+		annotation SummarizationSetBy = Automatic
+
+	partition FCT_ORDER_ITEMS = m
+		mode: import
+		source =
+				let
+				    Source = Snowflake.Databases("SVIPRYH-HOB47754.snowflakecomputing.com","ECOMMERCE_RETAIL_WH",[Implementation="1.0"]),
+				    ECOMMERCE_RETAIL_DB_PROD_Database = Source{[Name="ECOMMERCE_RETAIL_DB_PROD",Kind="Database"]}[Data],
+				    MARTS_Schema = ECOMMERCE_RETAIL_DB_PROD_Database{[Name="MARTS",Kind="Schema"]}[Data],
+				    FCT_ORDER_ITEMS_Table = MARTS_Schema{[Name="FCT_ORDER_ITEMS",Kind="Table"]}[Data]
+				in
+				    FCT_ORDER_ITEMS_Table
+
+	annotation PBI_ResultType = Table
+

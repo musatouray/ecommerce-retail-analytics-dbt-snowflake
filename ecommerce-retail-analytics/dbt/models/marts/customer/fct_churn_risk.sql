@@ -32,9 +32,9 @@ churn_metrics as (
         (cb.total_orders = 1) as is_single_purchaser,
         -- Simple churn risk score based on recency and engagement
         case
-            when datediff(day, cb.last_order_date, r.max_date) > 90 then 'Churned'
-            when datediff(day, cb.last_order_date, r.max_date) between 60 and 90 then 'At Risk'
-            when datediff(day, cb.last_order_date, r.max_date) between 30 and 60 then 'Cooling'
+            when datediff(day, cb.last_order_date, r.max_date) > {{ var('churn_churned_days') }} then 'Churned'
+            when datediff(day, cb.last_order_date, r.max_date) > {{ var('churn_at_risk_days') }}  then 'At Risk'
+            when datediff(day, cb.last_order_date, r.max_date) > {{ var('churn_cooling_days') }}  then 'Cooling'
             else 'Active'
         end as churn_status,
 
@@ -79,7 +79,7 @@ churn_risk_score as (
                 else 0
               end
             -- Low value customer adds 15 points
-            + case when total_revenue < 100 then 15 else 0 end
+            + case when total_revenue < {{ var('churn_low_value_threshold') }} then 15 else 0 end
         ) as churn_risk_score
     from churn_metrics
 ),

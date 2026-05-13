@@ -22,6 +22,24 @@ vars:
   customer_promoter_threshold: 4.5
   customer_neutral_threshold: 3.0
 
+  # Churn status thresholds (days since last order)                                                                                                                                                                                       
+  # - Average purchase cycle for general retail: 30-45 days                                                                                 
+  # - Customer considered "cooling" after 1-2 cycles without purchase                                                                       
+  # - Customer considered "at risk" after 2-3 cycles                                                                                        
+  # - Customer considered "churned" after 3+ cycles (90+ days)                                                                                                                                                                                      
+  churn_churned_days: 90                                                                                                                    
+  churn_at_risk_days: 60                                                                                                                    
+  churn_cooling_days: 30                                                                                                                    
+                                                                                                                                              
+  # Low-value customer threshold for churn risk scoring
+  churn_low_value_threshold: 100
+
+  # CLV prediction model parameters
+  # Prediction horizon: How far into the future to predict customer value
+  # Model uses exponential decay: P(purchase) = e^(-λt)
+  # where λ = purchase_rate (purchases/day), t = days_since_last_order
+  clv_prediction_horizon_days: 365
+
   # Seller/Product segmentation thresholds
   platinum_value_threshold: 10000
   gold_value_threshold: 1000

@@ -1,6 +1,5 @@
 -- Daily revenue fact table aggregated at date grain
 -- Use this for revenue trends, daily performance, and time-series analysis
-
 with orders as (
     select *
     from {{ ref('int_orders_enriched') }}

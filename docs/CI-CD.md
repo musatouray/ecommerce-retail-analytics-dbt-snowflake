@@ -848,6 +848,115 @@ jobs:
 
 ---
 
+## Rollback & Recovery Procedures
+
+### When to Rollback
+
+| Scenario | Severity | Action |
+|----------|----------|--------|
+| Tests fail in production | 🔴 Critical | Immediate rollback |
+| Model produces wrong data | 🔴 Critical | Rollback + investigate |
+| Performance degradation | 🟡 High | Assess impact, then rollback |
+| Non-critical model fails | 🟢 Low | Fix forward in new PR |
+
+### Rollback Methods
+
+#### Method 1: Git Revert (Recommended)
+
+Safest approach - creates a new commit that undoes the breaking change:
+
+```bash
+# 1. Find the breaking commit
+git log --oneline -10
+
+# 2. Revert it (creates new commit)
+git revert <commit-sha>
+
+# 3. Push to main (triggers CD automatically)
+git push origin main
+```
+
+**Pros:** Full audit trail, no force push needed
+**Cons:** Adds commits to history
+
+#### Method 2: Manual Re-deployment
+
+Use workflow_dispatch to redeploy a previous state:
+
+1. Go to **Actions** → **dbt CD** → **Run workflow**
+2. Optionally enable `full_refresh` if schema changed
+3. Monitor deployment
+
+**When to use:** When you need to rebuild all models from scratch
+
+#### Method 3: Exclude Broken Model
+
+If one model is broken but others are fine:
+
+```bash
+# Run in Snowflake or via dbt
+dbt build --exclude model_name
+```
+
+**When to use:** Isolate a single broken model while investigating
+
+### Recovery Checklist
+
+When a production deployment fails:
+
+- [ ] **1. Assess impact** - Which models failed? Are dashboards affected?
+- [ ] **2. Notify stakeholders** - Alert data consumers of potential issues
+- [ ] **3. Check test results** - Review the failed tests in GitHub Actions
+- [ ] **4. Decide: rollback or fix forward?**
+  - Rollback if: Critical data errors, multiple models affected
+  - Fix forward if: Minor issue, quick fix available
+- [ ] **5. Execute recovery** - Use Method 1, 2, or 3 above
+- [ ] **6. Verify** - Run `dbt test` on affected models
+- [ ] **7. Post-mortem** - Document what went wrong and how to prevent it
+
+### Snowflake-Specific Recovery
+
+#### Check Recent Table Changes
+```sql
+-- See what changed in the last 24 hours
+SELECT *
+FROM SNOWFLAKE.ACCOUNT_USAGE.QUERY_HISTORY
+WHERE QUERY_TYPE IN ('CREATE_TABLE_AS_SELECT', 'INSERT', 'MERGE')
+  AND DATABASE_NAME = 'ECOMMERCE_RETAIL_DB_PROD'
+  AND START_TIME > DATEADD(hour, -24, CURRENT_TIMESTAMP())
+ORDER BY START_TIME DESC;
+```
+
+#### Time Travel Recovery (if needed)
+```sql
+-- Restore table to state before bad deployment
+CREATE OR REPLACE TABLE MARTS.fct_orders AS
+SELECT * FROM MARTS.fct_orders AT (OFFSET => -3600);  -- 1 hour ago
+
+-- Or use timestamp
+CREATE OR REPLACE TABLE MARTS.fct_orders AS
+SELECT * FROM MARTS.fct_orders AT (TIMESTAMP => '2024-01-15 10:00:00'::TIMESTAMP);
+```
+
+**Note:** Time travel retention is 1 day by default (up to 90 days on Enterprise).
+
+### Prevention: Pre-deployment Checks
+
+Add these to your workflow before deploying:
+
+```yaml
+# Add to dbt-cd.yml before the deploy step
+- name: Pre-deployment validation
+  run: |
+    cd ${{ env.DBT_PROJECT_PATH }}
+    # Compile to catch SQL errors
+    dbt compile
+    # Run tests on source data
+    dbt test --select source:*
+```
+
+---
+
 ## Quick Reference: Context Variables
 
 | Variable | Description | Example |

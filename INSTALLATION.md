@@ -6,6 +6,7 @@
 - [uv](https://docs.astral.sh/uv/) - Fast Python package manager
 - Snowflake account with key-pair authentication
 - Kaggle account (for data download)
+- AWS account with S3 access (for incremental data pipeline)
 
 ## Snowflake Architecture (Medallion Pattern)
 
@@ -75,6 +76,10 @@ Required environment variables:
 | `SNOWFLAKE_PRIVATE_KEY_PASSPHRASE` | Passphrase for private key (if encrypted) | |
 | `KAGGLE_USERNAME` | Your Kaggle username | |
 | `KAGGLE_KEY` | Your Kaggle API key | |
+| `AWS_ACCESS_KEY_ID` | AWS IAM user access key (for S3 uploads) | `AKIA...` |
+| `AWS_SECRET_ACCESS_KEY` | AWS IAM user secret key | |
+| `AWS_REGION` | AWS region for S3 bucket | `us-east-1` |
+| `S3_BUCKET` | S3 bucket name for raw data | `ecommerce-retail-analytics-raw` |
 
 ### GitHub Secrets (for CI/CD)
 
@@ -191,6 +196,38 @@ You should see:
 ```
 All checks passed!
 ```
+
+## 7. AWS S3 Integration (Optional - for Incremental Pipeline)
+
+If you plan to use the incremental data pipeline with Faker-generated data, you need to set up AWS S3 integration.
+
+See **[docs/AWS-SNOWFLAKE-INTEGRATION-SETUP.md](docs/AWS-SNOWFLAKE-INTEGRATION-SETUP.md)** for the complete guide.
+
+### Quick Overview
+
+1. **Create S3 bucket**: `ecommerce-retail-analytics-raw` with folders per table
+2. **Create IAM resources**:
+   - Policy: `ecommerce-s3-pipeline-policy`
+   - User: `snowflake-data-engineer` (for Airflow/Python uploads)
+   - Role: `snowflake-ecommerce-s3-role` (for Snowflake to assume)
+3. **Run Snowflake SQL scripts**:
+   ```bash
+   # In Snowflake worksheet (as ACCOUNTADMIN):
+   snowflake/5-aws-storage-integration.sql
+
+   # Then (as LEAD_DATA_ENGINEER_ROLE):
+   snowflake/6-stage-&-file-format.sql
+   ```
+4. **Configure AWS trust relationship** using values from `DESC INTEGRATION s3_ecommerce_integration`
+
+### Verify Integration
+
+```sql
+-- Test the stage connection
+LIST @ECOMMERCE_RETAIL_DB_DEV.RAW.raw_ecommerce_s3_stage;
+```
+
+---
 
 ## Troubleshooting
 

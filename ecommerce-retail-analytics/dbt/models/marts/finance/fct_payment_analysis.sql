@@ -1,6 +1,5 @@
 -- Payment analysis fact table aggregated by payment type and month
 -- Use this for payment method performance, installment analysis, and payment trends
-
 with payments as (
     select *
     from {{ ref('stg_ecommerce__order_payments') }}
@@ -46,6 +45,7 @@ monthly_aggregates as (
 final as (
     select
         -- Grain keys
+        {{ dbt_utils.generate_surrogate_key(['payment_type', 'year_month']) }} as payment_key,
         ma.payment_type,
         ma.year_month,
 

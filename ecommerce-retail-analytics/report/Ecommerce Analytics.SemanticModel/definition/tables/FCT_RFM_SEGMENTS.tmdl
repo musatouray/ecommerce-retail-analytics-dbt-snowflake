@@ -1,0 +1,126 @@
+table FCT_RFM_SEGMENTS
+	lineageTag: 5d5cd826-5672-4bef-93ed-7b84e9a2a9ee
+
+	column RFM_SEGMENT_KEY
+		dataType: string
+		lineageTag: 994ece81-461c-4092-b08e-3642a8564baa
+		summarizeBy: none
+		sourceColumn: RFM_SEGMENT_KEY
+
+		annotation SummarizationSetBy = Automatic
+
+	column CUSTOMER_UNIQUE_ID
+		dataType: string
+		lineageTag: e84fa378-ef57-4fa1-a94c-cb9030cbbb4c
+		summarizeBy: none
+		sourceColumn: CUSTOMER_UNIQUE_ID
+
+		annotation SummarizationSetBy = Automatic
+
+	column RECENCY
+		dataType: double
+		lineageTag: 0c1edf57-f2b4-4b53-a273-e76cc8a63aa4
+		summarizeBy: sum
+		sourceColumn: RECENCY
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column FREQUENCY
+		dataType: double
+		lineageTag: 44b433f9-1909-45f5-abd4-73f60757707f
+		summarizeBy: sum
+		sourceColumn: FREQUENCY
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column MONETARY
+		dataType: double
+		lineageTag: 2e79d41e-c2b6-4ce1-aedf-eaa88b2281d8
+		summarizeBy: sum
+		sourceColumn: MONETARY
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column R_SCORE
+		dataType: double
+		lineageTag: ff68920f-034e-4c63-8491-6a6ab8dae151
+		summarizeBy: sum
+		sourceColumn: R_SCORE
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column F_SCORE
+		dataType: double
+		lineageTag: d5dee23b-64f7-482c-89ad-621d16da7ffc
+		summarizeBy: sum
+		sourceColumn: F_SCORE
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column M_SCORE
+		dataType: double
+		lineageTag: 478d0f75-6885-47a3-8163-040cbd22c5f2
+		summarizeBy: sum
+		sourceColumn: M_SCORE
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column COMBINED_SCORE
+		dataType: string
+		lineageTag: e42beca2-43f2-4572-a3b8-5a8d7571f33e
+		summarizeBy: none
+		sourceColumn: COMBINED_SCORE
+
+		annotation SummarizationSetBy = Automatic
+
+	column RFM_SEGMENT
+		dataType: string
+		lineageTag: 68d83f58-3e72-429e-9f71-8543c773bfc0
+		summarizeBy: none
+		sourceColumn: RFM_SEGMENT
+
+		annotation SummarizationSetBy = Automatic
+
+	column CREATED_AT
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 1f45021f-f56f-447f-aee4-a77f1a4e78dc
+		summarizeBy: none
+		sourceColumn: CREATED_AT
+
+		annotation SummarizationSetBy = Automatic
+
+	column UPDATED_AT
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: cc297fac-7aff-4502-a713-81685e9aa49a
+		summarizeBy: none
+		sourceColumn: UPDATED_AT
+
+		annotation SummarizationSetBy = Automatic
+
+	partition FCT_RFM_SEGMENTS = m
+		mode: import
+		source =
+				let
+				    Source = Snowflake.Databases("SVIPRYH-HOB47754.snowflakecomputing.com","ECOMMERCE_RETAIL_WH",[Implementation="1.0"]),
+				    ECOMMERCE_RETAIL_DB_PROD_Database = Source{[Name="ECOMMERCE_RETAIL_DB_PROD",Kind="Database"]}[Data],
+				    MARTS_Schema = ECOMMERCE_RETAIL_DB_PROD_Database{[Name="MARTS",Kind="Schema"]}[Data],
+				    FCT_RFM_SEGMENTS_Table = MARTS_Schema{[Name="FCT_RFM_SEGMENTS",Kind="Table"]}[Data]
+				in
+				    FCT_RFM_SEGMENTS_Table
+
+	annotation PBI_ResultType = Table
+
