@@ -8,5 +8,8 @@
 # Logs
 logs/
 
+# dbt artifacts (version-specific lock file)
+ecommerce-retail-analytics/dbt/package-lock.yml
+
 # Windows artifacts
 nul
