@@ -1,3 +1,6 @@
+-- Customer dimension table with one row per unique customer
+-- Use this for customer-level analytics: segmentation, lifetime value, and retention metrics
+
 with customers as (
     select * from {{ ref('stg_ecommerce__customers') }}
 ),

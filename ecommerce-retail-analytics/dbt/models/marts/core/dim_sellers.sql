@@ -1,3 +1,6 @@
+-- Seller dimension table with one row per seller
+-- Use this for seller analytics: performance tracking, fulfillment metrics, and geographic coverage
+
 with sellers as (
     select * from {{ ref('stg_ecommerce__sellers') }}
 ),

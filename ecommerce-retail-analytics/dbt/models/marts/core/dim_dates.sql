@@ -1,8 +1,5 @@
-{{
-  config(
-    materialized = 'table'
-    )
-}}
+-- Date dimension table with one row per calendar day
+-- Use this for time-based analysis: trends, seasonality, and period comparisons
 
 with generated_dates as (
     {{ get_order_date_spine() }}
