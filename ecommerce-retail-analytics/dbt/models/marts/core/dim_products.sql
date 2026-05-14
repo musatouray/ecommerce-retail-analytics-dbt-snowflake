@@ -1,3 +1,6 @@
+-- Product dimension table with one row per product
+-- Use this for product analytics: category performance, ratings, and inventory insights
+
 with products as (
     select *
     from {{ ref('stg_ecommerce__products') }}
