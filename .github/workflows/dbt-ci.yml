@@ -35,7 +35,7 @@ jobs:
           python-version: '3.11'
 
       - name: Install SQLFluff
-        run: pip install sqlfluff sqlfluff-templater-dbt dbt-snowflake==1.9.0
+        run: pip install sqlfluff sqlfluff-templater-dbt dbt-core==1.11.8 dbt-snowflake==1.11.4
 
       - name: Lint SQL files (lenient - warnings only)
         run: |
@@ -72,7 +72,7 @@ jobs:
 
       - name: Install dbt
         run: |
-          pip install dbt-core==1.9.0 dbt-snowflake==1.9.0
+          pip install dbt-core==1.11.8 dbt-snowflake==1.11.4
           dbt --version
 
       # Write private key to file (required for Snowflake keypair auth)
