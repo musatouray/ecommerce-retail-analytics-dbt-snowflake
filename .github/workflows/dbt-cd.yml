@@ -38,10 +38,10 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: '3.11'
 
@@ -116,7 +116,7 @@ jobs:
 
       # Save production manifest for Slim CI comparisons
       - name: Upload production manifest
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: prod-manifest
           path: ${{ env.DBT_PROJECT_PATH }}/target/manifest.json
@@ -124,7 +124,7 @@ jobs:
 
       # Upload docs artifact
       - name: Upload docs artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: dbt-docs
           path: |
