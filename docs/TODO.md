@@ -32,6 +32,23 @@
 ✅ Query optimization
 ✅ Data Lineage Visualization (Using dbt)
 ✅ Power BI Dashboard
+    ✅ DESIGN FRAMEWORK (docs/dashboard-design/)
+        ▪ 00-design-framework.md : Theme design, measure organization, page structure
+        ▪ design-tokens.md : Human-readable color/typography reference
+        ▪ ecommerce-analytics-theme.json : Power BI theme (580+ lines)
+    ✅ NARRATIVE BRIEFS (10 pages with wireframes + data mapping)
+        ▪ 01-executive-summary.md : KPIs, revenue trends, business health
+        ▪ 02-rfm-segmentation.md : RFM analysis, customer segments
+        ▪ 03-customer-lifetime-value.md : CLV tiers and predictions
+        ▪ 04-cohort-retention.md : Retention heatmap by cohort
+        ▪ 05-churn-risk.md : Churn risk scoring and alerts
+        ▪ 06-funnel-analysis.md : Order status funnel
+        ▪ 07-product-performance.md : Pareto analysis (80/20)
+        ▪ 08-market-basket.md : Cross-sell opportunities
+        ▪ 09-geographic-insights.md : Brazil map, regional metrics
+        ▪ 10-time-trends.md : Time intelligence, seasonality
+    ⏳ BUILD VISUALS (follow wireframes in narrative briefs)
+    ⏳ CREATE DAX MEASURES (as specified in each page brief)
 ✅ BG/NBD Predictive Model via dbt Python for predictive_ltv
 ✅ Self-Correcting Agentic SQL Analyst - An Agentic RAG using crewAI / LangGraph / Microsoft Agent Framework SDK
 ✅ Streamlit App
