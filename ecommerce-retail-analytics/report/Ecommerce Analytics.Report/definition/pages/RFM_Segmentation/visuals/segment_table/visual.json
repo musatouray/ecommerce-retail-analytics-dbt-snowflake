@@ -1,0 +1,221 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.8.0/schema.json",
+  "name": "segment_table",
+  "position": {
+    "x": 1216,
+    "y": 100,
+    "z": 0,
+    "height": 732,
+    "width": 680,
+    "tabOrder": 9
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FCT_RFM_SEGMENTS"
+                    }
+                  },
+                  "Property": "RFM_SEGMENT"
+                }
+              },
+              "queryRef": "FCT_RFM_SEGMENTS.RFM_SEGMENT",
+              "nativeQueryRef": "RFM_SEGMENT"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "RFM Total Customers"
+                }
+              },
+              "queryRef": "_Measures.RFM Total Customers",
+              "nativeQueryRef": "Customers"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Avg Recency (Days)"
+                }
+              },
+              "queryRef": "_Measures.Avg Recency (Days)",
+              "nativeQueryRef": "Avg Recency"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Avg Frequency"
+                }
+              },
+              "queryRef": "_Measures.Avg Frequency",
+              "nativeQueryRef": "Avg Frequency"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Avg Monetary"
+                }
+              },
+              "queryRef": "_Measures.Avg Monetary",
+              "nativeQueryRef": "Avg Monetary"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "RFM Segment %"
+                }
+              },
+              "queryRef": "_Measures.RFM Segment %",
+              "nativeQueryRef": "% of Total"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "_Measures"
+                  }
+                },
+                "Property": "RFM Total Customers"
+              }
+            },
+            "direction": "Descending"
+          }
+        ]
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Segment Detail'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "7c267effcdfeeaa1f8fc",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "FCT_RFM_SEGMENTS"
+              }
+            },
+            "Property": "RFM_SEGMENT"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "43351d27d5e0fa348b22",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "_Measures"
+              }
+            },
+            "Property": "RFM Total Customers"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "8f95eeaf92debe528c8b",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "_Measures"
+              }
+            },
+            "Property": "Avg Recency (Days)"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "e82daf445a46d5cae966",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "_Measures"
+              }
+            },
+            "Property": "Avg Frequency"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "7377411e910f63deb09d",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "_Measures"
+              }
+            },
+            "Property": "Avg Monetary"
+          }
+        },
+        "type": "Advanced"
+      }
+    ]
+  }
+}

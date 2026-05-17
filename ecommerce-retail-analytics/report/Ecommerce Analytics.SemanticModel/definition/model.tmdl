@@ -12,7 +12,6 @@ annotation PBI_QueryOrder = ["_Measures","DIM_COHORTS","DIM_CUSTOMERS","DIM_DATE
 
 annotation PBI_ProTooling = ["DevMode"]
 
-ref table _Measures
 ref table DIM_COHORTS
 ref table DIM_CUSTOMERS
 ref table DIM_DATES
@@ -31,6 +30,7 @@ ref table FCT_ORDERS_FUNNEL
 ref table FCT_PARETO_PRODUCTS
 ref table FCT_PAYMENT_ANALYSIS
 ref table FCT_RFM_SEGMENTS
+ref table _Measures
 
 ref cultureInfo en-US
 

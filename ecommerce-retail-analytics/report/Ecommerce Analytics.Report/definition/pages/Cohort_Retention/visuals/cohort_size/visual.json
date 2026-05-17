@@ -1,0 +1,79 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.8.0/schema.json",
+  "name": "cohort_size",
+  "position": {
+    "x": 740,
+    "y": 632,
+    "z": 0,
+    "height": 220,
+    "width": 456,
+    "tabOrder": 7
+  },
+  "visual": {
+    "visualType": "barChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FCT_COHORT_RETENTION"
+                    }
+                  },
+                  "Property": "COHORT_KEY"
+                }
+              },
+              "queryRef": "FCT_COHORT_RETENTION.COHORT_KEY",
+              "nativeQueryRef": "Cohort",
+              "active": true
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Cohort Size"
+                }
+              },
+              "queryRef": "_Measures.Cohort Size",
+              "nativeQueryRef": "Cohort Size"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Cohort Size'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}
