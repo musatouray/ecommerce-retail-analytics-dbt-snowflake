@@ -1,7 +1,16 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/pagesMetadata/1.0.0/schema.json",
   "pageOrder": [
-    "9ebae341b465b91b82ff"
+    "9ebae341b465b91b82ff",
+    "rfm_segmentation_page",
+    "clv_page",
+    "cohort_retention_page",
+    "churn_risk_page",
+    "funnel_analysis_page",
+    "product_performance_page",
+    "market_basket_page",
+    "geographic_insights_page",
+    "time_trends_page"
   ],
-  "activePageName": "9ebae341b465b91b82ff"
+  "activePageName": "time_trends_page"
 }

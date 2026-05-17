@@ -1,0 +1,79 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.8.0/schema.json",
+  "name": "segment_treemap",
+  "position": {
+    "x": 24,
+    "y": 236,
+    "z": 0,
+    "height": 300,
+    "width": 580,
+    "tabOrder": 6
+  },
+  "visual": {
+    "visualType": "treemap",
+    "query": {
+      "queryState": {
+        "Group": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FCT_RFM_SEGMENTS"
+                    }
+                  },
+                  "Property": "RFM_SEGMENT"
+                }
+              },
+              "queryRef": "FCT_RFM_SEGMENTS.RFM_SEGMENT",
+              "nativeQueryRef": "RFM_SEGMENT",
+              "active": true
+            }
+          ]
+        },
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "RFM Total Customers"
+                }
+              },
+              "queryRef": "_Measures.RFM Total Customers",
+              "nativeQueryRef": "RFM Total Customers"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Segment Distribution'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

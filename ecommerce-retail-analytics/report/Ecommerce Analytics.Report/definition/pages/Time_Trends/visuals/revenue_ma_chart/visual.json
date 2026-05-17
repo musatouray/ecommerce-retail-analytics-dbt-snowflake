@@ -1,0 +1,107 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.8.0/schema.json",
+  "name": "revenue_ma_chart",
+  "position": {
+    "x": 24,
+    "y": 236,
+    "z": 0,
+    "height": 300,
+    "width": 1172,
+    "tabOrder": 6
+  },
+  "visual": {
+    "visualType": "lineChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FCT_DAILY_REVENUE_TIME_SERIES"
+                    }
+                  },
+                  "Property": "DATE"
+                }
+              },
+              "queryRef": "FCT_DAILY_REVENUE_TIME_SERIES.DATE",
+              "nativeQueryRef": "Date",
+              "active": true
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Daily Revenue"
+                }
+              },
+              "queryRef": "_Measures.Daily Revenue",
+              "nativeQueryRef": "Daily"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "7-Day MA Revenue"
+                }
+              },
+              "queryRef": "_Measures.7-Day MA Revenue",
+              "nativeQueryRef": "7-Day MA"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "28-Day MA Revenue"
+                }
+              },
+              "queryRef": "_Measures.28-Day MA Revenue",
+              "nativeQueryRef": "28-Day MA"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Daily Revenue with Moving Averages'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

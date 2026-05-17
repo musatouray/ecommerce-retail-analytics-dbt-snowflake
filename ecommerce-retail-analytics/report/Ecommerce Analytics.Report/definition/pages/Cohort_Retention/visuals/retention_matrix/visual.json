@@ -1,0 +1,96 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.8.0/schema.json",
+  "name": "retention_matrix",
+  "position": {
+    "x": 24,
+    "y": 236,
+    "z": 0,
+    "height": 380,
+    "width": 1172,
+    "tabOrder": 5
+  },
+  "visual": {
+    "visualType": "matrix",
+    "query": {
+      "queryState": {
+        "Rows": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FCT_COHORT_RETENTION"
+                    }
+                  },
+                  "Property": "COHORT_KEY"
+                }
+              },
+              "queryRef": "FCT_COHORT_RETENTION.COHORT_KEY",
+              "nativeQueryRef": "Cohort"
+            }
+          ]
+        },
+        "Columns": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FCT_COHORT_RETENTION"
+                    }
+                  },
+                  "Property": "PERIOD_NUMBER"
+                }
+              },
+              "queryRef": "FCT_COHORT_RETENTION.PERIOD_NUMBER",
+              "nativeQueryRef": "Period"
+            }
+          ]
+        },
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "_Measures"
+                    }
+                  },
+                  "Property": "Retention Rate"
+                }
+              },
+              "queryRef": "_Measures.Retention Rate",
+              "nativeQueryRef": "Retention Rate"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Retention Heatmap (Cohort x Period)'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}
