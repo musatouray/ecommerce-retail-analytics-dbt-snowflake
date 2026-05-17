@@ -4,646 +4,635 @@ table _Measures
 	/// =============================================
 	/// _Base Measures - Core Metrics
 	/// =============================================
-
-	measure 'Total Revenue' = SUM(FCT_ORDERS[GROSS_ORDER_VALUE])
+	measure 'Total Revenue' = SUM(FCT_ORDERS[TOTAL_PAYMENT_VALUE])
+		formatString: $#,##0
 		displayFolder: _Base
-		formatString: "R$"\ #,##0
 		lineageTag: b1000001-0001-0001-0001-000000000001
 
 	measure 'Total Orders' = COUNTROWS(FCT_ORDERS)
-		displayFolder: _Base
 		formatString: #,##0
+		displayFolder: _Base
 		lineageTag: b1000002-0001-0001-0001-000000000002
 
-	measure 'Total Customers' = DISTINCTCOUNT(FCT_ORDERS[CUSTOMER_KEY])
-		displayFolder: _Base
+	measure 'Total Customers' = DISTINCTCOUNT(DIM_CUSTOMERS[CUSTOMER_UNIQUE_ID])
 		formatString: #,##0
+		displayFolder: _Base
 		lineageTag: b1000003-0001-0001-0001-000000000003
 
 	measure 'Average Order Value' = DIVIDE([Total Revenue], [Total Orders], 0)
+		formatString: $#,##0.00
 		displayFolder: _Base
-		formatString: "R$"\ #,##0.00
 		lineageTag: b1000004-0001-0001-0001-000000000004
 
 	measure 'Average Review Score' = AVERAGE(FCT_ORDERS[REVIEW_SCORE])
-		displayFolder: _Base
 		formatString: 0.0
+		displayFolder: _Base
 		lineageTag: b1000005-0001-0001-0001-000000000005
 
 	measure 'Total Freight' = SUM(FCT_ORDERS[TOTAL_FREIGHT_VALUE])
+		formatString: $#,##0
 		displayFolder: _Base
-		formatString: "R$"\ #,##0
 		lineageTag: b1000006-0001-0001-0001-000000000006
 
 	measure 'Delivery Rate' =
-		DIVIDE(
-			COUNTROWS(FILTER(FCT_ORDERS, FCT_ORDERS[ORDER_STATUS] = "delivered")),
-			[Total Orders],
-			0
-		)
-		displayFolder: _Base
-		formatString: 0.0%
-		lineageTag: b1000007-0001-0001-0001-000000000007
+			DIVIDE(
+				COUNTROWS(FILTER(FCT_ORDERS, FCT_ORDERS[ORDER_STATUS] = "delivered")),
+				[Total Orders],
+				0
+			)
+			formatString: 0.0%
+			displayFolder: _Base
+			lineageTag: b1000007-0001-0001-0001-000000000007
 
 	measure 'On-Time Delivery Rate' =
-		DIVIDE(
-			COUNTROWS(FILTER(FCT_ORDERS, FCT_ORDERS[IS_ON_TIME_DELIVERY] = TRUE())),
-			COUNTROWS(FILTER(FCT_ORDERS, FCT_ORDERS[ORDER_STATUS] = "delivered")),
-			0
-		)
-		displayFolder: _Base
-		formatString: 0.0%
-		lineageTag: b1000008-0001-0001-0001-000000000008
+			DIVIDE(
+				COUNTROWS(FILTER(FCT_ORDERS, FCT_ORDERS[IS_ON_TIME_DELIVERY] = TRUE())),
+				COUNTROWS(FILTER(FCT_ORDERS, FCT_ORDERS[ORDER_STATUS] = "delivered")),
+				0
+			)
+			formatString: 0.0%
+			displayFolder: _Base
+			lineageTag: b1000008-0001-0001-0001-000000000008
 
 	/// =============================================
 	/// _Time Intelligence Measures
 	/// =============================================
-
 	measure 'YTD Revenue' =
-		CALCULATE(
-			[Total Revenue],
-			DATESYTD(DIM_DATES[DATE])
-		)
-		displayFolder: _Time Intelligence
-		formatString: "R$"\ #,##0
-		lineageTag: t1000001-0001-0001-0001-000000000001
+			CALCULATE(
+				[Total Revenue],
+				DATESYTD(DIM_DATES[DATE])
+			)
+			formatString: $#,##0
+			displayFolder: _Time Intelligence
+			lineageTag: t1000001-0001-0001-0001-000000000001
 
 	measure 'MTD Revenue' =
-		CALCULATE(
-			[Total Revenue],
-			DATESMTD(DIM_DATES[DATE])
-		)
-		displayFolder: _Time Intelligence
-		formatString: "R$"\ #,##0
-		lineageTag: t1000002-0001-0001-0001-000000000002
+			CALCULATE(
+				[Total Revenue],
+				DATESMTD(DIM_DATES[DATE])
+			)
+			formatString: $#,##0
+			displayFolder: _Time Intelligence
+			lineageTag: t1000002-0001-0001-0001-000000000002
 
 	measure 'QTD Revenue' =
-		CALCULATE(
-			[Total Revenue],
-			DATESQTD(DIM_DATES[DATE])
-		)
-		displayFolder: _Time Intelligence
-		formatString: "R$"\ #,##0
-		lineageTag: t1000003-0001-0001-0001-000000000003
+			CALCULATE(
+				[Total Revenue],
+				DATESQTD(DIM_DATES[DATE])
+			)
+			formatString: $#,##0
+			displayFolder: _Time Intelligence
+			lineageTag: t1000003-0001-0001-0001-000000000003
 
 	measure 'Prior Month Revenue' =
-		CALCULATE(
-			[Total Revenue],
-			DATEADD(DIM_DATES[DATE], -1, MONTH)
-		)
-		displayFolder: _Time Intelligence
-		formatString: "R$"\ #,##0
-		lineageTag: t1000004-0001-0001-0001-000000000004
+			CALCULATE(
+				[Total Revenue],
+				DATEADD(DIM_DATES[DATE], -1, MONTH)
+			)
+			formatString: $#,##0
+			displayFolder: _Time Intelligence
+			lineageTag: t1000004-0001-0001-0001-000000000004
 
 	measure 'Prior Year Revenue' =
-		CALCULATE(
-			[Total Revenue],
-			SAMEPERIODLASTYEAR(DIM_DATES[DATE])
-		)
-		displayFolder: _Time Intelligence
-		formatString: "R$"\ #,##0
-		lineageTag: t1000005-0001-0001-0001-000000000005
+			CALCULATE(
+				[Total Revenue],
+				SAMEPERIODLASTYEAR(DIM_DATES[DATE])
+			)
+			formatString: $#,##0
+			displayFolder: _Time Intelligence
+			lineageTag: t1000005-0001-0001-0001-000000000005
 
 	measure 'Revenue MoM %' =
-		VAR CurrentMonth = [Total Revenue]
-		VAR PriorMonth = [Prior Month Revenue]
-		RETURN DIVIDE(CurrentMonth - PriorMonth, PriorMonth, 0)
-		displayFolder: _Time Intelligence
-		formatString: 0.0%;-0.0%;0.0%
-		lineageTag: t1000006-0001-0001-0001-000000000006
+			VAR CurrentMonth = [Total Revenue]
+			VAR PriorMonth = [Prior Month Revenue]
+			RETURN DIVIDE(CurrentMonth - PriorMonth, PriorMonth, 0)
+			formatString: 0.0%;-0.0%;0.0%
+			displayFolder: _Time Intelligence
+			lineageTag: t1000006-0001-0001-0001-000000000006
 
 	measure 'Revenue YoY %' =
-		VAR CurrentPeriod = [Total Revenue]
-		VAR PriorYear = [Prior Year Revenue]
-		RETURN DIVIDE(CurrentPeriod - PriorYear, PriorYear, 0)
-		displayFolder: _Time Intelligence
-		formatString: 0.0%;-0.0%;0.0%
-		lineageTag: t1000007-0001-0001-0001-000000000007
+			VAR CurrentPeriod = [Total Revenue]
+			VAR PriorYear = [Prior Year Revenue]
+			RETURN DIVIDE(CurrentPeriod - PriorYear, PriorYear, 0)
+			formatString: 0.0%;-0.0%;0.0%
+			displayFolder: _Time Intelligence
+			lineageTag: t1000007-0001-0001-0001-000000000007
 
 	measure 'Prior Month Orders' =
-		CALCULATE(
-			[Total Orders],
-			DATEADD(DIM_DATES[DATE], -1, MONTH)
-		)
-		displayFolder: _Time Intelligence
-		formatString: #,##0
-		lineageTag: t1000008-0001-0001-0001-000000000008
+			CALCULATE(
+				[Total Orders],
+				DATEADD(DIM_DATES[DATE], -1, MONTH)
+			)
+			formatString: #,##0
+			displayFolder: _Time Intelligence
+			lineageTag: t1000008-0001-0001-0001-000000000008
 
 	measure 'Orders MoM %' =
-		VAR CurrentMonth = [Total Orders]
-		VAR PriorMonth = [Prior Month Orders]
-		RETURN DIVIDE(CurrentMonth - PriorMonth, PriorMonth, 0)
-		displayFolder: _Time Intelligence
-		formatString: 0.0%;-0.0%;0.0%
-		lineageTag: t1000009-0001-0001-0001-000000000009
+			VAR CurrentMonth = [Total Orders]
+			VAR PriorMonth = [Prior Month Orders]
+			RETURN DIVIDE(CurrentMonth - PriorMonth, PriorMonth, 0)
+			formatString: 0.0%;-0.0%;0.0%
+			displayFolder: _Time Intelligence
+			lineageTag: t1000009-0001-0001-0001-000000000009
 
 	measure 'Prior Year Orders' =
-		CALCULATE(
-			[Total Orders],
-			SAMEPERIODLASTYEAR(DIM_DATES[DATE])
-		)
-		displayFolder: _Time Intelligence
-		formatString: #,##0
-		lineageTag: t1000010-0001-0001-0001-000000000010
+			CALCULATE(
+				[Total Orders],
+				SAMEPERIODLASTYEAR(DIM_DATES[DATE])
+			)
+			formatString: #,##0
+			displayFolder: _Time Intelligence
+			lineageTag: t1000010-0001-0001-0001-000000000010
 
 	measure 'Orders YoY %' =
-		VAR CurrentPeriod = [Total Orders]
-		VAR PriorYear = [Prior Year Orders]
-		RETURN DIVIDE(CurrentPeriod - PriorYear, PriorYear, 0)
-		displayFolder: _Time Intelligence
-		formatString: 0.0%;-0.0%;0.0%
-		lineageTag: t1000011-0001-0001-0001-000000000011
+			VAR CurrentPeriod = [Total Orders]
+			VAR PriorYear = [Prior Year Orders]
+			RETURN DIVIDE(CurrentPeriod - PriorYear, PriorYear, 0)
+			formatString: 0.0%;-0.0%;0.0%
+			displayFolder: _Time Intelligence
+			lineageTag: t1000011-0001-0001-0001-000000000011
 
 	/// =============================================
 	/// _RFM Segment Measures
 	/// =============================================
-
 	measure 'RFM Total Customers' = COUNTROWS(FCT_RFM_SEGMENTS)
-		displayFolder: _Segments\RFM
 		formatString: #,##0
+		displayFolder: _Segments\RFM
 		lineageTag: r1000001-0001-0001-0001-000000000001
 
 	measure 'Champions Count' =
-		CALCULATE(
-			COUNTROWS(FCT_RFM_SEGMENTS),
-			FCT_RFM_SEGMENTS[RFM_SEGMENT] = "Champions"
-		)
-		displayFolder: _Segments\RFM
-		formatString: #,##0
-		lineageTag: r1000002-0001-0001-0001-000000000002
+			CALCULATE(
+				COUNTROWS(FCT_RFM_SEGMENTS),
+				FCT_RFM_SEGMENTS[RFM_SEGMENT] = "Champions"
+			)
+			formatString: #,##0
+			displayFolder: _Segments\RFM
+			lineageTag: r1000002-0001-0001-0001-000000000002
 
 	measure 'Loyal Customers Count' =
-		CALCULATE(
-			COUNTROWS(FCT_RFM_SEGMENTS),
-			FCT_RFM_SEGMENTS[RFM_SEGMENT] = "Loyal Customers"
-		)
-		displayFolder: _Segments\RFM
-		formatString: #,##0
-		lineageTag: r1000003-0001-0001-0001-000000000003
+			CALCULATE(
+				COUNTROWS(FCT_RFM_SEGMENTS),
+				FCT_RFM_SEGMENTS[RFM_SEGMENT] = "Loyal Customers"
+			)
+			formatString: #,##0
+			displayFolder: _Segments\RFM
+			lineageTag: r1000003-0001-0001-0001-000000000003
 
 	measure 'At Risk Count' =
-		CALCULATE(
-			COUNTROWS(FCT_RFM_SEGMENTS),
-			FCT_RFM_SEGMENTS[RFM_SEGMENT] = "At Risk"
-		)
-		displayFolder: _Segments\RFM
-		formatString: #,##0
-		lineageTag: r1000004-0001-0001-0001-000000000004
+			CALCULATE(
+				COUNTROWS(FCT_RFM_SEGMENTS),
+				FCT_RFM_SEGMENTS[RFM_SEGMENT] = "At Risk"
+			)
+			formatString: #,##0
+			displayFolder: _Segments\RFM
+			lineageTag: r1000004-0001-0001-0001-000000000004
 
 	measure 'Hibernating Count' =
-		CALCULATE(
-			COUNTROWS(FCT_RFM_SEGMENTS),
-			FCT_RFM_SEGMENTS[RFM_SEGMENT] = "Hibernating"
-		)
-		displayFolder: _Segments\RFM
-		formatString: #,##0
-		lineageTag: r1000005-0001-0001-0001-000000000005
+			CALCULATE(
+				COUNTROWS(FCT_RFM_SEGMENTS),
+				FCT_RFM_SEGMENTS[RFM_SEGMENT] = "Hibernating"
+			)
+			formatString: #,##0
+			displayFolder: _Segments\RFM
+			lineageTag: r1000005-0001-0001-0001-000000000005
 
 	measure 'RFM Segment %' =
-		DIVIDE(
-			COUNTROWS(FCT_RFM_SEGMENTS),
-			CALCULATE(COUNTROWS(FCT_RFM_SEGMENTS), ALL(FCT_RFM_SEGMENTS[RFM_SEGMENT])),
-			0
-		)
-		displayFolder: _Segments\RFM
-		formatString: 0.0%
-		lineageTag: r1000006-0001-0001-0001-000000000006
+			DIVIDE(
+				COUNTROWS(FCT_RFM_SEGMENTS),
+				CALCULATE(COUNTROWS(FCT_RFM_SEGMENTS), ALL(FCT_RFM_SEGMENTS[RFM_SEGMENT])),
+				0
+			)
+			formatString: 0.0%
+			displayFolder: _Segments\RFM
+			lineageTag: r1000006-0001-0001-0001-000000000006
 
 	measure 'Avg Recency (Days)' = AVERAGE(FCT_RFM_SEGMENTS[RECENCY])
-		displayFolder: _Segments\RFM
 		formatString: #,##0
+		displayFolder: _Segments\RFM
 		lineageTag: r1000007-0001-0001-0001-000000000007
 
 	measure 'Avg Frequency' = AVERAGE(FCT_RFM_SEGMENTS[FREQUENCY])
-		displayFolder: _Segments\RFM
 		formatString: 0.0
+		displayFolder: _Segments\RFM
 		lineageTag: r1000008-0001-0001-0001-000000000008
 
 	measure 'Avg Monetary' = AVERAGE(FCT_RFM_SEGMENTS[MONETARY])
+		formatString: $#,##0
 		displayFolder: _Segments\RFM
-		formatString: "R$"\ #,##0
 		lineageTag: r1000009-0001-0001-0001-000000000009
 
 	/// =============================================
 	/// _CLV Segment Measures
 	/// =============================================
-
 	measure 'Total Historical CLV' = SUM(FCT_CLV_CUSTOMER[HISTORICAL_CLV])
+		formatString: $#,##0
 		displayFolder: _Segments\CLV
-		formatString: "R$"\ #,##0
 		lineageTag: c1000001-0001-0001-0001-000000000001
 
 	measure 'Avg Historical CLV' = AVERAGE(FCT_CLV_CUSTOMER[HISTORICAL_CLV])
+		formatString: $#,##0
 		displayFolder: _Segments\CLV
-		formatString: "R$"\ #,##0
 		lineageTag: c1000002-0001-0001-0001-000000000002
 
 	measure 'Total Predicted LTV' = SUM(FCT_CLV_CUSTOMER[PREDICTED_LTV])
+		formatString: $#,##0
 		displayFolder: _Segments\CLV
-		formatString: "R$"\ #,##0
 		lineageTag: c1000003-0001-0001-0001-000000000003
 
 	measure 'Avg Predicted LTV' = AVERAGE(FCT_CLV_CUSTOMER[PREDICTED_LTV])
+		formatString: $#,##0
 		displayFolder: _Segments\CLV
-		formatString: "R$"\ #,##0
 		lineageTag: c1000004-0001-0001-0001-000000000004
 
 	measure 'High CLV Customers' =
-		CALCULATE(
-			COUNTROWS(FCT_CLV_CUSTOMER),
-			FCT_CLV_CUSTOMER[CLV_SEGMENT] = "High"
-		)
-		displayFolder: _Segments\CLV
-		formatString: #,##0
-		lineageTag: c1000005-0001-0001-0001-000000000005
+			CALCULATE(
+				COUNTROWS(FCT_CLV_CUSTOMER),
+				FCT_CLV_CUSTOMER[CLV_SEGMENT] = "High"
+			)
+			formatString: #,##0
+			displayFolder: _Segments\CLV
+			lineageTag: c1000005-0001-0001-0001-000000000005
 
 	measure 'Medium CLV Customers' =
-		CALCULATE(
-			COUNTROWS(FCT_CLV_CUSTOMER),
-			FCT_CLV_CUSTOMER[CLV_SEGMENT] = "Medium"
-		)
-		displayFolder: _Segments\CLV
-		formatString: #,##0
-		lineageTag: c1000006-0001-0001-0001-000000000006
+			CALCULATE(
+				COUNTROWS(FCT_CLV_CUSTOMER),
+				FCT_CLV_CUSTOMER[CLV_SEGMENT] = "Medium"
+			)
+			formatString: #,##0
+			displayFolder: _Segments\CLV
+			lineageTag: c1000006-0001-0001-0001-000000000006
 
 	measure 'Low CLV Customers' =
-		CALCULATE(
-			COUNTROWS(FCT_CLV_CUSTOMER),
-			FCT_CLV_CUSTOMER[CLV_SEGMENT] = "Low"
-		)
-		displayFolder: _Segments\CLV
-		formatString: #,##0
-		lineageTag: c1000007-0001-0001-0001-000000000007
+			CALCULATE(
+				COUNTROWS(FCT_CLV_CUSTOMER),
+				FCT_CLV_CUSTOMER[CLV_SEGMENT] = "Low"
+			)
+			formatString: #,##0
+			displayFolder: _Segments\CLV
+			lineageTag: c1000007-0001-0001-0001-000000000007
 
 	measure 'CLV Segment %' =
-		DIVIDE(
-			COUNTROWS(FCT_CLV_CUSTOMER),
-			CALCULATE(COUNTROWS(FCT_CLV_CUSTOMER), ALL(FCT_CLV_CUSTOMER[CLV_SEGMENT])),
-			0
-		)
-		displayFolder: _Segments\CLV
-		formatString: 0.0%
-		lineageTag: c1000008-0001-0001-0001-000000000008
+			DIVIDE(
+				COUNTROWS(FCT_CLV_CUSTOMER),
+				CALCULATE(COUNTROWS(FCT_CLV_CUSTOMER), ALL(FCT_CLV_CUSTOMER[CLV_SEGMENT])),
+				0
+			)
+			formatString: 0.0%
+			displayFolder: _Segments\CLV
+			lineageTag: c1000008-0001-0001-0001-000000000008
 
 	measure 'Avg CLV Score' = AVERAGE(FCT_CLV_CUSTOMER[CLV_SCORE])
-		displayFolder: _Segments\CLV
 		formatString: 0.00
+		displayFolder: _Segments\CLV
 		lineageTag: c1000009-0001-0001-0001-000000000009
 
 	/// =============================================
 	/// _Churn Risk Measures
 	/// =============================================
-
 	measure 'Active Customers' =
-		CALCULATE(
-			COUNTROWS(FCT_CHURN_RISK),
-			FCT_CHURN_RISK[CHURN_STATUS] = "Active"
-		)
-		displayFolder: _Segments\Churn
-		formatString: #,##0
-		lineageTag: ch100001-0001-0001-0001-000000000001
+			CALCULATE(
+				COUNTROWS(FCT_CHURN_RISK),
+				FCT_CHURN_RISK[CHURN_STATUS] = "Active"
+			)
+			formatString: #,##0
+			displayFolder: _Segments\Churn
+			lineageTag: ch100001-0001-0001-0001-000000000001
 
 	measure 'Cooling Customers' =
-		CALCULATE(
-			COUNTROWS(FCT_CHURN_RISK),
-			FCT_CHURN_RISK[CHURN_STATUS] = "Cooling"
-		)
-		displayFolder: _Segments\Churn
-		formatString: #,##0
-		lineageTag: ch100002-0001-0001-0001-000000000002
+			CALCULATE(
+				COUNTROWS(FCT_CHURN_RISK),
+				FCT_CHURN_RISK[CHURN_STATUS] = "Cooling"
+			)
+			formatString: #,##0
+			displayFolder: _Segments\Churn
+			lineageTag: ch100002-0001-0001-0001-000000000002
 
 	measure 'At Risk Customers' =
-		CALCULATE(
-			COUNTROWS(FCT_CHURN_RISK),
-			FCT_CHURN_RISK[CHURN_STATUS] = "At Risk"
-		)
-		displayFolder: _Segments\Churn
-		formatString: #,##0
-		lineageTag: ch100003-0001-0001-0001-000000000003
+			CALCULATE(
+				COUNTROWS(FCT_CHURN_RISK),
+				FCT_CHURN_RISK[CHURN_STATUS] = "At Risk"
+			)
+			formatString: #,##0
+			displayFolder: _Segments\Churn
+			lineageTag: ch100003-0001-0001-0001-000000000003
 
 	measure 'Churned Customers' =
-		CALCULATE(
-			COUNTROWS(FCT_CHURN_RISK),
-			FCT_CHURN_RISK[CHURN_STATUS] = "Churned"
-		)
-		displayFolder: _Segments\Churn
-		formatString: #,##0
-		lineageTag: ch100004-0001-0001-0001-000000000004
+			CALCULATE(
+				COUNTROWS(FCT_CHURN_RISK),
+				FCT_CHURN_RISK[CHURN_STATUS] = "Churned"
+			)
+			formatString: #,##0
+			displayFolder: _Segments\Churn
+			lineageTag: ch100004-0001-0001-0001-000000000004
 
 	measure 'Churn Rate' =
-		DIVIDE(
-			[Churned Customers],
-			COUNTROWS(FCT_CHURN_RISK),
-			0
-		)
-		displayFolder: _Segments\Churn
-		formatString: 0.0%
-		lineageTag: ch100005-0001-0001-0001-000000000005
+			DIVIDE(
+				[Churned Customers],
+				[Total Churn Customers],
+				0
+			)
+			formatString: 0.0%
+			displayFolder: _Segments\Churn
+			lineageTag: ch100005-0001-0001-0001-000000000005
 
 	measure 'At Risk Rate' =
-		DIVIDE(
-			[At Risk Customers],
-			COUNTROWS(FCT_CHURN_RISK),
-			0
-		)
-		displayFolder: _Segments\Churn
-		formatString: 0.0%
-		lineageTag: ch100006-0001-0001-0001-000000000006
+			DIVIDE(
+				[At Risk Customers],
+				[Total Churn Customers],
+				0
+			)
+			formatString: 0.0%
+			displayFolder: _Segments\Churn
+			lineageTag: ch100006-0001-0001-0001-000000000006
 
 	measure 'Avg Days Since Last Order' = AVERAGE(FCT_CHURN_RISK[DAYS_SINCE_LAST_ORDER])
-		displayFolder: _Segments\Churn
 		formatString: #,##0
+		displayFolder: _Segments\Churn
 		lineageTag: ch100007-0001-0001-0001-000000000007
 
 	measure 'Avg Churn Risk Score' = AVERAGE(FCT_CHURN_RISK[CHURN_RISK_SCORE])
-		displayFolder: _Segments\Churn
 		formatString: 0.00
+		displayFolder: _Segments\Churn
 		lineageTag: ch100008-0001-0001-0001-000000000008
 
 	measure 'At Risk Revenue' =
-		CALCULATE(
-			SUM(FCT_CHURN_RISK[TOTAL_REVENUE]),
-			FCT_CHURN_RISK[CHURN_STATUS] IN {"At Risk", "Cooling"}
-		)
-		displayFolder: _Segments\Churn
-		formatString: "R$"\ #,##0
-		lineageTag: ch100009-0001-0001-0001-000000000009
+			CALCULATE(
+				SUM(FCT_CHURN_RISK[TOTAL_REVENUE]),
+				FCT_CHURN_RISK[CHURN_STATUS] IN {"At Risk", "Cooling"}
+			)
+			formatString: $#,##0
+			displayFolder: _Segments\Churn
+			lineageTag: ch100009-0001-0001-0001-000000000009
 
 	/// =============================================
 	/// _Cohort Retention Measures
 	/// =============================================
-
 	measure 'Cohort Size' = SUM(FCT_COHORT_RETENTION[COHORT_SIZE])
-		displayFolder: _Cohort
 		formatString: #,##0
+		displayFolder: _Cohort
 		lineageTag: co100001-0001-0001-0001-000000000001
 
 	measure 'Retained Customers' = SUM(FCT_COHORT_RETENTION[ACTIVE_CUSTOMERS])
-		displayFolder: _Cohort
 		formatString: #,##0
+		displayFolder: _Cohort
 		lineageTag: co100002-0001-0001-0001-000000000002
 
 	measure 'Retention Rate' =
-		DIVIDE(
-			SUM(FCT_COHORT_RETENTION[ACTIVE_CUSTOMERS]),
-			SUM(FCT_COHORT_RETENTION[COHORT_SIZE]),
-			0
-		)
-		displayFolder: _Cohort
-		formatString: 0.0%
-		lineageTag: co100003-0001-0001-0001-000000000003
+			DIVIDE(
+				[Retained Customers],
+				[Cohort Size],
+				0
+			)
+			formatString: 0.0%
+			displayFolder: _Cohort
+			lineageTag: co100003-0001-0001-0001-000000000003
 
 	measure 'Avg Retention Rate' = AVERAGE(FCT_COHORT_RETENTION[RETENTION_RATE])
-		displayFolder: _Cohort
 		formatString: 0.0%
+		displayFolder: _Cohort
 		lineageTag: co100004-0001-0001-0001-000000000004
 
 	measure 'Cohort Churn Rate' = AVERAGE(FCT_COHORT_RETENTION[CHURN_RATE])
-		displayFolder: _Cohort
 		formatString: 0.0%
+		displayFolder: _Cohort
 		lineageTag: co100005-0001-0001-0001-000000000005
 
 	measure 'Total Cohorts' = DISTINCTCOUNT(FCT_COHORT_RETENTION[COHORT_KEY])
-		displayFolder: _Cohort
 		formatString: #,##0
+		displayFolder: _Cohort
 		lineageTag: co100006-0001-0001-0001-000000000006
 
 	/// =============================================
 	/// _Funnel Measures
 	/// =============================================
-
 	measure 'Orders Placed' = SUM(FCT_ORDERS_FUNNEL[ORDERS_PLACED])
-		displayFolder: _Funnel
 		formatString: #,##0
+		displayFolder: _Funnel
 		lineageTag: f1000001-0001-0001-0001-000000000001
 
 	measure 'Orders Approved' = SUM(FCT_ORDERS_FUNNEL[ORDERS_APPROVED])
-		displayFolder: _Funnel
 		formatString: #,##0
+		displayFolder: _Funnel
 		lineageTag: f1000002-0001-0001-0001-000000000002
 
 	measure 'Orders Shipped' = SUM(FCT_ORDERS_FUNNEL[ORDERS_SHIPPED])
-		displayFolder: _Funnel
 		formatString: #,##0
+		displayFolder: _Funnel
 		lineageTag: f1000003-0001-0001-0001-000000000003
 
 	measure 'Orders Delivered' = SUM(FCT_ORDERS_FUNNEL[ORDERS_DELIVERED])
-		displayFolder: _Funnel
 		formatString: #,##0
+		displayFolder: _Funnel
 		lineageTag: f1000004-0001-0001-0001-000000000004
 
 	measure 'Orders Reviewed' = SUM(FCT_ORDERS_FUNNEL[ORDERS_REVIEWED])
-		displayFolder: _Funnel
 		formatString: #,##0
+		displayFolder: _Funnel
 		lineageTag: f1000005-0001-0001-0001-000000000005
 
 	measure 'Orders Canceled' = SUM(FCT_ORDERS_FUNNEL[ORDERS_CANCELED])
-		displayFolder: _Funnel
 		formatString: #,##0
+		displayFolder: _Funnel
 		lineageTag: f1000006-0001-0001-0001-000000000006
 
 	measure 'Placed to Approved %' = AVERAGE(FCT_ORDERS_FUNNEL[PLACED_TO_APPROVED_PCT])
-		displayFolder: _Funnel
 		formatString: 0.0%
+		displayFolder: _Funnel
 		lineageTag: f1000007-0001-0001-0001-000000000007
 
 	measure 'Approved to Shipped %' = AVERAGE(FCT_ORDERS_FUNNEL[APPROVED_TO_SHIPPED_PCT])
-		displayFolder: _Funnel
 		formatString: 0.0%
+		displayFolder: _Funnel
 		lineageTag: f1000008-0001-0001-0001-000000000008
 
 	measure 'Shipped to Delivered %' = AVERAGE(FCT_ORDERS_FUNNEL[SHIPPED_TO_DELIVERED_PCT])
-		displayFolder: _Funnel
 		formatString: 0.0%
+		displayFolder: _Funnel
 		lineageTag: f1000009-0001-0001-0001-000000000009
 
 	measure 'Overall Delivery Rate' = AVERAGE(FCT_ORDERS_FUNNEL[OVERALL_DELIVERY_RATE])
-		displayFolder: _Funnel
 		formatString: 0.0%
+		displayFolder: _Funnel
 		lineageTag: f1000010-0001-0001-0001-000000000010
 
 	measure 'Cancellation Rate' = AVERAGE(FCT_ORDERS_FUNNEL[CANCELLATION_RATE])
-		displayFolder: _Funnel
 		formatString: 0.0%
+		displayFolder: _Funnel
 		lineageTag: f1000011-0001-0001-0001-000000000011
 
 	measure 'Avg Days to Delivery' = AVERAGE(FCT_ORDERS_FUNNEL[AVG_DAYS_TO_DELIVERY])
-		displayFolder: _Funnel
 		formatString: 0.0
+		displayFolder: _Funnel
 		lineageTag: f1000012-0001-0001-0001-000000000012
 
 	/// =============================================
 	/// _Product Performance Measures (Pareto)
 	/// =============================================
-
 	measure 'Product Revenue' = SUM(FCT_PARETO_PRODUCTS[TOTAL_REVENUE])
+		formatString: $#,##0
 		displayFolder: _Product
-		formatString: "R$"\ #,##0
 		lineageTag: p1000001-0001-0001-0001-000000000001
 
 	measure 'Product Orders' = SUM(FCT_PARETO_PRODUCTS[TOTAL_ORDERS])
-		displayFolder: _Product
 		formatString: #,##0
+		displayFolder: _Product
 		lineageTag: p1000002-0001-0001-0001-000000000002
 
 	measure 'Total Products' = COUNTROWS(FCT_PARETO_PRODUCTS)
-		displayFolder: _Product
 		formatString: #,##0
+		displayFolder: _Product
 		lineageTag: p1000003-0001-0001-0001-000000000003
 
 	measure 'Top 20% Products Count' =
-		CALCULATE(
-			COUNTROWS(FCT_PARETO_PRODUCTS),
-			FCT_PARETO_PRODUCTS[PARETO_SEGMENT] = "Top 20%"
-		)
-		displayFolder: _Product
-		formatString: #,##0
-		lineageTag: p1000004-0001-0001-0001-000000000004
+			CALCULATE(
+				COUNTROWS(FCT_PARETO_PRODUCTS),
+				FCT_PARETO_PRODUCTS[PARETO_SEGMENT] = "Top 20%"
+			)
+			formatString: #,##0
+			displayFolder: _Product
+			lineageTag: p1000004-0001-0001-0001-000000000004
 
 	measure 'Top 20% Revenue' =
-		CALCULATE(
-			SUM(FCT_PARETO_PRODUCTS[TOTAL_REVENUE]),
-			FCT_PARETO_PRODUCTS[PARETO_SEGMENT] = "Top 20%"
-		)
-		displayFolder: _Product
-		formatString: "R$"\ #,##0
-		lineageTag: p1000005-0001-0001-0001-000000000005
+			CALCULATE(
+				SUM(FCT_PARETO_PRODUCTS[TOTAL_REVENUE]),
+				FCT_PARETO_PRODUCTS[PARETO_SEGMENT] = "Top 20%"
+			)
+			formatString: $#,##0
+			displayFolder: _Product
+			lineageTag: p1000005-0001-0001-0001-000000000005
 
 	measure 'Top 20% Revenue %' =
-		DIVIDE(
-			[Top 20% Revenue],
-			[Product Revenue],
-			0
-		)
-		displayFolder: _Product
-		formatString: 0.0%
-		lineageTag: p1000006-0001-0001-0001-000000000006
+			DIVIDE(
+				[Top 20% Revenue],
+				[Product Revenue],
+				0
+			)
+			formatString: 0.0%
+			displayFolder: _Product
+			lineageTag: p1000006-0001-0001-0001-000000000006
 
 	measure 'Avg Revenue per Product' = DIVIDE([Product Revenue], [Total Products], 0)
+		formatString: $#,##0
 		displayFolder: _Product
-		formatString: "R$"\ #,##0
 		lineageTag: p1000007-0001-0001-0001-000000000007
 
 	measure 'Total Categories' = DISTINCTCOUNT(FCT_PARETO_PRODUCTS[PRODUCT_CATEGORY])
-		displayFolder: _Product
 		formatString: #,##0
+		displayFolder: _Product
 		lineageTag: p1000008-0001-0001-0001-000000000008
 
 	/// =============================================
 	/// _Market Basket Measures
 	/// =============================================
-
 	measure 'Total Product Pairs' = COUNTROWS(FCT_MARKET_BASKET)
-		displayFolder: _Market Basket
 		formatString: #,##0
+		displayFolder: _Market Basket
 		lineageTag: m1000001-0001-0001-0001-000000000001
 
 	measure 'Avg Support %' = AVERAGE(FCT_MARKET_BASKET[SUPPORT_PCT])
-		displayFolder: _Market Basket
 		formatString: 0.00%
+		displayFolder: _Market Basket
 		lineageTag: m1000002-0001-0001-0001-000000000002
 
 	measure 'Avg Confidence %' = AVERAGE(FCT_MARKET_BASKET[CONFIDENCE_A_TO_B_PCT])
-		displayFolder: _Market Basket
 		formatString: 0.0%
+		displayFolder: _Market Basket
 		lineageTag: m1000003-0001-0001-0001-000000000003
 
 	measure 'Avg Lift' = AVERAGE(FCT_MARKET_BASKET[LIFT])
-		displayFolder: _Market Basket
 		formatString: 0.00
+		displayFolder: _Market Basket
 		lineageTag: m1000004-0001-0001-0001-000000000004
 
 	measure 'High Lift Pairs' =
-		CALCULATE(
-			COUNTROWS(FCT_MARKET_BASKET),
-			FCT_MARKET_BASKET[LIFT] > 1.5
-		)
-		displayFolder: _Market Basket
-		formatString: #,##0
-		lineageTag: m1000005-0001-0001-0001-000000000005
+			CALCULATE(
+				COUNTROWS(FCT_MARKET_BASKET),
+				FCT_MARKET_BASKET[LIFT] > 1.5
+			)
+			formatString: #,##0
+			displayFolder: _Market Basket
+			lineageTag: m1000005-0001-0001-0001-000000000005
 
 	measure 'Total Pair Occurrences' = SUM(FCT_MARKET_BASKET[PAIR_COUNT])
-		displayFolder: _Market Basket
 		formatString: #,##0
+		displayFolder: _Market Basket
 		lineageTag: m1000006-0001-0001-0001-000000000006
 
 	measure 'Cross-Sell Opportunities' =
-		CALCULATE(
-			COUNTROWS(FCT_MARKET_BASKET),
-			FCT_MARKET_BASKET[LIFT] > 1 && FCT_MARKET_BASKET[CONFIDENCE_A_TO_B_PCT] > 0.1
-		)
-		displayFolder: _Market Basket
-		formatString: #,##0
-		lineageTag: m1000007-0001-0001-0001-000000000007
+			CALCULATE(
+				COUNTROWS(FCT_MARKET_BASKET),
+				FCT_MARKET_BASKET[LIFT] > 1 && FCT_MARKET_BASKET[CONFIDENCE_A_TO_B_PCT] > 0.1
+			)
+			formatString: #,##0
+			displayFolder: _Market Basket
+			lineageTag: m1000007-0001-0001-0001-000000000007
 
 	/// =============================================
 	/// _Geographic Measures
 	/// =============================================
-
 	measure 'Geo Revenue' = SUM(FCT_GEO_PERFORMANCE[TOTAL_REVENUE])
+		formatString: $#,##0
 		displayFolder: _Geographic
-		formatString: "R$"\ #,##0
 		lineageTag: g1000001-0001-0001-0001-000000000001
 
 	measure 'Geo Orders' = SUM(FCT_GEO_PERFORMANCE[TOTAL_ORDERS])
-		displayFolder: _Geographic
 		formatString: #,##0
+		displayFolder: _Geographic
 		lineageTag: g1000002-0001-0001-0001-000000000002
 
 	measure 'Total States' = DISTINCTCOUNT(FCT_GEO_PERFORMANCE[STATE])
-		displayFolder: _Geographic
 		formatString: #,##0
+		displayFolder: _Geographic
 		lineageTag: g1000003-0001-0001-0001-000000000003
 
 	measure 'Total Cities' = SUM(FCT_GEO_PERFORMANCE[UNIQUE_CITIES])
-		displayFolder: _Geographic
 		formatString: #,##0
+		displayFolder: _Geographic
 		lineageTag: g1000004-0001-0001-0001-000000000004
 
 	measure 'Geo AOV' = DIVIDE([Geo Revenue], [Geo Orders], 0)
+		formatString: $#,##0.00
 		displayFolder: _Geographic
-		formatString: "R$"\ #,##0.00
 		lineageTag: g1000005-0001-0001-0001-000000000005
 
 	measure 'Geo Avg Review' = AVERAGE(FCT_GEO_PERFORMANCE[AVERAGE_REVIEW_SCORE])
-		displayFolder: _Geographic
 		formatString: 0.0
+		displayFolder: _Geographic
 		lineageTag: g1000006-0001-0001-0001-000000000006
 
 	measure 'Geo Delivery Rate' =
-		DIVIDE(
-			SUM(FCT_GEO_PERFORMANCE[DELIVERED_ORDERS]),
-			SUM(FCT_GEO_PERFORMANCE[TOTAL_ORDERS]),
-			0
-		)
-		displayFolder: _Geographic
-		formatString: 0.0%
-		lineageTag: g1000007-0001-0001-0001-000000000007
+			DIVIDE(
+				SUM(FCT_GEO_PERFORMANCE[DELIVERED_ORDERS]),
+				SUM(FCT_GEO_PERFORMANCE[TOTAL_ORDERS]),
+				0
+			)
+			formatString: 0.0%
+			displayFolder: _Geographic
+			lineageTag: g1000007-0001-0001-0001-000000000007
 
 	measure 'Geo Cancellation Rate' =
-		DIVIDE(
-			SUM(FCT_GEO_PERFORMANCE[CANCELED_ORDERS]),
-			SUM(FCT_GEO_PERFORMANCE[TOTAL_ORDERS]),
-			0
-		)
-		displayFolder: _Geographic
-		formatString: 0.0%
-		lineageTag: g1000008-0001-0001-0001-000000000008
+			DIVIDE(
+				SUM(FCT_GEO_PERFORMANCE[CANCELED_ORDERS]),
+				SUM(FCT_GEO_PERFORMANCE[TOTAL_ORDERS]),
+				0
+			)
+			formatString: 0.0%
+			displayFolder: _Geographic
+			lineageTag: g1000008-0001-0001-0001-000000000008
 
 	measure 'Revenue % of Total' =
-		DIVIDE(
-			[Geo Revenue],
-			CALCULATE([Geo Revenue], ALL(FCT_GEO_PERFORMANCE[STATE])),
-			0
-		)
-		displayFolder: _Geographic
-		formatString: 0.0%
-		lineageTag: g1000009-0001-0001-0001-000000000009
+			DIVIDE(
+				[Geo Revenue],
+				CALCULATE([Geo Revenue], ALL(FCT_GEO_PERFORMANCE[STATE])),
+				0
+			)
+			formatString: 0.0%
+			displayFolder: _Geographic
+			lineageTag: g1000009-0001-0001-0001-000000000009
 
 	/// =============================================
 	/// _Data Visualization Measures
 	/// =============================================
-
 	measure 'Revenue Growth Arrow' =
 		VAR GrowthPct = [Revenue MoM %]
 		RETURN
@@ -712,9 +701,9 @@ table _Measures
 		RETURN
 			SWITCH(
 				TRUE(),
-				Rev >= 1000000, FORMAT(Rev / 1000000, "R$ #,##0.0") & "M",
-				Rev >= 1000, FORMAT(Rev / 1000, "R$ #,##0.0") & "K",
-				FORMAT(Rev, "R$ #,##0")
+				Rev >= 1000000, FORMAT(Rev / 1000000, "$#,##0.0") & "M",
+				Rev >= 1000, FORMAT(Rev / 1000, "$#,##0.0") & "K",
+				FORMAT(Rev, "$#,##0")
 			)
 		displayFolder: _Data Visualization
 		lineageTag: v1000006-0001-0001-0001-000000000006
@@ -729,6 +718,388 @@ table _Measures
 			)
 		displayFolder: _Data Visualization
 		lineageTag: v1000007-0001-0001-0001-000000000007
+
+	measure 'WTD Revenue' =
+		VAR CurrentDate = MAX(DIM_DATES[DATE])
+		VAR WeekStart = CurrentDate - WEEKDAY(CurrentDate, 2) + 1
+		RETURN
+		CALCULATE(
+			[Total Revenue],
+			DIM_DATES[DATE] >= WeekStart && DIM_DATES[DATE] <= CurrentDate
+		)
+		formatString: $#,##0
+		displayFolder: _Time Intelligence
+		lineageTag: t1000012-0001-0001-0001-000000000012
+
+	measure 'Revenue WoW %' =
+		VAR CurrentWeek = [WTD Revenue]
+		VAR PriorWeek = CALCULATE([WTD Revenue], DATEADD(DIM_DATES[DATE], -7, DAY))
+		RETURN DIVIDE(CurrentWeek - PriorWeek, PriorWeek, 0)
+		formatString: 0.0%;-0.0%;0.0%
+		displayFolder: _Time Intelligence
+		lineageTag: t1000013-0001-0001-0001-000000000013
+
+	measure 'Prior Month Customers' =
+		CALCULATE(
+			[Total Customers],
+			DATEADD(DIM_DATES[DATE], -1, MONTH)
+		)
+		formatString: #,##0
+		displayFolder: _Time Intelligence
+		lineageTag: t1000014-0001-0001-0001-000000000014
+
+	measure 'Customers MoM %' =
+		VAR CurrentMonth = [Total Customers]
+		VAR PriorMonth = [Prior Month Customers]
+		RETURN DIVIDE(CurrentMonth - PriorMonth, PriorMonth, 0)
+		formatString: 0.0%;-0.0%;0.0%
+		displayFolder: _Time Intelligence
+		lineageTag: t1000015-0001-0001-0001-000000000015
+
+	measure 'Cumulative Revenue' =
+		CALCULATE(
+			[Total Revenue],
+			FILTER(
+				ALL(DIM_DATES),
+				DIM_DATES[DATE] <= MAX(DIM_DATES[DATE])
+			)
+		)
+		formatString: $#,##0
+		displayFolder: _Time Intelligence
+		lineageTag: t1000016-0001-0001-0001-000000000016
+
+	measure 'Cumulative Orders' =
+		CALCULATE(
+			[Total Orders],
+			FILTER(
+				ALL(DIM_DATES),
+				DIM_DATES[DATE] <= MAX(DIM_DATES[DATE])
+			)
+		)
+		formatString: #,##0
+		displayFolder: _Time Intelligence
+		lineageTag: t1000017-0001-0001-0001-000000000017
+
+	/// =============================================
+	/// _Analytical Measures
+	/// =============================================
+	measure 'Single Purchaser Count' =
+		CALCULATE(
+			DISTINCTCOUNT(DIM_CUSTOMERS[CUSTOMER_UNIQUE_ID]),
+			FILTER(
+				SUMMARIZE(FCT_ORDERS, DIM_CUSTOMERS[CUSTOMER_UNIQUE_ID], "Orders", COUNTROWS(FCT_ORDERS)),
+				[Orders] = 1
+			)
+		)
+		formatString: #,##0
+		displayFolder: _Analytical
+		lineageTag: a1000001-0001-0001-0001-000000000001
+
+	measure 'Repeat Purchaser Count' =
+		CALCULATE(
+			DISTINCTCOUNT(DIM_CUSTOMERS[CUSTOMER_UNIQUE_ID]),
+			FILTER(
+				SUMMARIZE(FCT_ORDERS, DIM_CUSTOMERS[CUSTOMER_UNIQUE_ID], "Orders", COUNTROWS(FCT_ORDERS)),
+				[Orders] > 1
+			)
+		)
+		formatString: #,##0
+		displayFolder: _Analytical
+		lineageTag: a1000002-0001-0001-0001-000000000002
+
+	measure 'Single Purchaser %' = DIVIDE([Single Purchaser Count], [Total Customers], 0)
+		formatString: 0.0%
+		displayFolder: _Analytical
+		lineageTag: a1000003-0001-0001-0001-000000000003
+
+	measure 'Repeat Purchaser %' = DIVIDE([Repeat Purchaser Count], [Total Customers], 0)
+		formatString: 0.0%
+		displayFolder: _Analytical
+		lineageTag: a1000004-0001-0001-0001-000000000004
+
+	measure 'Avg Orders per Customer' = DIVIDE([Total Orders], [Total Customers], 0)
+		formatString: 0.0
+		displayFolder: _Analytical
+		lineageTag: a1000005-0001-0001-0001-000000000005
+
+	measure 'Revenue per Customer' = DIVIDE([Total Revenue], [Total Customers], 0)
+		formatString: $#,##0.00
+		displayFolder: _Analytical
+		lineageTag: a1000006-0001-0001-0001-000000000006
+
+	measure 'Potential Loyalists Count' =
+		CALCULATE(
+			COUNTROWS(FCT_RFM_SEGMENTS),
+			FCT_RFM_SEGMENTS[RFM_SEGMENT] = "Potential Loyalists"
+		)
+		formatString: #,##0
+		displayFolder: _Segments\RFM
+		lineageTag: r1000010-0001-0001-0001-000000000010
+
+	measure 'New Customers Count' =
+		CALCULATE(
+			COUNTROWS(FCT_RFM_SEGMENTS),
+			FCT_RFM_SEGMENTS[RFM_SEGMENT] = "New Customers"
+		)
+		formatString: #,##0
+		displayFolder: _Segments\RFM
+		lineageTag: r1000011-0001-0001-0001-000000000011
+
+	measure 'RFM Segment Revenue' = SUM(FCT_RFM_SEGMENTS[MONETARY])
+		formatString: $#,##0
+		displayFolder: _Segments\RFM
+		lineageTag: r1000012-0001-0001-0001-000000000012
+
+	measure 'RFM Segment Revenue %' =
+		DIVIDE(
+			[RFM Segment Revenue],
+			CALCULATE([RFM Segment Revenue], ALL(FCT_RFM_SEGMENTS[RFM_SEGMENT])),
+			0
+		)
+		formatString: 0.0%
+		displayFolder: _Segments\RFM
+		lineageTag: r1000013-0001-0001-0001-000000000013
+
+	measure 'High CLV Revenue %' =
+		DIVIDE(
+			CALCULATE(SUM(FCT_CLV_CUSTOMER[HISTORICAL_CLV]), FCT_CLV_CUSTOMER[CLV_SEGMENT] = "High"),
+			[Total Historical CLV],
+			0
+		)
+		formatString: 0.0%
+		displayFolder: _Segments\CLV
+		lineageTag: c1000010-0001-0001-0001-000000000010
+
+	measure 'Medium CLV Revenue %' =
+		DIVIDE(
+			CALCULATE(SUM(FCT_CLV_CUSTOMER[HISTORICAL_CLV]), FCT_CLV_CUSTOMER[CLV_SEGMENT] = "Medium"),
+			[Total Historical CLV],
+			0
+		)
+		formatString: 0.0%
+		displayFolder: _Segments\CLV
+		lineageTag: c1000011-0001-0001-0001-000000000011
+
+	measure 'Total Churn Customers' = COUNTROWS(FCT_CHURN_RISK)
+		formatString: #,##0
+		displayFolder: _Segments\Churn
+		lineageTag: ch100010-0001-0001-0001-000000000010
+
+	measure 'Active Rate' =
+		DIVIDE(
+			[Active Customers],
+			[Total Churn Customers],
+			0
+		)
+		formatString: 0.0%
+		displayFolder: _Segments\Churn
+		lineageTag: ch100011-0001-0001-0001-000000000011
+
+	measure 'Churn Status %' =
+		DIVIDE(
+			COUNTROWS(FCT_CHURN_RISK),
+			CALCULATE(COUNTROWS(FCT_CHURN_RISK), ALL(FCT_CHURN_RISK[CHURN_STATUS])),
+			0
+		)
+		formatString: 0.0%
+		displayFolder: _Segments\Churn
+		lineageTag: ch100012-0001-0001-0001-000000000012
+
+	measure 'Revenue at Risk %' =
+		DIVIDE(
+			[At Risk Revenue],
+			SUM(FCT_CHURN_RISK[TOTAL_REVENUE]),
+			0
+		)
+		formatString: 0.0%
+		displayFolder: _Segments\Churn
+		lineageTag: ch100013-0001-0001-0001-000000000013
+
+	measure 'P1 Retention Rate' =
+		CALCULATE(
+			AVERAGE(FCT_COHORT_RETENTION[RETENTION_RATE]),
+			FCT_COHORT_RETENTION[PERIOD_NUMBER] = 1
+		)
+		formatString: 0.0%
+		displayFolder: _Cohort
+		lineageTag: co100007-0001-0001-0001-000000000007
+
+	measure 'P3 Retention Rate' =
+		CALCULATE(
+			AVERAGE(FCT_COHORT_RETENTION[RETENTION_RATE]),
+			FCT_COHORT_RETENTION[PERIOD_NUMBER] = 3
+		)
+		formatString: 0.0%
+		displayFolder: _Cohort
+		lineageTag: co100008-0001-0001-0001-000000000008
+
+	measure 'P6 Retention Rate' =
+		CALCULATE(
+			AVERAGE(FCT_COHORT_RETENTION[RETENTION_RATE]),
+			FCT_COHORT_RETENTION[PERIOD_NUMBER] = 6
+		)
+		formatString: 0.0%
+		displayFolder: _Cohort
+		lineageTag: co100009-0001-0001-0001-000000000009
+
+	measure 'Avg P1-P6 Drop' =
+		[P1 Retention Rate] - [P6 Retention Rate]
+		formatString: 0.0%
+		displayFolder: _Cohort
+		lineageTag: co100010-0001-0001-0001-000000000010
+
+	measure 'Latest Cohort Size' =
+		CALCULATE(
+			SUM(FCT_COHORT_RETENTION[COHORT_SIZE]),
+			FILTER(
+				ALL(FCT_COHORT_RETENTION[COHORT_KEY]),
+				FCT_COHORT_RETENTION[COHORT_KEY] = MAX(FCT_COHORT_RETENTION[COHORT_KEY])
+			),
+			FCT_COHORT_RETENTION[PERIOD_NUMBER] = 0
+		)
+		formatString: #,##0
+		displayFolder: _Cohort
+		lineageTag: co100011-0001-0001-0001-000000000011
+
+	measure 'Delivered to Reviewed %' =
+		DIVIDE([Orders Reviewed], [Orders Delivered], 0)
+		formatString: 0.0%
+		displayFolder: _Funnel
+		lineageTag: f1000013-0001-0001-0001-000000000013
+
+	measure 'Funnel Drop-off Rate' =
+		1 - [Overall Delivery Rate]
+		formatString: 0.0%
+		displayFolder: _Funnel
+		lineageTag: f1000014-0001-0001-0001-000000000014
+
+	measure 'Category Revenue %' =
+		DIVIDE(
+			[Product Revenue],
+			CALCULATE([Product Revenue], ALL(FCT_PARETO_PRODUCTS[PRODUCT_CATEGORY])),
+			0
+		)
+		formatString: 0.0%
+		displayFolder: _Product
+		lineageTag: p1000009-0001-0001-0001-000000000009
+
+	measure 'Max Lift' = MAX(FCT_MARKET_BASKET[LIFT])
+		formatString: 0.00
+		displayFolder: _Market Basket
+		lineageTag: m1000008-0001-0001-0001-000000000008
+
+	measure 'Max Support %' = MAX(FCT_MARKET_BASKET[SUPPORT_PCT])
+		formatString: 0.00%
+		displayFolder: _Market Basket
+		lineageTag: m1000009-0001-0001-0001-000000000009
+
+	measure 'State Revenue Rank' =
+		RANKX(
+			ALL(FCT_GEO_PERFORMANCE[STATE]),
+			[Geo Revenue],
+			,
+			DESC,
+			Dense
+		)
+		formatString: #,##0
+		displayFolder: _Geographic
+		lineageTag: g1000010-0001-0001-0001-000000000010
+
+	/// =============================================
+	/// _Time Series Measures (Moving Averages)
+	/// =============================================
+	measure '7-Day MA Revenue' = SUM(FCT_DAILY_REVENUE_TIME_SERIES[ROLLING_AVG_REVENUE_7D])
+		formatString: $#,##0
+		displayFolder: _Time Series
+		lineageTag: ts100001-0001-0001-0001-000000000001
+
+	measure '28-Day MA Revenue' = SUM(FCT_DAILY_REVENUE_TIME_SERIES[ROLLING_AVG_REVENUE_28D])
+		formatString: $#,##0
+		displayFolder: _Time Series
+		lineageTag: ts100002-0001-0001-0001-000000000002
+
+	measure '90-Day MA Revenue' = SUM(FCT_DAILY_REVENUE_TIME_SERIES[ROLLING_AVG_REVENUE_90D])
+		formatString: $#,##0
+		displayFolder: _Time Series
+		lineageTag: ts100003-0001-0001-0001-000000000003
+
+	measure 'Daily Revenue' = SUM(FCT_DAILY_REVENUE_TIME_SERIES[TOTAL_REVENUE])
+		formatString: $#,##0
+		displayFolder: _Time Series
+		lineageTag: ts100004-0001-0001-0001-000000000004
+
+	measure 'Daily Orders' = SUM(FCT_DAILY_REVENUE_TIME_SERIES[TOTAL_ORDERS])
+		formatString: #,##0
+		displayFolder: _Time Series
+		lineageTag: ts100005-0001-0001-0001-000000000005
+
+	measure 'TS YTD Revenue' = SUM(FCT_DAILY_REVENUE_TIME_SERIES[YTD_REVENUE])
+		formatString: $#,##0
+		displayFolder: _Time Series
+		lineageTag: ts100006-0001-0001-0001-000000000006
+
+	measure 'TS Revenue MoM %' = SUM(FCT_DAILY_REVENUE_TIME_SERIES[REVENUE_GROWTH_MOM_PCT])
+		formatString: 0.0%;-0.0%;0.0%
+		displayFolder: _Time Series
+		lineageTag: ts100007-0001-0001-0001-000000000007
+
+	measure 'TS Revenue YoY %' = SUM(FCT_DAILY_REVENUE_TIME_SERIES[REVENUE_GROWTH_YOY_PCT])
+		formatString: 0.0%;-0.0%;0.0%
+		displayFolder: _Time Series
+		lineageTag: ts100008-0001-0001-0001-000000000008
+
+	measure 'Customers Growth Arrow' =
+		VAR GrowthPct = [Customers MoM %]
+		RETURN
+			SWITCH(
+				TRUE(),
+				GrowthPct > 0.01, UNICHAR(9650),
+				GrowthPct < -0.01, UNICHAR(9660),
+				UNICHAR(9472)
+			)
+		displayFolder: _Data Visualization
+		lineageTag: v1000008-0001-0001-0001-000000000008
+
+	measure 'RFM Segment Color' =
+		VAR Segment = SELECTEDVALUE(FCT_RFM_SEGMENTS[RFM_SEGMENT])
+		RETURN
+			SWITCH(
+				Segment,
+				"Champions", "#1E3A5F",
+				"Loyal Customers", "#00897B",
+				"At Risk", "#FF7043",
+				"Hibernating", "#90A4AE",
+				"#607D8B"
+			)
+		displayFolder: _Data Visualization
+		lineageTag: v1000009-0001-0001-0001-000000000009
+
+	measure 'CLV Segment Color' =
+		VAR Segment = SELECTEDVALUE(FCT_CLV_CUSTOMER[CLV_SEGMENT])
+		RETURN
+			SWITCH(
+				Segment,
+				"High", "#1E3A5F",
+				"Medium", "#00897B",
+				"Low", "#90A4AE",
+				"#607D8B"
+			)
+		displayFolder: _Data Visualization
+		lineageTag: v1000010-0001-0001-0001-000000000010
+
+	measure 'Lift Color' =
+		VAR LiftVal = [Avg Lift]
+		RETURN
+			SWITCH(
+				TRUE(),
+				LiftVal > 4.0, "#D84315",
+				LiftVal > 2.5, "#FF7043",
+				LiftVal > 1.5, "#FF9800",
+				LiftVal >= 1.0, "#FFC107",
+				"#90A4AE"
+			)
+		displayFolder: _Data Visualization
+		lineageTag: v1000011-0001-0001-0001-000000000011
 
 	/// Hidden column for calculated table
 	column Value
