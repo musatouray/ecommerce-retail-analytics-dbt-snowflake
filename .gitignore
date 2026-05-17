@@ -13,3 +13,8 @@ ecommerce-retail-analytics/dbt/package-lock.yml
 
 # Windows artifacts
 nul
+
+# Power BI local settings (user-specific)
+**/.pbi/localSettings.json
+**/.pbi/editorSettings.json
+**/.pbi/cache.abf
