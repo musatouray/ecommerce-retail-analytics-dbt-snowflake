@@ -3,11 +3,11 @@
   "name": "revenue_trend",
   "position": {
     "x": 40,
-    "y": 260,
-    "z": 0,
+    "y": 348,
+    "z": 8000,
     "height": 320,
     "width": 1100,
-    "tabOrder": 0
+    "tabOrder": 8000
   },
   "visual": {
     "visualType": "lineChart",
@@ -20,14 +20,14 @@
                 "Column": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "FCT_DAILY_REVENUE_TIME_SERIES"
+                      "Entity": "DIM_DATES"
                     }
                   },
-                  "Property": "DATE"
+                  "Property": "MONTH_YEAR"
                 }
               },
-              "queryRef": "FCT_DAILY_REVENUE_TIME_SERIES.DATE",
-              "nativeQueryRef": "DATE",
+              "queryRef": "DIM_DATES.MONTH_YEAR",
+              "nativeQueryRef": "MONTH_YEAR",
               "active": true
             }
           ]
@@ -55,19 +55,18 @@
         "sort": [
           {
             "field": {
-              "Measure": {
+              "Column": {
                 "Expression": {
                   "SourceRef": {
-                    "Entity": "_Measures"
+                    "Entity": "DIM_DATES"
                   }
                 },
-                "Property": "Total Revenue"
+                "Property": "MONTH_YEAR"
               }
             },
-            "direction": "Descending"
+            "direction": "Ascending"
           }
-        ],
-        "isDefaultSort": true
+        ]
       }
     },
     "visualContainerObjects": {
@@ -98,6 +97,37 @@
               "expr": {
                 "Literal": {
                   "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "dropShadow": [
+        {
+          "properties": {
+            "shadowDistance": {
+              "expr": {
+                "Literal": {
+                  "Value": "1D"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#E0E0E0'"
+                    }
+                  }
+                }
+              }
+            },
+            "shadowSpread": {
+              "expr": {
+                "Literal": {
+                  "Value": "1D"
                 }
               }
             }

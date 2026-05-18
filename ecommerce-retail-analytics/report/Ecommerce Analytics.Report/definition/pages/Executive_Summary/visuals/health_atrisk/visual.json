@@ -3,11 +3,11 @@
   "name": "health_atrisk",
   "position": {
     "x": 1180,
-    "y": 480,
-    "z": 0,
+    "y": 568,
+    "z": 1000,
     "height": 100,
     "width": 700,
-    "tabOrder": 0
+    "tabOrder": 1000
   },
   "visual": {
     "visualType": "card",
@@ -79,6 +79,37 @@
               "expr": {
                 "Literal": {
                   "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "dropShadow": [
+        {
+          "properties": {
+            "shadowDistance": {
+              "expr": {
+                "Literal": {
+                  "Value": "1D"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#E0E0E0'"
+                    }
+                  }
+                }
+              }
+            },
+            "shadowSpread": {
+              "expr": {
+                "Literal": {
+                  "Value": "1D"
                 }
               }
             }

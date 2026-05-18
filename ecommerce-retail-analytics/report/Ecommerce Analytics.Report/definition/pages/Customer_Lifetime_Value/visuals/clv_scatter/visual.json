@@ -3,11 +3,11 @@
   "name": "clv_scatter",
   "position": {
     "x": 440,
-    "y": 236,
+    "y": 324,
     "z": 0,
     "height": 300,
     "width": 756,
-    "tabOrder": 7
+    "tabOrder": 6000
   },
   "visual": {
     "visualType": "scatterChart",

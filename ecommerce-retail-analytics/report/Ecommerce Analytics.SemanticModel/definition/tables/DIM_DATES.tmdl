@@ -1,5 +1,9 @@
+/// Conformed date dimension. MUST be marked as a Date Table in Power BI Desktop
+/// (right-click table -> Mark as Date Table -> DATE column) for time-intelligence
+/// functions (DATESYTD, SAMEPERIODLASTYEAR, DATEADD) to return correct values.
 table DIM_DATES
 	lineageTag: b4cf66a4-55c7-458b-be19-6f24ccc2c2e6
+	dataCategory: Time
 
 	column DATE_KEY
 		dataType: double
@@ -13,7 +17,8 @@ table DIM_DATES
 
 	column DATE
 		dataType: dateTime
-		formatString: Long Date
+		isKey
+		formatString: Short Date
 		lineageTag: 53a735b5-6978-4f5d-b2c9-e44469b05cbf
 		summarizeBy: none
 		sourceColumn: DATE
@@ -23,22 +28,26 @@ table DIM_DATES
 		annotation UnderlyingDateTimeDataType = Date
 
 	column YEAR
-		dataType: double
+		dataType: int64
 		lineageTag: 75ec83fb-7478-46a4-8688-b75081936d6b
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: YEAR
 
-		annotation SummarizationSetBy = Automatic
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = User
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	column ISO_YEAR
-		dataType: double
+		dataType: int64
 		lineageTag: e3ddc542-da5b-49e8-b3e3-7aa7001cbd84
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: ISO_YEAR
 
-		annotation SummarizationSetBy = Automatic
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = User
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
@@ -67,12 +76,14 @@ table DIM_DATES
 		annotation SummarizationSetBy = Automatic
 
 	column QUARTER_NUMBER
-		dataType: double
+		dataType: int64
 		lineageTag: 11605ecf-b884-4eca-a44a-09bdd87829a1
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: QUARTER_NUMBER
 
-		annotation SummarizationSetBy = Automatic
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = User
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
@@ -85,12 +96,14 @@ table DIM_DATES
 		annotation SummarizationSetBy = Automatic
 
 	column MONTH
-		dataType: double
+		dataType: int64
 		lineageTag: 91bcf95c-99aa-4b71-9836-3a270a1c2200
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: MONTH
 
-		annotation SummarizationSetBy = Automatic
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = User
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
@@ -107,16 +120,21 @@ table DIM_DATES
 		lineageTag: 22854fdf-475c-4411-9774-26839f95436d
 		summarizeBy: none
 		sourceColumn: MONTH_YEAR
+		sortByColumn: YEAR_MONTH
+
+		changedProperty = SortByColumn
 
 		annotation SummarizationSetBy = Automatic
 
 	column WEEK
-		dataType: double
+		dataType: int64
 		lineageTag: ce9f366e-5509-453b-baf9-0b4c6c3cf812
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: WEEK
 
-		annotation SummarizationSetBy = Automatic
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = User
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
@@ -129,22 +147,26 @@ table DIM_DATES
 		annotation SummarizationSetBy = Automatic
 
 	column DAY
-		dataType: double
+		dataType: int64
 		lineageTag: 03c000dd-0867-4f66-b710-05c78c5f1ba4
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: DAY
 
-		annotation SummarizationSetBy = Automatic
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = User
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	column ISO_DAY_OF_WEEK
-		dataType: double
+		dataType: int64
 		lineageTag: e2876260-e7f0-448e-a158-891770d8c87e
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: ISO_DAY_OF_WEEK
 
-		annotation SummarizationSetBy = Automatic
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = User
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
@@ -157,12 +179,14 @@ table DIM_DATES
 		annotation SummarizationSetBy = Automatic
 
 	column DAY_OF_WEEK
-		dataType: double
+		dataType: int64
 		lineageTag: 3f75fc87-fc1c-4e3b-a184-402f508f5a05
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: DAY_OF_WEEK
 
-		annotation SummarizationSetBy = Automatic
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = User
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
@@ -185,52 +209,62 @@ table DIM_DATES
 		annotation SummarizationSetBy = Automatic
 
 	column DAY_OFFSET
-		dataType: double
+		dataType: int64
 		lineageTag: d1de5b77-5d4c-4a76-95ba-648557364a9a
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: DAY_OFFSET
 
-		annotation SummarizationSetBy = Automatic
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = User
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	column WEEK_OFFSET
-		dataType: double
+		dataType: int64
 		lineageTag: eb77c5b6-d2e6-48d3-87a1-d658529f36eb
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: WEEK_OFFSET
 
-		annotation SummarizationSetBy = Automatic
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = User
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	column MONTH_OFFSET
-		dataType: double
+		dataType: int64
 		lineageTag: 4ae506e6-5229-4a3c-bf35-cfd6bf9e2a54
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: MONTH_OFFSET
 
-		annotation SummarizationSetBy = Automatic
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = User
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	column QUARTER_OFFSET
-		dataType: double
+		dataType: int64
 		lineageTag: 52629fa2-c994-4424-8e10-915203a80e87
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: QUARTER_OFFSET
 
-		annotation SummarizationSetBy = Automatic
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = User
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	column YEAR_OFFSET
-		dataType: double
+		dataType: int64
 		lineageTag: 27f494ad-528d-4a03-a77a-bd6519a48b81
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: YEAR_OFFSET
 
-		annotation SummarizationSetBy = Automatic
+		changedProperty = DataType
+
+		annotation SummarizationSetBy = User
 
 		annotation PBI_FormatHint = {"isGeneralNumber":true}
 

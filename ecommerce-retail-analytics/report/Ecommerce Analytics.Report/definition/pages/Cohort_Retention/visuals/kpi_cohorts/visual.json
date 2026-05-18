@@ -3,11 +3,11 @@
   "name": "kpi_cohorts",
   "position": {
     "x": 24,
-    "y": 100,
-    "z": 0,
+    "y": 188,
+    "z": 1000,
     "height": 120,
     "width": 220,
-    "tabOrder": 1
+    "tabOrder": 0
   },
   "visual": {
     "visualType": "card",

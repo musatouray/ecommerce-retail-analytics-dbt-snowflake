@@ -12,7 +12,7 @@ table FCT_ORDERS_FUNNEL
 	column DATE_KEY
 		dataType: double
 		lineageTag: b2dc890b-794a-46ac-a60a-126815f2c58c
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: DATE_KEY
 
 		annotation SummarizationSetBy = Automatic

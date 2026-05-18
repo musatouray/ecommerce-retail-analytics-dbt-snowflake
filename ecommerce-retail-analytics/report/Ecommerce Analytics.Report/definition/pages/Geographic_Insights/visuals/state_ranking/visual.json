@@ -3,11 +3,11 @@
   "name": "state_ranking",
   "position": {
     "x": 24,
-    "y": 236,
-    "z": 0,
+    "y": 324,
+    "z": 7000,
     "height": 320,
     "width": 580,
-    "tabOrder": 6
+    "tabOrder": 10000
   },
   "visual": {
     "visualType": "barChart",

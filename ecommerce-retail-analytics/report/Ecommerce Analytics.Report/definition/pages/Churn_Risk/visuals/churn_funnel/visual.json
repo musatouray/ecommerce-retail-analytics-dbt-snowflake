@@ -3,11 +3,11 @@
   "name": "churn_funnel",
   "position": {
     "x": 24,
-    "y": 236,
+    "y": 324,
     "z": 0,
     "height": 280,
     "width": 580,
-    "tabOrder": 6
+    "tabOrder": 5000
   },
   "visual": {
     "visualType": "barChart",
@@ -50,6 +50,23 @@
             }
           ]
         }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "_Measures"
+                  }
+                },
+                "Property": "Total Churn Customers"
+              }
+            },
+            "direction": "Descending"
+          }
+        ]
       }
     },
     "visualContainerObjects": {

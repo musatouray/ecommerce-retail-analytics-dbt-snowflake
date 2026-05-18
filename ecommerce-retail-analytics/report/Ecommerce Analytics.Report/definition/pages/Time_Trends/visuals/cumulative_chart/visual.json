@@ -2,12 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.8.0/schema.json",
   "name": "cumulative_chart",
   "position": {
-    "x": 24,
-    "y": 552,
+    "x": 1227.2768388080203,
+    "y": 324.192901053619,
     "z": 0,
-    "height": 280,
-    "width": 580,
-    "tabOrder": 7
+    "height": 429.54689358280706,
+    "width": 653.00390291294661,
+    "tabOrder": 11000
   },
   "visual": {
     "visualType": "areaChart",
@@ -23,11 +23,11 @@
                       "Entity": "DIM_DATES"
                     }
                   },
-                  "Property": "DATE"
+                  "Property": "YEAR_QUARTER"
                 }
               },
-              "queryRef": "DIM_DATES.DATE",
-              "nativeQueryRef": "Date",
+              "queryRef": "DIM_DATES.YEAR_QUARTER",
+              "nativeQueryRef": "YEAR_QUARTER",
               "active": true
             }
           ]
@@ -50,6 +50,23 @@
             }
           ]
         }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "DIM_DATES"
+                  }
+                },
+                "Property": "YEAR_QUARTER"
+              }
+            },
+            "direction": "Ascending"
+          }
+        ]
       }
     },
     "visualContainerObjects": {

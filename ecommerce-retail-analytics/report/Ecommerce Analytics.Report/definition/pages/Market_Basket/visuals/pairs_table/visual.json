@@ -3,11 +3,11 @@
   "name": "pairs_table",
   "position": {
     "x": 24,
-    "y": 572,
-    "z": 0,
+    "y": 660,
+    "z": 6000,
     "height": 260,
     "width": 1172,
-    "tabOrder": 7
+    "tabOrder": 6000
   },
   "visual": {
     "visualType": "tableEx",

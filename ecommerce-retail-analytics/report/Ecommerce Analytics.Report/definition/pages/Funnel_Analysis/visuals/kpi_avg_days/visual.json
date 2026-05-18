@@ -2,12 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.8.0/schema.json",
   "name": "kpi_avg_days",
   "position": {
-    "x": 496,
-    "y": 100,
-    "z": 0,
-    "height": 120,
-    "width": 220,
-    "tabOrder": 3
+    "x": 495.54196887720065,
+    "y": 153.9885090202516,
+    "z": 2000,
+    "height": 153.9885090202516,
+    "width": 219.98358431464513,
+    "tabOrder": 7000
   },
   "visual": {
     "visualType": "card",

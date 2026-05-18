@@ -3,11 +3,11 @@
   "name": "kpi_customers",
   "position": {
     "x": 980,
-    "y": 100,
-    "z": 0,
+    "y": 188,
+    "z": 5000,
     "height": 140,
     "width": 400,
-    "tabOrder": 0
+    "tabOrder": 5000
   },
   "visual": {
     "visualType": "card",
@@ -79,6 +79,37 @@
               "expr": {
                 "Literal": {
                   "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "dropShadow": [
+        {
+          "properties": {
+            "shadowDistance": {
+              "expr": {
+                "Literal": {
+                  "Value": "1D"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#E0E0E0'"
+                    }
+                  }
+                }
+              }
+            },
+            "shadowSpread": {
+              "expr": {
+                "Literal": {
+                  "Value": "1D"
                 }
               }
             }

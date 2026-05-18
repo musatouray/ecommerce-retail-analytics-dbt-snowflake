@@ -2,35 +2,17 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.8.0/schema.json",
   "name": "retention_matrix",
   "position": {
-    "x": 24,
-    "y": 236,
-    "z": 0,
-    "height": 380,
-    "width": 1172,
-    "tabOrder": 5
+    "x": 24.313975108460777,
+    "y": 324.192901053619,
+    "z": 6000,
+    "height": 466.59676041474734,
+    "width": 1370.8450727817885,
+    "tabOrder": 4000
   },
   "visual": {
     "visualType": "matrix",
     "query": {
       "queryState": {
-        "Rows": {
-          "projections": [
-            {
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "FCT_COHORT_RETENTION"
-                    }
-                  },
-                  "Property": "COHORT_KEY"
-                }
-              },
-              "queryRef": "FCT_COHORT_RETENTION.COHORT_KEY",
-              "nativeQueryRef": "Cohort"
-            }
-          ]
-        },
         "Columns": {
           "projections": [
             {
@@ -46,6 +28,24 @@
               },
               "queryRef": "FCT_COHORT_RETENTION.PERIOD_NUMBER",
               "nativeQueryRef": "Period"
+            }
+          ]
+        },
+        "Rows": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "DIM_COHORTS"
+                    }
+                  },
+                  "Property": "COHORT_MONTH_NAME"
+                }
+              },
+              "queryRef": "DIM_COHORTS.COHORT_MONTH_NAME",
+              "nativeQueryRef": "COHORT_MONTH_NAME"
             }
           ]
         },
@@ -68,6 +68,44 @@
           ]
         }
       }
+    },
+    "objects": {
+      "columnFormatting": [
+        {
+          "properties": {
+            "styleSubtotals": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "_Measures.Retention Rate"
+          }
+        }
+      ],
+      "general": [
+        {
+          "properties": {
+            "rowSubtotals": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "columnSubtotals": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ]
     },
     "visualContainerObjects": {
       "title": [

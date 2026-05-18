@@ -67,3 +67,22 @@ relationship AutoDetected_8b61e5eb-a417-458a-811a-7e7cb4436348
 	fromColumn: FCT_ORDER_ITEMS.ORDER_ID
 	toColumn: FCT_ORDERS.ORDER_ID
 
+relationship dd208b29-74bb-6e6e-179d-4fd48cf3d836
+	fromColumn: FCT_ORDERS.ORDER_DATE_KEY
+	toColumn: DIM_DATES.DATE_KEY
+
+relationship 2d7872ae-530c-6898-8ef9-0c9566077e24
+	isActive: false
+	fromColumn: FCT_ORDERS.DELIVERY_DATE_KEY
+	toColumn: DIM_DATES.DATE_KEY
+
+relationship 8552228a-d076-0ee4-5198-28083929bc1a
+	fromColumn: FCT_ORDER_ITEMS.ORDER_DATE_KEY
+	toColumn: DIM_DATES.DATE_KEY
+
+relationship 1700d365-d45b-070f-e9ce-79bacb820ce7
+	crossFilteringBehavior: bothDirections
+	fromCardinality: one
+	fromColumn: DIM_DATES.DATE_KEY
+	toColumn: FCT_ORDERS_FUNNEL.DATE_KEY
+

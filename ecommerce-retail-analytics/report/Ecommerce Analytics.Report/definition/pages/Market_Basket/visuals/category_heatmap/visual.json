@@ -3,34 +3,16 @@
   "name": "category_heatmap",
   "position": {
     "x": 740,
-    "y": 236,
+    "y": 324,
     "z": 0,
     "height": 320,
     "width": 456,
-    "tabOrder": 6
+    "tabOrder": 5000
   },
   "visual": {
     "visualType": "matrix",
     "query": {
       "queryState": {
-        "Rows": {
-          "projections": [
-            {
-              "field": {
-                "Column": {
-                  "Expression": {
-                    "SourceRef": {
-                      "Entity": "FCT_MARKET_BASKET"
-                    }
-                  },
-                  "Property": "CATEGORY_A"
-                }
-              },
-              "queryRef": "FCT_MARKET_BASKET.CATEGORY_A",
-              "nativeQueryRef": "Category A"
-            }
-          ]
-        },
         "Columns": {
           "projections": [
             {
@@ -46,6 +28,24 @@
               },
               "queryRef": "FCT_MARKET_BASKET.CATEGORY_B",
               "nativeQueryRef": "Category B"
+            }
+          ]
+        },
+        "Rows": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "FCT_MARKET_BASKET"
+                    }
+                  },
+                  "Property": "CATEGORY_A"
+                }
+              },
+              "queryRef": "FCT_MARKET_BASKET.CATEGORY_A",
+              "nativeQueryRef": "Category A"
             }
           ]
         },

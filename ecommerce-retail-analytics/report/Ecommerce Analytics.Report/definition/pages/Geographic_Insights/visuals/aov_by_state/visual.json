@@ -3,11 +3,11 @@
   "name": "aov_by_state",
   "position": {
     "x": 620,
-    "y": 236,
+    "y": 324,
     "z": 0,
     "height": 320,
     "width": 576,
-    "tabOrder": 7
+    "tabOrder": 11000
   },
   "visual": {
     "visualType": "barChart",

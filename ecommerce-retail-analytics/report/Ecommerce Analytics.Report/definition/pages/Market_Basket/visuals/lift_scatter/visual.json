@@ -3,11 +3,11 @@
   "name": "lift_scatter",
   "position": {
     "x": 24,
-    "y": 236,
-    "z": 0,
+    "y": 324,
+    "z": 5000,
     "height": 320,
     "width": 700,
-    "tabOrder": 5
+    "tabOrder": 4000
   },
   "visual": {
     "visualType": "scatterChart",

@@ -2,12 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.8.0/schema.json",
   "name": "revenue_ma_chart",
   "position": {
-    "x": 24,
-    "y": 236,
-    "z": 0,
-    "height": 300,
-    "width": 1172,
-    "tabOrder": 6
+    "x": 24.313975108460777,
+    "y": 324.192901053619,
+    "z": 8000,
+    "height": 739.80709894638107,
+    "width": 1171.70203856011,
+    "tabOrder": 10000
   },
   "visual": {
     "visualType": "lineChart",
@@ -20,14 +20,14 @@
                 "Column": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "FCT_DAILY_REVENUE_TIME_SERIES"
+                      "Entity": "DIM_DATES"
                     }
                   },
                   "Property": "DATE"
                 }
               },
-              "queryRef": "FCT_DAILY_REVENUE_TIME_SERIES.DATE",
-              "nativeQueryRef": "Date",
+              "queryRef": "DIM_DATES.DATE",
+              "nativeQueryRef": "DATE",
               "active": true
             }
           ]
@@ -78,6 +78,24 @@
             }
           ]
         }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "DIM_DATES"
+                  }
+                },
+                "Property": "DATE"
+              }
+            },
+            "direction": "Ascending"
+          }
+        ],
+        "isDefaultSort": true
       }
     },
     "visualContainerObjects": {

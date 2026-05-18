@@ -2,12 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.8.0/schema.json",
   "name": "state_slicer",
   "position": {
-    "x": 1500,
-    "y": 24,
-    "z": 0,
-    "height": 60,
-    "width": 396,
-    "tabOrder": 1
+    "x": 1500.5196066935794,
+    "y": 112.30740883431884,
+    "z": 8000,
+    "height": 96.098092095344981,
+    "width": 395.97045176636124,
+    "tabOrder": 5000
   },
   "visual": {
     "visualType": "slicer",
@@ -65,5 +65,23 @@
       ]
     },
     "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "82675e1bb952b54957a0",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "FCT_GEO_PERFORMANCE"
+              }
+            },
+            "Property": "STATE"
+          }
+        },
+        "type": "Categorical"
+      }
+    ]
   }
 }
