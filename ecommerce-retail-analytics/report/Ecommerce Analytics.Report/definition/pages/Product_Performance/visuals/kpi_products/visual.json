@@ -2,12 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.8.0/schema.json",
   "name": "kpi_products",
   "position": {
-    "x": 24,
-    "y": 100,
-    "z": 0,
-    "height": 120,
-    "width": 220,
-    "tabOrder": 2
+    "x": 24.313975108460777,
+    "y": 103.04494212633378,
+    "z": 4000,
+    "height": 167.8822090822292,
+    "width": 219.98358431464513,
+    "tabOrder": 1000
   },
   "visual": {
     "visualType": "card",
@@ -56,5 +56,23 @@
       ]
     },
     "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "32bd52ea31c649b789df",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "_Measures"
+              }
+            },
+            "Property": "Total Products"
+          }
+        },
+        "type": "Advanced"
+      }
+    ]
   }
 }

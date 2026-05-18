@@ -3,11 +3,11 @@
   "name": "days_inactive",
   "position": {
     "x": 620,
-    "y": 236,
-    "z": 0,
+    "y": 324,
+    "z": 3000,
     "height": 280,
     "width": 576,
-    "tabOrder": 7
+    "tabOrder": 6000
   },
   "visual": {
     "visualType": "barChart",
@@ -50,6 +50,23 @@
             }
           ]
         }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "_Measures"
+                  }
+                },
+                "Property": "Avg Days Since Last Order"
+              }
+            },
+            "direction": "Descending"
+          }
+        ]
       }
     },
     "visualContainerObjects": {

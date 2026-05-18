@@ -2,12 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.8.0/schema.json",
   "name": "kpi_top20_revenue",
   "position": {
-    "x": 496,
-    "y": 100,
-    "z": 0,
-    "height": 120,
-    "width": 220,
-    "tabOrder": 4
+    "x": 511.75128561617447,
+    "y": 103.04494212633378,
+    "z": 6000,
+    "height": 167.8822090822292,
+    "width": 219.98358431464513,
+    "tabOrder": 3000
   },
   "visual": {
     "visualType": "card",
@@ -56,5 +56,23 @@
       ]
     },
     "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "fc3853b9b886615a8f62",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "_Measures"
+              }
+            },
+            "Property": "Top 20% Revenue %"
+          }
+        },
+        "type": "Advanced"
+      }
+    ]
   }
 }

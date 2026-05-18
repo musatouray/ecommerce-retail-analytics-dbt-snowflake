@@ -3,11 +3,11 @@
   "name": "top_categories",
   "position": {
     "x": 680,
-    "y": 620,
-    "z": 0,
-    "height": 400,
+    "y": 708,
+    "z": 10000,
+    "height": 356,
     "width": 1200,
-    "tabOrder": 0
+    "tabOrder": 11000
   },
   "visual": {
     "visualType": "clusteredBarChart",
@@ -103,8 +103,71 @@
             }
           }
         }
+      ],
+      "dropShadow": [
+        {
+          "properties": {
+            "shadowDistance": {
+              "expr": {
+                "Literal": {
+                  "Value": "1D"
+                }
+              }
+            },
+            "color": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#E0E0E0'"
+                    }
+                  }
+                }
+              }
+            },
+            "shadowSpread": {
+              "expr": {
+                "Literal": {
+                  "Value": "1D"
+                }
+              }
+            }
+          }
+        }
       ]
     },
     "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "e1a66cf23239b4e28c93",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "FCT_CATEGORY_PERFORMANCE"
+              }
+            },
+            "Property": "PRODUCT_CATEGORY"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "d77694f2e9d77caa71fa",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "_Measures"
+              }
+            },
+            "Property": "Total Revenue"
+          }
+        },
+        "type": "Advanced"
+      }
+    ]
   }
 }

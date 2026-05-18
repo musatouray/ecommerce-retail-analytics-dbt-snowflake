@@ -3,11 +3,11 @@
   "name": "clv_table",
   "position": {
     "x": 24,
-    "y": 552,
-    "z": 0,
+    "y": 640,
+    "z": 3000,
     "height": 280,
     "width": 1172,
-    "tabOrder": 8
+    "tabOrder": 8000
   },
   "visual": {
     "visualType": "tableEx",

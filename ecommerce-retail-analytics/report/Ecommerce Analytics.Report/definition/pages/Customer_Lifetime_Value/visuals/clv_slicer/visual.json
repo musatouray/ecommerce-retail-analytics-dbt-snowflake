@@ -3,11 +3,11 @@
   "name": "clv_slicer",
   "position": {
     "x": 1500,
-    "y": 24,
-    "z": 0,
+    "y": 112,
+    "z": 2000,
     "height": 60,
     "width": 396,
-    "tabOrder": 1
+    "tabOrder": 0
   },
   "visual": {
     "visualType": "slicer",

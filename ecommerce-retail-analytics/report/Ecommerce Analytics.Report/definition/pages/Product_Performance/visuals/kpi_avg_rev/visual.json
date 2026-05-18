@@ -2,12 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.8.0/schema.json",
   "name": "kpi_avg_rev",
   "position": {
-    "x": 732,
-    "y": 100,
-    "z": 0,
-    "height": 120,
-    "width": 220,
-    "tabOrder": 5
+    "x": 757.20665337777848,
+    "y": 103.04494212633378,
+    "z": 2000,
+    "height": 167.8822090822292,
+    "width": 219.98358431464513,
+    "tabOrder": 4000
   },
   "visual": {
     "visualType": "card",
@@ -56,5 +56,23 @@
       ]
     },
     "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "a7cb9f408103ff2eea73",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "_Measures"
+              }
+            },
+            "Property": "Avg Revenue per Product"
+          }
+        },
+        "type": "Advanced"
+      }
+    ]
   }
 }

@@ -26,10 +26,11 @@
 ✅ Idempotency 
 ✅ Late-arriving data handling
 ✅ Backfill
+✅ SCD Type 2
 ✅ Implement Change Data Capture (CDC)
 ✅ Schema Evolution or Schema Drift
 ✅ Partitioning, clustering keys
-✅ Query optimization
+✅ Query optimization 
 ✅ Data Lineage Visualization (Using dbt)
 ✅ Power BI Dashboard
     ✅ DESIGN FRAMEWORK (docs/dashboard-design/)

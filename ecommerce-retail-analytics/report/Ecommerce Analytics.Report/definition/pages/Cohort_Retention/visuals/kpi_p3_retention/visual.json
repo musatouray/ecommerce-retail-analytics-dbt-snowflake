@@ -3,11 +3,11 @@
   "name": "kpi_p3_retention",
   "position": {
     "x": 496,
-    "y": 100,
-    "z": 0,
+    "y": 188,
+    "z": 3000,
     "height": 120,
     "width": 220,
-    "tabOrder": 3
+    "tabOrder": 2000
   },
   "visual": {
     "visualType": "card",

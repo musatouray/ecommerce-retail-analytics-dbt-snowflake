@@ -29,10 +29,12 @@ table FCT_COHORT_RETENTION
 		annotation UnderlyingDateTimeDataType = Date
 
 	column PERIOD_NUMBER
-		dataType: double
+		dataType: int64
 		lineageTag: 183845c4-16e6-42c6-9e7f-3e3566209a9e
 		summarizeBy: sum
 		sourceColumn: PERIOD_NUMBER
+
+		changedProperty = DataType
 
 		annotation SummarizationSetBy = Automatic
 
@@ -60,13 +62,12 @@ table FCT_COHORT_RETENTION
 
 	column RETENTION_RATE
 		dataType: double
+		formatString: 0.00
 		lineageTag: 8527d342-7f00-46a7-9c5a-05d84b8e27be
 		summarizeBy: sum
 		sourceColumn: RETENTION_RATE
 
 		annotation SummarizationSetBy = Automatic
-
-		annotation PBI_FormatHint = {"isGeneralNumber":true}
 
 	column CHURN_RATE
 		dataType: double

@@ -25,7 +25,7 @@ table FCT_DAILY_REVENUE_TIME_SERIES
 	column YEAR
 		dataType: double
 		lineageTag: a2fefd55-6608-41da-bdd7-3dd957b3e9da
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: YEAR
 
 		annotation SummarizationSetBy = Automatic
@@ -35,7 +35,7 @@ table FCT_DAILY_REVENUE_TIME_SERIES
 	column QUARTER_NUMBER
 		dataType: double
 		lineageTag: 75f2b378-0872-4dd7-ad8f-09734e26a529
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: QUARTER_NUMBER
 
 		annotation SummarizationSetBy = Automatic
@@ -45,7 +45,7 @@ table FCT_DAILY_REVENUE_TIME_SERIES
 	column MONTH
 		dataType: double
 		lineageTag: 4939b4bd-4d3f-4810-8b33-dc38884d0bb9
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: MONTH
 
 		annotation SummarizationSetBy = Automatic

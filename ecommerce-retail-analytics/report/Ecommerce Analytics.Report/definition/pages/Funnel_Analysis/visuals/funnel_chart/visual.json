@@ -3,11 +3,11 @@
   "name": "funnel_chart",
   "position": {
     "x": 24,
-    "y": 236,
-    "z": 0,
+    "y": 324,
+    "z": 1000,
     "height": 340,
     "width": 1172,
-    "tabOrder": 5
+    "tabOrder": 9000
   },
   "visual": {
     "visualType": "tableEx",

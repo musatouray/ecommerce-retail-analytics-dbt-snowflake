@@ -2,12 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.8.0/schema.json",
   "name": "kpi_churned",
   "position": {
-    "x": 496,
-    "y": 100,
-    "z": 0,
-    "height": 120,
-    "width": 220,
-    "tabOrder": 4
+    "x": 495.54196887720065,
+    "y": 157.461934035746,
+    "z": 5000,
+    "height": 150.5150840047572,
+    "width": 219.98358431464513,
+    "tabOrder": 3000
   },
   "visual": {
     "visualType": "card",

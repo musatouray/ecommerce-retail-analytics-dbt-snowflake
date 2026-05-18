@@ -28,7 +28,7 @@ table FCT_ORDERS
 	column ORDER_DATE_KEY
 		dataType: double
 		lineageTag: 440d2e17-04af-4c2f-9863-09f7a85e9c1c
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: ORDER_DATE_KEY
 
 		annotation SummarizationSetBy = Automatic

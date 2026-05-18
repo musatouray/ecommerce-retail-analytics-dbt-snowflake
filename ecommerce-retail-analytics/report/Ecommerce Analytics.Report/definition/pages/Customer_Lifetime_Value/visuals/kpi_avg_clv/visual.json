@@ -2,12 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.8.0/schema.json",
   "name": "kpi_avg_clv",
   "position": {
-    "x": 260,
-    "y": 100,
-    "z": 0,
-    "height": 120,
-    "width": 220,
-    "tabOrder": 3
+    "x": 260.50687616207978,
+    "y": 142.41042563527029,
+    "z": 4000,
+    "height": 165.56659240523291,
+    "width": 219.98358431464513,
+    "tabOrder": 2000
   },
   "visual": {
     "visualType": "card",

@@ -54,7 +54,7 @@ table FCT_ORDER_ITEMS
 	column ORDER_DATE_KEY
 		dataType: double
 		lineageTag: 575c141a-f7d4-4ffc-8515-07022b071ac9
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: ORDER_DATE_KEY
 
 		annotation SummarizationSetBy = Automatic

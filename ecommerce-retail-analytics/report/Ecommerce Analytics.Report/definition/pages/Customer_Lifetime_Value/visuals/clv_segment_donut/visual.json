@@ -3,11 +3,11 @@
   "name": "clv_segment_donut",
   "position": {
     "x": 24,
-    "y": 236,
-    "z": 0,
+    "y": 324,
+    "z": 1000,
     "height": 300,
     "width": 400,
-    "tabOrder": 6
+    "tabOrder": 5000
   },
   "visual": {
     "visualType": "donutChart",

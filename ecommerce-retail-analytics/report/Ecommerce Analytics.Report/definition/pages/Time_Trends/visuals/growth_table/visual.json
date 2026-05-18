@@ -2,12 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.8.0/schema.json",
   "name": "growth_table",
   "position": {
-    "x": 620,
-    "y": 552,
-    "z": 0,
-    "height": 280,
-    "width": 576,
-    "tabOrder": 8
+    "x": 1227.2768388080203,
+    "y": 783.84281143737746,
+    "z": 2000,
+    "height": 280.15718856262254,
+    "width": 653.00390291294661,
+    "tabOrder": 12000
   },
   "visual": {
     "visualType": "tableEx",

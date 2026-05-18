@@ -2,12 +2,12 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.8.0/schema.json",
   "name": "segment_table",
   "position": {
-    "x": 1216,
-    "y": 100,
-    "z": 0,
-    "height": 732,
-    "width": 680,
-    "tabOrder": 9
+    "x": 1215.6987554230388,
+    "y": 247.77098443860032,
+    "z": 7000,
+    "height": 672.68664466741484,
+    "width": 680.79130303690181,
+    "tabOrder": 8000
   },
   "visual": {
     "visualType": "tableEx",
@@ -143,79 +143,5 @@
       ]
     },
     "drillFilterOtherVisuals": true
-  },
-  "filterConfig": {
-    "filters": [
-      {
-        "name": "7c267effcdfeeaa1f8fc",
-        "field": {
-          "Column": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "FCT_RFM_SEGMENTS"
-              }
-            },
-            "Property": "RFM_SEGMENT"
-          }
-        },
-        "type": "Categorical"
-      },
-      {
-        "name": "43351d27d5e0fa348b22",
-        "field": {
-          "Measure": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "_Measures"
-              }
-            },
-            "Property": "RFM Total Customers"
-          }
-        },
-        "type": "Advanced"
-      },
-      {
-        "name": "8f95eeaf92debe528c8b",
-        "field": {
-          "Measure": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "_Measures"
-              }
-            },
-            "Property": "Avg Recency (Days)"
-          }
-        },
-        "type": "Advanced"
-      },
-      {
-        "name": "e82daf445a46d5cae966",
-        "field": {
-          "Measure": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "_Measures"
-              }
-            },
-            "Property": "Avg Frequency"
-          }
-        },
-        "type": "Advanced"
-      },
-      {
-        "name": "7377411e910f63deb09d",
-        "field": {
-          "Measure": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "_Measures"
-              }
-            },
-            "Property": "Avg Monetary"
-          }
-        },
-        "type": "Advanced"
-      }
-    ]
   }
 }
